@@ -70,12 +70,17 @@ def main(argv=None):
     rhash = run_hash(cfg_dict)
     print(f"[simcert] mode={cfg.mode} model={cfg.model_name} dataset={cfg.dataset_name} hash={rhash}")
 
+    ds_kwargs = {
+        k: v
+        for k, v in OmegaConf.to_container(cfg.dataset, resolve=True).items()
+        if k not in ("name", "val_frac", "test_frac")
+    }
     ds = load_dataset(
         cfg.dataset_name,
         seed=int(cfg.seed),
         val_frac=float(cfg.dataset.val_frac),
-        test_frac=float(cfg.dataset.test_frac),
-        n_per_class=int(cfg.dataset.get("n_per_class", 65)),
+        test_frac=float(cfg.dataset.get("test_frac", 0.2)),
+        **ds_kwargs,
     )
     print(f"[simcert] dataset: {ds.summary()}")
     vocab = build_vocab(ds.train)

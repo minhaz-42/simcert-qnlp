@@ -40,18 +40,27 @@ def audit_model(
 
     for ex in examples:
         # Each example decomposes into atomic auditable units; truncate every unit, then
-        # let the model's composition map the (truncated) per-unit expvals to a label.
+        # let the model's composition map the (truncated) per-unit info to a label.
         units = model.audit_units(ex)
         sweeps = [
             run_chi_sweep(u.qfunc(), u.n_qubits, u.observables, chi_values, cutoff) for u in units
         ]
-        full_preds.append(model.compose(ex, [s["full_expvals"] for s in sweeps]))
+        nqs = [u.n_qubits for u in units]
+        full_info = [
+            {"expvals": s["full_expvals"], "state": s["full_state"], "n_qubits": nq}
+            for s, nq in zip(sweeps, nqs)
+        ]
+        full_preds.append(model.compose(ex, full_info))
         entropies.append(
-            float(np.mean([max_bipartite_entropy(s["full_state"], u.n_qubits)
-                           for s, u in zip(sweeps, units)]))
+            float(np.mean([max_bipartite_entropy(s["full_state"], nq)
+                           for s, nq in zip(sweeps, nqs)]))
         )
         for k in keys:
-            preds_by_key[k].append(model.compose(ex, [s["sweep"][k]["expvals"] for s in sweeps]))
+            info = [
+                {"expvals": s["sweep"][k]["expvals"], "state": s["sweep"][k]["state"], "n_qubits": nq}
+                for s, nq in zip(sweeps, nqs)
+            ]
+            preds_by_key[k].append(model.compose(ex, info))
             fid_by_key[k].append(float(np.mean([s["sweep"][k]["fidelity"] for s in sweeps])))
 
     full_preds = np.array(full_preds)

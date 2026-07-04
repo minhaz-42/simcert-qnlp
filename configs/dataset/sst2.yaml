@@ -1,0 +1,7 @@
+# SST-2 (real sentiment). Small balanced subset at simulator scale (like the QNLP papers).
+name: sst2
+n_train: 600      # balanced subset of the SST-2 train split
+n_test: 200       # from the labelled validation split (SST-2 test has no gold labels)
+max_tokens: 16    # cap sequence length for per-token models
+val_frac: 0.15
+test_frac: 0.0    # ignored; test comes from the SST-2 validation split

@@ -118,7 +118,9 @@ def run_chi_sweep(
             psi = truncate_state_to_bond_dim(psi_full, n_qubits, int(chi), cutoff)
             fid = state_fidelity(psi_full, psi)
         ev = np.array([pauli_expval(psi, n_qubits, o) for o in observables])
-        sweep[_chi_key(chi)] = {"chi": chi, "expvals": ev, "fidelity": fid}
+        # keep the (truncated) state too: mixed-state models (QMSAN) need it to form
+        # reduced density matrices; pure-state models just read `expvals`.
+        sweep[_chi_key(chi)] = {"chi": chi, "expvals": ev, "fidelity": fid, "state": psi}
 
     return {
         "n_qubits": n_qubits,

@@ -76,9 +76,15 @@ class QNLPModel(ABC):
         """Atomic auditable circuits for one example (default: the single circuit)."""
         return self.export_circuits([example])
 
-    def compose(self, example, unit_expvals: list[np.ndarray]) -> int:
-        """Map the units' expectation values to one label (default: single-unit head)."""
-        return self.decision_from_expvals(unit_expvals[0])
+    def compose(self, example, units: list[dict]) -> int:
+        """Map the units' audit info to one label (default: single-unit head).
+
+        ``units`` is a list aligned with ``audit_units``; each element is a dict
+        ``{"expvals": np.ndarray, "state": np.ndarray, "n_qubits": int}`` for the
+        current bond dimension. Pure-state models read ``expvals``; mixed-state
+        models (QMSAN) form reduced density matrices from ``state``.
+        """
+        return self.decision_from_expvals(units[0]["expvals"])
 
     @abstractmethod
     def save(self, path) -> None: ...

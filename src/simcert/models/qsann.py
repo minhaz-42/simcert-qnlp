@@ -237,13 +237,14 @@ class QSANN(QNLPModel):
 
         return qf
 
-    def compose(self, example, unit_expvals: list[np.ndarray]) -> int:
+    def compose(self, example, units: list[dict]) -> int:
         """Classical GPQSA head over the (possibly truncated) per-token expvals."""
         toks = example.tokens or ["<unk>"]
         s_n = len(toks)
-        zq = [float(np.asarray(unit_expvals[3 * t])[0]) for t in range(s_n)]
-        zk = [float(np.asarray(unit_expvals[3 * t + 1])[0]) for t in range(s_n)]
-        o = [np.asarray(unit_expvals[3 * t + 2], dtype=float) for t in range(s_n)]
+        ev = [np.asarray(u["expvals"], dtype=float) for u in units]
+        zq = [float(ev[3 * t][0]) for t in range(s_n)]
+        zk = [float(ev[3 * t + 1][0]) for t in range(s_n)]
+        o = [ev[3 * t + 2] for t in range(s_n)]
         x = [self._x_torch(t).detach().cpu().numpy() for t in toks]
         w = self.w.detach().cpu().numpy()
         b = float(self.b.detach().cpu())

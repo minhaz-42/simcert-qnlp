@@ -1,0 +1,9 @@
+# QMSAN — Quantum Mixed-State Self-Attention (arXiv:2403.02871), NP variant, MC scale.
+# Query/key are reduced density matrices (partial-trace last n/2 qubits); attention = tr(rho.sigma).
+n_qubits: 2       # MC=2, RP/sentiment=4
+layers: 1
+emb_std: 0.3      # word->x_s embedding init (paper leaves the embedding unspecified)
+epochs: 40
+lr: 0.05
+published_accuracy: 1.0   # QMSAN reports 100% on MC (75.6% on RP is the headline claim)
+baseline: logreg_bow

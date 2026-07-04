@@ -56,11 +56,22 @@ def load_dataset(
         from .datasets import mc
 
         pairs = mc.generate(n_per_class=kwargs.get("n_per_class", 65), seed=seed)
-        n_classes = 2
-    else:
-        raise ValueError(f"unknown dataset {name!r} (available: 'mc')")
-    train, val, test = _split(pairs, val_frac, test_frac, seed)
-    return Dataset(name=name, train=train, val=val, test=test, n_classes=n_classes)
+        train, val, test = _split(pairs, val_frac, test_frac, seed)
+        return Dataset(name=name, train=train, val=val, test=test, n_classes=2)
+    if name == "sst2":
+        from .datasets import sst2
+
+        train_pairs, test_pairs = sst2.load_splits(
+            n_train=kwargs.get("n_train", 600),
+            n_test=kwargs.get("n_test", 200),
+            max_tokens=kwargs.get("max_tokens", 16),
+            seed=seed,
+        )
+        # dataset provides its own train/test; carve val out of train (test_frac ignored)
+        train, val, _ = _split(train_pairs, val_frac, 0.0, seed)
+        test = [TextExample(t, int(l)) for t, l in test_pairs]
+        return Dataset(name=name, train=train, val=val, test=test, n_classes=2)
+    raise ValueError(f"unknown dataset {name!r} (available: 'mc', 'sst2')")
 
 
 def build_vocab(examples: list[TextExample], min_freq: int = 1) -> dict[str, int]:

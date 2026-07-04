@@ -44,3 +44,7 @@ simcert_anon_code.zip
 paper/*.log
 paper/*.aux
 paper/*.out
+
+# arXiv build artifacts
+/arxiv/
+/arxiv_submission.tar.gz

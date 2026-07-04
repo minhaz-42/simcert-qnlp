@@ -36,3 +36,6 @@ data/**
 
 # reference PDFs: keep local for reading, don't bloat the repo (index is in references/README.md)
 references/pdfs/
+
+# anonymized snapshot artifact (regenerate via scripts/make_anon_snapshot.sh)
+simcert_anon_code.zip

@@ -1,30 +1,33 @@
-% SimCert -- paper draft. Written to TMLR norms (single column, ~12pp, unlimited appendix,
-% double-blind). For submission, swap this preamble for the official tmlr.sty. A short
-% non-archival abstract for QTML 2026 is in abstract_qtml.tex.
+% SimCert -- TMLR submission (official tmlr.sty; anonymous/double-blind by default).
+% For camera-ready: \usepackage[accepted]{tmlr}. For a de-anonymised preprint: [preprint].
+% A non-archival QTML 2026 abstract is in abstract_qtml.tex.
 % Style constraints honored: no bullet lists, no em dashes.
-\documentclass[11pt]{article}
-\usepackage[letterpaper,margin=1in]{geometry}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
+\documentclass[10pt]{article}
+\usepackage{tmlr}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{xcolor}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
-\usepackage{natbib}
 \usepackage{tikz}
 \usetikzlibrary{fit,backgrounds,positioning,arrows.meta,shapes.geometric,decorations.pathreplacing,calc}
 \usepackage{quantikz}
-\usepackage[hidelinks]{hyperref}
+\usepackage{hyperref}
+\usepackage{url}
 \graphicspath{{../figures/}}
 
 \newtheorem*{result}{Result (informal)}
 \newcommand{\chistar}{\ensuremath{\chi^\star}}
 
-\title{\textbf{\textsc{SimCert}: A Classical-Simulability Audit of\\ Trained Quantum-NLP Text Classifiers}}
-\author{Anonymous author(s)\\\small Submission under double-blind review}
-\date{}
+\title{\textsc{SimCert}: A Classical-Simulability Audit of\\ Trained Quantum-NLP Text Classifiers}
+
+\author{\name Tanvir Ahmed \email tanvir.ahmed32@northsouth.edu \\
+       \addr North South University, Dhaka, Bangladesh}
+
+\def\month{07}
+\def\year{2026}
+\def\openreview{\url{https://openreview.net/forum?id=XXXX}}
 
 \begin{document}
 \maketitle
@@ -96,22 +99,29 @@ and the open questions we think follow.
 
 \section{Related work}
 \label{sec:related}
-Our closest relatives are recent audits of QML in other domains. \citet{bowles2024} benchmark
-twelve QML models across many tabular datasets, match them against out-of-the-box classical
-baselines, and find that removing entanglement rarely hurts; we adopt their entanglement-removal
-ablation and their discipline of scoping every claim to the tested regime. \citet{bermejo2024}
-show that trained quantum convolutional networks are effectively classically simulable by
-propagating low-weight observables, which is the vision-domain analogue of the question we ask for
-text. The theoretical basis for treating a trained variational model as a matrix product state is
-due to \citet{shin2024}, and \citet{cerezo2025} argue that the very structure making such models
-trainable, the absence of barren plateaus, tends to make them classically simulable; our bond
-dimension criterion is the operational instrument these results invite. On the QNLP side, the
-models we audit are the compositional DisCoCat framework \citep{lorenz2021}, the Gaussian-projected
-and mixed-state quantum self-attention networks \citep{li2022,chen2024}, and the all-quantum token
-mixer \citep{claqs2025}; each reports an accuracy comparison against a classical network, and none
-reports a classical surrogate of its own trained circuit. We read our results as extending the
-tabular and vision audits to language, and as agreeing with them, rather than as a challenge to any
-individual QNLP paper.
+Our closest relatives are recent audits of quantum machine learning in other domains.
+\citet{bowles2024} benchmark twelve QML models across many tabular datasets, match them against
+out-of-the-box classical baselines, and find that removing entanglement rarely hurts; we adopt
+their entanglement-removal ablation and their discipline of scoping every claim to the tested
+regime. \citet{bermejo2024} show that trained quantum convolutional networks are effectively
+classically simulable by propagating low-weight observables, the vision-domain analogue of the
+question we ask for text. The theoretical footing is that a trained variational model is a
+constrained matrix product state \citep{shin2024}, and that the very structure making such models
+trainable, the absence of barren plateaus, tends to make them classically simulable
+\citep{cerezo2025}; our bond-dimension criterion is the operational instrument these results
+invite. Our two auxiliary witnesses come from the same program: the geometric difference between
+quantum and classical kernels \citep{huang2021} and the Fourier spectrum accessible to a
+data-reuploading encoding \citep{schuld2021}.
+
+On the QNLP side, the models we audit are the compositional DisCoCat framework \citep{lorenz2021},
+the Gaussian-projected and mixed-state quantum self-attention networks \citep{li2022,chen2024}, and
+the all-quantum token mixer \citep{claqs2025}. Each reports an accuracy comparison against a
+classical network, and none reports a classical surrogate of its own trained circuit, which is the
+gap we fill. What is new here is not the idea of a simulability audit but its first application to
+language, where the circuits are structurally unlike the tabular and vision cases (compositional
+cups, attention, and mixed states), and its packaging as a reusable protocol and harness rather
+than a one-off study. We read our results as extending the tabular and vision audits to language,
+and as agreeing with them, rather than as a challenge to any individual QNLP paper.
 
 \section{What a simulability audit can and cannot tell us}
 \label{sec:epistemics}
@@ -406,7 +416,10 @@ every input. \chistar\ is defined against a tolerance, and while we check robust
 a different tolerance shifts the borderline cases. Our simulability notion is the practical one, up
 to data loading, not a hardness result. The scales are small, and although the point of the scaling
 study is that they need not be large for the pattern to appear, a determined optimum at larger $n$
-remains out of simulation's reach. Finally, the all-quantum mixer runs at reduced scale on a CPU. A
+remains out of simulation's reach. Our reimplementations also fall short of the published accuracies
+on \textsc{rp}, so for those models we audit weaker instances than the originals, though the verdict
+concerns the circuits we actually trained rather than the published ones. Finally, the all-quantum
+mixer runs at reduced scale on a CPU. A
 faithful full-scale reproduction of its published accuracy would need a GPU, and it is the one
 experiment here we could not run.\footnote{This is also the only place additional compute would
 change what we can measure, since the rest of the audit is CPU-bound by design.}
@@ -429,7 +442,6 @@ scripts that regenerate every figure and table from stored results are released 
 repository above. The audit is deterministic given a trained model, and the only stochasticity is in
 training, which we control by seed.
 
-\bibliographystyle{plainnat}
 \begin{thebibliography}{99}
 \small
 \bibitem[Bowles et al.(2024)]{bowles2024} J.~Bowles, S.~Ahmed, and M.~Schuld. Better than classical?

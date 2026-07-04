@@ -1,41 +1,40 @@
-% Fig 1: the audited pipeline (classical/quantum stages) + the SimCert audit below it.
+% Fig 1: two-track schematic. Top = trained quantum model; bottom = classical MPS surrogate that
+% replaces the quantum core; linked by an equivalence. Minimal, paper-friendly palette.
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[
-  font=\small, >=Latex, node distance=5mm and 5mm,
-  cl/.style={draw=blue!55, thick, rounded corners=2pt, fill=blue!10, minimum height=9mm, align=center, inner sep=4pt},
-  qu/.style={draw=orange!75!black, thick, rounded corners=2pt, fill=orange!18, minimum height=9mm, align=center, inner sep=4pt},
-  au/.style={draw=teal!70!black, thick, rounded corners=3pt, fill=teal!10, align=center, inner sep=6pt},
+  font=\small, >=Latex,
+  n/.style={draw=black!40, rounded corners=2pt, minimum height=8.5mm, minimum width=13mm, inner sep=2pt, fill=black!4, align=center},
+  q/.style={draw=blue!55!black, line width=0.7pt, rounded corners=3pt, minimum height=10mm, minimum width=34mm, inner sep=2pt, fill=blue!9, align=center},
+  c/.style={draw=teal!60!black, line width=0.7pt, rounded corners=3pt, minimum height=10mm, minimum width=34mm, inner sep=2pt, fill=teal!12, align=center},
+  lbl/.style={black!55, font=\itshape\footnotesize, align=right},
 ]
-% --- model row ---
-\node (x) {$x$};
-\node[cl, right=of x] (emb) {embed};
-\node[qu, right=of emb] (enc) {encode\\$U_{\mathrm enc}(x)$};
-\node[qu, right=3mm of enc] (ent) {entangle\\$U(\theta)$};
-\node[qu, right=3mm of ent] (meas) {measure\\$\langle P\rangle$};
-\node[cl, right=of meas] (head) {head};
-\node[right=of head] (y) {$\hat y$};
-\foreach \a/\b in {x/emb, emb/enc, enc/ent, ent/meas, meas/head, head/y} \draw[->] (\a)--(\b);
-% brace over the quantum core
-\draw[decorate, decoration={brace, amplitude=5pt}, orange!75!black, thick]
-  ([yshift=2mm]enc.north west) -- ([yshift=2mm]meas.north east)
-  node[midway, above=5pt, black]{\scriptsize quantum core ($n$ qubits): $|\psi_\theta(x)\rangle$};
-% --- audit row ---
-\node[au, below=13mm of ent, xshift=6mm] (audit)
-  {\textbf{\textsc{SimCert} audit}\\[2pt]
-   re-simulate $|\psi_\theta(x)\rangle$ as a bond-dimension-$\chi$ MPS;\\
-   sweep $\chi=1,2,4,\dots$};
-\draw[->, thick, teal!70!black] ([xshift=3mm]meas.south) |- (audit.east);
-\node[right=6mm of audit, align=left] (verdict)
-  {recovered prediction $\hat y^{(\chi)}$\\ matches $\hat y$ at $\chi^\star\!\le 2$\\ \scriptsize(for every audited model)};
-\draw[->, teal!70!black] (audit) -- (verdict);
-% (colors are explained in the caption: blue = classical, orange = quantum core, teal = audit)
+% ---- top track: trained quantum model ----
+\node (x1) {$x$};
+\node[n, right=4mm of x1] (e1) {embed};
+\node[q, right=5mm of e1] (qc) {quantum core\\[-1pt]$U_{\mathrm enc}(x)\,U(\theta)\to\langle P\rangle$};
+\node[n, right=5mm of qc] (h1) {head};
+\node[right=4mm of h1] (y1) {$\hat y$};
+\foreach \a/\b in {x1/e1,e1/qc,qc/h1,h1/y1} \draw[->] (\a)--(\b);
+\node[lbl, left=3mm of x1] {trained\\quantum\\model};
+% ---- bottom track: classical surrogate ----
+\node[below=16mm of x1] (x2) {$x$};
+\node[n, right=4mm of x2] (e2) {embed};
+\node[c, right=5mm of e2] (mp) {classical MPS surrogate\\[-1pt]bond dimension $\chi$};
+\node[n, right=5mm of mp] (h2) {head};
+\node[right=4mm of h2] (y2) {$\hat y^{(\chi)}$};
+\foreach \a/\b in {x2/e2,e2/mp,mp/h2,h2/y2} \draw[->] (\a)--(\b);
+\node[lbl, left=3mm of x2] {\textsc{SimCert}\\surrogate};
+% ---- equivalence between the two cores ----
+\draw[<->, thick, dashed, black!55] (qc) -- (mp);
+\node[right=1.5mm, align=left, font=\scriptsize, black!70] at ($(qc)!0.5!(mp)$)
+  {truncate to bond $\chi$,\\ then $\hat y^{(\chi)}\!=\hat y$ for $\chi^\star\!\le 2$};
 \end{tikzpicture}
-\caption{A trained QNLP classifier (top) threads a sentence
-$x$ through a classical embedding (blue), a quantum core (orange: encode, entangle, measure) that
-prepares $|\psi_\theta(x)\rangle$, and a classical head, producing a label $\hat y$.
-\textsc{SimCert} (bottom, teal) replaces the quantum core with a classical matrix-product-state
-surrogate of bond dimension $\chi$ and sweeps $\chi$ to find the smallest value that still recovers
-the model's own predictions. For every audited model that value is $1$ or $2$.}
+\caption{\textsc{SimCert} at a glance. A trained quantum-NLP classifier (top) embeds a sentence
+$x$, runs a quantum core that prepares $|\psi_\theta(x)\rangle$ and reads out Pauli expectations,
+and applies a classical head to obtain a label $\hat y$. \textsc{SimCert} replaces the quantum core
+with a classical matrix-product-state surrogate of bond dimension $\chi$ (bottom) and asks how small
+$\chi$ can be before the recovered label $\hat y^{(\chi)}$ changes. For every audited model the two
+tracks agree already at $\chi^\star\le 2$.}
 \label{fig:pipeline}
 \end{figure}

@@ -27,11 +27,12 @@
 \node[grp, fit=(T0)(T3), red!55!black] (Tbox) {};
 \node[red!55!black, above=1pt of Tbox.north] {\scriptsize basis $\mathbf{T}(x)$};
 
-% ===== basis-equivalence arrow =====
-\node (sim) at (2.55,-1.4*\dy) {$\underset{\text{\scriptsize basis-equivalent}}{\sim}$};
+% ===== basis-equivalence arrow (centred in the widened gap) =====
+\node (sim) at (3.15,{-\dy*1.5}) {\large$\sim$};
+\node[below=-1pt of sim, font=\scriptsize, align=center] {basis-equivalent};
 
 % ===== classical side: bond-chi classical MPS x same basis =====
-\begin{scope}[shift={(4.0,0)}]
+\begin{scope}[shift={(5.0,0)}]
   \foreach \k in {0,1,2,3}{
     \node[cmps] (C\k) at (0, -\dy*\k) {};
     \node[tri]  (U\k) at (1.4, -\dy*\k) {};

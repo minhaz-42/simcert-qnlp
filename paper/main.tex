@@ -14,6 +14,9 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{natbib}
+\usepackage{tikz}
+\usetikzlibrary{fit,backgrounds,positioning,arrows.meta}
+\usepackage{quantikz}
 \usepackage[hidelinks]{hyperref}
 \graphicspath{{../figures/}}
 
@@ -50,6 +53,7 @@ the findings as a protocol and a set of questions for QNLP model and benchmark d
 \end{abstract}
 
 \section{Introduction}
+\label{sec:intro}
 Because fault-tolerant quantum hardware is not yet available, most claims in quantum machine
 learning (QML) are established by classical simulation of small circuits, and quantum NLP
 inherits this practice. A steady stream of QNLP models reports accuracy gains on text
@@ -59,15 +63,15 @@ recently, fully-quantum token mixers~\citep{claqs2025}. The reported numbers are
 usually left implicit is the inference the reader is invited to draw---that the \emph{quantum}
 structure is doing the work.
 
-That inference is testable, and it is tested surprisingly rarely. Surveying recent QNLP papers
-that claim a quantum benefit on text, we find that the large majority compare against classical
-\emph{networks} of matched size but not against a classical \emph{simulation of their own
-circuit}---the one baseline that would isolate whether the quantum resource, rather than the
+That inference is testable, and it is tested surprisingly rarely. Across the QNLP
+text-classification papers we examined (Appendix~\ref{app:survey}), models are compared against
+classical \emph{networks} of matched size but not against a classical \emph{simulation of their
+own circuit}---the one baseline that would isolate whether the quantum resource, rather than the
 surrounding classical machinery or the trainable parameters, is responsible.\footnote{We count
 a paper as testing simulability only if it reports a classical surrogate of the trained circuit
 (tensor-network contraction, Pauli propagation, or an explicit entanglement-removal ablation),
-not merely a separately-trained classical baseline. The exact search and inclusion criteria are
-in Appendix~\ref{app:survey}.} The same gap was recently closed for tabular
+not merely a separately-trained classical baseline. This is a focused review, not a saturated
+systematic survey; scope and counts are in Appendix~\ref{app:survey}.} The same gap was recently closed for tabular
 QML~\citep{bowles2024} and for quantum convolutional networks~\citep{bermejo2024}, with the
 theoretical footing that trainable variational models are constrained matrix product states
 (MPS)~\citep{shin2024} and that the absence of barren plateaus tends to imply classical
@@ -118,6 +122,7 @@ the empirical one that current QNLP papers implicitly answer in the affirmative.
 
 \section{Framework and definitions}
 \label{sec:framework}
+\input{figs/fig_pipeline.tex}
 \paragraph{Setup.} A QNLP text classifier maps an input $x$ (a sentence, or a sequence of
 token embeddings) to a trained circuit that prepares a state $|\psi_\theta(x)\rangle$ on $n$
 qubits, from which a readout---a set of Pauli expectation values, possibly followed by a small
@@ -132,6 +137,7 @@ state~\citep{cerezo2025,shin2024}. Our surrogate is an MPS, which realizes CSIM 
 required bond dimension is small; we make no claim about regimes where it is not. Every claim
 below is of the form ``simulable at bond dimension up to $\chi$, at these model sizes, on these
 datasets.''
+\input{figs/fig_venn.tex}
 
 \paragraph{The bond-dimension criterion.} For a trained state we form its optimal
 bond-dimension-$\chi$ MPS approximation $|\psi^{(\chi)}\rangle$ by sequential singular-value
@@ -198,6 +204,8 @@ reduced density matrices. Full circuits, gate sets, and parameter counts are in
 Appendix~\ref{app:circuits}.}
 \label{tab:models}
 \end{table}
+
+\input{figs/fig_circuit.tex}
 
 \paragraph{Datasets.} We use the tasks these models were built on. \textsc{mc} (meaning
 classification, cooking vs.\ computing) and \textsc{rp} (a relative-pronoun task) are the
@@ -411,17 +419,8 @@ mixer for text classification. \emph{arXiv:2510.06532}, 2025.
 \end{thebibliography}
 
 \appendix
-\section{Literature-survey methodology}\label{app:survey}
-\emph{To be completed:} search terms, date cutoff, inclusion/exclusion counts, and the
-selection-bias check for the motivating survey in Section~1.
-\section{Model circuits and glossary}\label{app:circuits}
-\emph{To be completed:} per-model ansätze (gate glyphs, repeated-block notation), the
-mixed-state purification path for \texttt{qmsan}, and a glossary keying physics terms for NLP
-readers.
-\section{Datasets and preprocessing}\label{app:data}
-\emph{To be completed:} sizes, splits, token-embedding construction, and the exact released
-indices.
-\section{Configurations and compute}\label{app:configs}
-\emph{To be completed:} hyperparameters per model, seeds, wall-clock/RAM, and the tolerance
-robustness study for \chistar.
+\input{appendix/A_survey.tex}
+\input{appendix/B_circuits.tex}
+\input{appendix/C_data.tex}
+\input{appendix/D_configs.tex}
 \end{document}

@@ -1,0 +1,30 @@
+\section{Datasets and preprocessing}\label{app:data}
+\paragraph{MC (meaning classification).} We use two variants. \textsc{mc-real} is the Lorenz
+et al.\ set (70 train / 30 dev / 30 test; 17-word vocabulary; 3--4 word cooking-vs-computing
+sentences), obtained from the authors' public resources repository; POS tags are stripped
+(\texttt{word\_N}$\to$\texttt{word}) since our bag-of-token models do not use them and the
+DisCoCat reader re-parses. \textsc{mc-synth} is a self-contained stand-in generated from disjoint
+food/IT subject--verb--object templates (65 per class), used only for the controlled scaling
+study; being disjoint-vocabulary it is near-linearly-separable, which is why every model
+saturates on it.
+
+\paragraph{RP (relative pronoun).} The Lorenz et al.\ RELPRON-derived set (74 train / 31 test;
+115-word vocabulary; four-token noun phrases), distinguishing subject- from object-relative
+clauses. We carve a 20\% validation split from train. RP is the discriminating benchmark and,
+with only 74 training items, the fragile one---the original papers note near-degenerate behaviour
+here, which we reproduce.
+
+\paragraph{SST-2.} A balanced subset of the Stanford Sentiment Treebank binary task
+(600 train / 200 test, drawn from the train and labelled-validation splits respectively via the
+HuggingFace datasets server), sequence length capped at 16 tokens. A genuinely non-separable,
+real-text task; accuracies here are in the 0.5--0.65 range, not saturated.
+
+\paragraph{Embeddings and tokenisation.} For \texttt{qsann}, \texttt{qmsan}, \texttt{claqs}, and
+\texttt{vqc\_text} we use a trainable per-token embedding (dimension equal to the model's feature
+width); \texttt{vqc\_text} averages token embeddings (bag-of-embeddings), the attention models
+keep per-token vectors, and \texttt{claqs} maps each token embedding through a trainable linear
+layer to ansatz-14 angles. DisCoCat does not use embeddings: each word's parameters \emph{are}
+its gate angles, trained via the \texttt{lambeq} pipeline with the offline \texttt{cups\_reader}
+(the trained Bobcat grammar parser's model host is no longer reachable, an acknowledged fidelity
+cost on RP). Splits are seed-stable; the exact indices and the synthetic generator are released
+with the harness so every split is reproducible.

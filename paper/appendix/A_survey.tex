@@ -1,0 +1,43 @@
+\section{Literature-review methodology}\label{app:survey}
+The motivating claim in Section~\ref{sec:intro}---that QNLP text-classification papers argue a
+quantum benefit from accuracy but rarely test whether the \emph{trained circuit} is classically
+simulable---rests on a focused review, not an exhaustive systematic survey; we scope it honestly
+here.
+
+\paragraph{Search and inclusion.} We searched arXiv (\texttt{quant-ph}, \texttt{cs.CL}) and
+Semantic Scholar for the conjunctions of \{``quantum''\} with \{``natural language
+processing'', ``text classification'', ``self-attention'', ``sentence classification''\} over
+2019--2025, and followed citations from the models we reimplement. We include a paper if it (i)
+proposes a quantum or hybrid model for a text-classification task and (ii) reports an accuracy
+comparison. We record, for each, whether it reports a \emph{classical surrogate of the trained
+circuit}---a tensor-network contraction, Pauli-propagation estimate, or an explicit
+entanglement-removal ablation---as opposed to merely a separately-trained classical network of
+comparable size.
+
+\paragraph{What we found.} Table~\ref{tab:survey} lists the core set. All report a classical
+\emph{network} baseline; none report a classical surrogate of their own trained circuit, and
+none report the bond dimension, entanglement, or a simulability check of the trained model. This
+is the gap \textsc{SimCert} fills. We stress the limits: this is a focused review of the papers
+central to this study plus those surfaced by the searches above, not a saturated systematic
+survey, and we did not attempt inter-rater agreement. We therefore phrase the claim in the main
+text as scoped to ``the papers we examined,'' and treat a full systematic survey (with
+pre-registered search strings and dual coding, in the style of the tabular-QML audit of
+\citealp{bowles2024}) as future work.
+
+\begin{table}[h]
+\centering\small
+\begin{tabular}{lccc}
+\toprule
+Paper & classical-network baseline & trained-circuit surrogate & reports $\chi$ / entanglement \\
+\midrule
+DisCoCat / \texttt{lambeq} \citep{lorenz2021} & --\,$^{a}$ & no & no \\
+\texttt{QSANN} \citep{li2022} & yes & no & no \\
+\texttt{QMSAN} \citep{chen2024} & yes & no & no \\
+\texttt{CLAQS} \citep{claqs2025} & yes & no & no \\
+\bottomrule
+\end{tabular}
+\caption{Core reviewed set. $^{a}$DisCoCat compares to a bag-of-words/word-sequence baseline
+rather than a matched network. None reports a classical surrogate of the trained circuit or a
+simulability diagnostic.}
+\label{tab:survey}
+\end{table}

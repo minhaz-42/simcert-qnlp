@@ -1,0 +1,18 @@
+% Fig: representative ansatz (data re-uploading + entangling chain), drawn with quantikz.
+\begin{figure}[t]
+\centering
+\begin{quantikz}[column sep=7pt, row sep=10pt]
+\lstick{$\ket{0}$} & \gate{R_y(x_1)} & \gate{R_y(\theta_1)} & \ctrl{1} & \qw      & \gate{R_z(\phi_1)} & \meter{$Z$} \\
+\lstick{$\ket{0}$} & \gate{R_y(x_2)} & \gate{R_y(\theta_2)} & \targ{}  & \ctrl{1} & \gate{R_z(\phi_2)} & \qw \\
+\lstick{$\ket{0}$} & \gate{R_y(x_3)} & \gate{R_y(\theta_3)} & \qw      & \targ{}  & \gate{R_z(\phi_3)} & \qw
+\end{quantikz}
+\caption{\textbf{Representative variational ansatz} (the reference classifier; the attention
+and mixer models use the same primitives). Each input feature is angle-encoded ($R_y(x_i)$),
+followed by a trainable layer ($R_y(\theta_i)$), a CNOT entangling chain, and a trainable
+$R_z(\phi_i)$. The block repeats $L$ times with the data re-uploaded each layer, and the class
+is read from $\langle Z_0\rangle$. The audit forms the bond-dimension-$\chi$ MPS approximation
+of the state prepared \emph{just before} measurement. Per-model circuits (including
+\texttt{qmsan}'s mixed-state readout and \texttt{claqs}'s LCU/QSVT block) are in
+Appendix~\ref{app:circuits}.}
+\label{fig:circuit}
+\end{figure}

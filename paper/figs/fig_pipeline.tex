@@ -1,0 +1,43 @@
+% Fig: the audited QNLP pipeline + the quantum/classical boundary + the surrogate equivalence.
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  box/.style={draw, rounded corners, minimum height=8mm, align=center, inner sep=3pt},
+  cbox/.style={box, fill=blue!6},
+  qbox/.style={box, fill=orange!12},
+  sbox/.style={box, fill=green!8},
+  >=latex
+]
+% top row: the trained model
+\node[align=center] (x) {sentence\\$x$};
+\node[cbox, right=6mm of x] (emb) {classical\\embed};
+\node[qbox, right=6mm of emb] (enc) {encode\\$U_{\mathrm enc}(x)$};
+\node[qbox, right=4mm of enc] (ent) {entangle\\$U(\theta)$};
+\node[qbox, right=4mm of ent] (meas) {measure\\$\langle P\rangle$};
+\node[cbox, right=6mm of meas] (head) {classical\\head};
+\node[right=6mm of head, align=center] (y) {label\\$\hat y$};
+\draw[->] (x) -- (emb);
+\draw[->] (emb) -- (enc);
+\draw[->] (enc) -- (ent);
+\draw[->] (ent) -- (meas);
+\draw[->] (meas) -- (head);
+\draw[->] (head) -- (y);
+% quantum-core bracket
+\begin{scope}[on background layer]
+\node[draw, dashed, rounded corners, fit=(enc)(ent)(meas), inner sep=5pt, label=above:{\itshape quantum core}] (qc) {};
+\end{scope}
+% surrogate row
+\node[sbox, below=12mm of ent] (mps) {classical MPS surrogate\\bond dimension $\chi$};
+\draw[->, thick] (qc.south) -- node[right, pos=0.45]{truncate} (mps.north);
+\node[right=6mm of mps, align=left] (eq) {$\hat y^{(\chi)}\!\approx\hat y$ \; already at\\ small $\chi$ ($1$ or $2$)};
+\draw[->] (mps) -- (eq);
+\end{tikzpicture}
+\caption{\textbf{What the audit interrogates.} A trained QNLP classifier (top) threads a
+sentence through a classical embedding, a \emph{quantum core} (encode $\to$ entangle $\to$
+measure), and a classical head. \textsc{SimCert} replaces the quantum core with a classical
+matrix-product-state surrogate of bond dimension $\chi$ (bottom) and asks how small $\chi$ can
+be before the model's predictions change. For every audited model the answer is small and
+constant: the surrogate reproduces the predictions at $\chi{=}1$ (a product state) or $\chi{=}2$.}
+\label{fig:pipeline}
+\end{figure}

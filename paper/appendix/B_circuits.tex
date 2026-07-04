@@ -1,0 +1,53 @@
+\section{Model circuits and glossary}\label{app:circuits}
+All models are reimplemented in PennyLane; \texttt{lambeq} produces the DisCoCat circuits. We
+give each model's trained state below; the audit truncates that state (Algorithm~\ref{alg:audit}).
+
+\paragraph{\texttt{vqc\_text} (reference).} Bag-of-embeddings feature $x\in\mathbb{R}^{n}$
+angle-encoded on $n$ qubits, $L$ layers of $R_y(x_i)$ (re-uploaded), trainable $R_y,R_z$, and a
+CNOT ring; readout $\langle Z_0\rangle$ (Fig.~\ref{fig:circuit}).
+
+\paragraph{\texttt{QSANN} (Gaussian-projected quantum self-attention).} Per token, the same
+strongly-entangling template ($H^{\otimes n}$, then $R_x/R_y$ layers with CNOT chains) prepares
+$|\psi_s\rangle=U_{\mathrm enc}(x_s)H^{\otimes n}|0\rangle$; three trainable ansätze
+$U_q,U_k,U_v$ give a query scalar $\langle Z_0\rangle$, a key scalar, and a $d$-dimensional value
+vector of single-qubit Pauli expectations. Attention $\alpha_{s,j}=\exp(-(\langle
+Z_q\rangle_s-\langle Z_k\rangle_j)^2)$, the residual sum, mean-pool, and sigmoid are all
+classical. The audit therefore acts \emph{per token} on the pure states
+$U_{q,k,v}|\psi_s\rangle$, and the classical head is the composition function.
+
+\paragraph{\texttt{QMSAN} (mixed-state self-attention).} Per token, a data-reuploading circuit
+($R_x(x_i)$; $L\times[\text{IsingZZ ring},\,R_y\text{ layer}]$; re-upload) prepares a pure state
+whose reduced density matrix on the first $n/2$ qubits is the query/key object; attention is the
+Hilbert--Schmidt overlap $\alpha_{s,j}=\mathrm{tr}(\rho_{q,s}\sigma_{k,j})$. We audit this on the
+\emph{purification}: we truncate the pure $n$-qubit state to bond dimension $\chi$, then take its
+partial trace to form $\rho,\sigma$. Values are per-qubit $\langle Z_i\rangle$.
+
+\paragraph{\texttt{CLAQS} (all-quantum token mixer).} On $q{=}8$ data qubits, each token's
+ansatz-14 embedding unitary $U_j$ is combined by a learnable, $\ell_1$-normalised complex
+linear-combination-of-unitaries $M=\sum_j \bar b_j U_j$; a learnable QSVT polynomial
+$P_c(M)=\sum_{k=0}^{5} c_k M^k$ and a window feed-forward unitary $U_{\mathrm FF}$ produce
+$|\psi\rangle=\mathrm{normalise}(U_{\mathrm FF}\,P_c(M)\,|0^8\rangle)$; readout is $24$ XYZ Pauli
+expectations into a two-layer MLP. Because $|\psi\rangle$ is a matrix polynomial rather than a
+gate sequence, the audit consumes the trained statevector directly. At $q{=}8$ the exact MPS
+bond dimension is $16$, which is why this is the one model where the $\chi$-axis has room to
+resolve structure.
+
+\paragraph{\texttt{discocat}.} A sentence's pregroup structure becomes one circuit: single-qubit
+word states ($R_x$ / Euler $R_xR_zR_x$), IQP ansätze for multi-qubit words (per layer: $H$ on
+all wires, then a chain of adjacent $C\!R_z$), a parameter-free GHZ for the relative pronoun, and
+grammar cups realised as Bell effects (post-select the paired qubits on $|0\rangle$). We audit
+the whole-sentence pure state before post-selection, then post-select and read the open wire's
+Born rule.
+
+\paragraph{Glossary (for NLP readers).}
+\textbf{NISQ}: noisy intermediate-scale quantum hardware.
+\textbf{PQC}: parameterised quantum circuit.
+\textbf{Ansatz}: a fixed circuit template whose rotation angles are trainable.
+\textbf{$R_x,R_y,R_z$}: single-qubit rotations; \textbf{CNOT}/$C\!R_z$: two-qubit entangling gates.
+\textbf{Statevector}: the $2^n$ complex amplitudes of an $n$-qubit pure state.
+\textbf{MPS} (matrix product state): a tensor-network factorisation whose \textbf{bond dimension
+$\chi$} caps the entanglement it can represent; $\chi{=}1$ is a product (unentangled) state.
+\textbf{Entanglement entropy $\bar S$}: bipartite von Neumann entropy of the state (nats).
+\textbf{IQP / LCU / QSVT}: instantaneous-quantum-polynomial ansatz / linear combination of
+unitaries / quantum singular-value transformation.
+\textbf{CSIM/QESIM}: classically simulable / classically simulable up to data loading.

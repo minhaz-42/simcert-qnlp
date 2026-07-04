@@ -1,17 +1,17 @@
 \section{Literature-review methodology}\label{app:survey}
-The motivating claim in Section~\ref{sec:intro}---that QNLP text-classification papers argue a
+The motivating claim in Section~\ref{sec:intro}, that QNLP text-classification papers argue a
 quantum benefit from accuracy but rarely test whether the \emph{trained circuit} is classically
-simulable---rests on a focused review, not an exhaustive systematic survey; we scope it honestly
-here.
+simulable, rests on a focused review rather than an exhaustive systematic survey, and we scope it
+honestly here.
 
 \paragraph{Search and inclusion.} We searched arXiv (\texttt{quant-ph}, \texttt{cs.CL}) and
 Semantic Scholar for the conjunctions of \{``quantum''\} with \{``natural language
 processing'', ``text classification'', ``self-attention'', ``sentence classification''\} over
-2019--2025, and followed citations from the models we reimplement. We include a paper if it (i)
+2019-2025, and followed citations from the models we reimplement. We include a paper if it (i)
 proposes a quantum or hybrid model for a text-classification task and (ii) reports an accuracy
 comparison. We record, for each, whether it reports a \emph{classical surrogate of the trained
-circuit}---a tensor-network contraction, Pauli-propagation estimate, or an explicit
-entanglement-removal ablation---as opposed to merely a separately-trained classical network of
+circuit}, meaning a tensor-network contraction, a Pauli-propagation estimate, or an explicit
+entanglement-removal ablation, as opposed to merely a separately-trained classical network of
 comparable size.
 
 \paragraph{What we found.} Table~\ref{tab:survey} lists the core set. All report a classical
@@ -30,7 +30,7 @@ pre-registered search strings and dual coding, in the style of the tabular-QML a
 \toprule
 Paper & classical-network baseline & trained-circuit surrogate & reports $\chi$ / entanglement \\
 \midrule
-DisCoCat / \texttt{lambeq} \citep{lorenz2021} & --\,$^{a}$ & no & no \\
+DisCoCat / \texttt{lambeq} \citep{lorenz2021} & -\,$^{a}$ & no & no \\
 \texttt{QSANN} \citep{li2022} & yes & no & no \\
 \texttt{QMSAN} \citep{chen2024} & yes & no & no \\
 \texttt{CLAQS} \citep{claqs2025} & yes & no & no \\

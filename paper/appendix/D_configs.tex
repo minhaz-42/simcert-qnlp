@@ -12,11 +12,11 @@ papers ($n{=}2$ qubits on \textsc{mc}, $n{=}4$ on \textsc{rp}; $q{=}8$ for \text
 \toprule
 Model & qubits & depth/layers & optimiser & epochs \\
 \midrule
-\texttt{vqc\_text} & 4--10 & 2 & Adam ($0.05$) & 30--40 \\
+\texttt{vqc\_text} & 4-10 & 2 & Adam ($0.05$) & 30-40 \\
 \texttt{qsann}     & 2 / 4 & $D_{\mathrm enc}{=}1,\,D_{qkv}{=}1$ & Adam ($0.05$) & 40 \\
 \texttt{qmsan}     & 2 / 4 & $L{=}1$ (IsingZZ ring) & Adam ($0.05$) & 40 \\
-\texttt{claqs}     & 8     & $L{=}1$, QSVT degree $5$ & AdamW ($0.05$) & 10--12 \\
-\texttt{discocat}  & 3--7  & IQP $L{=}1$ & SPSA & 120 \\
+\texttt{claqs}     & 8     & $L{=}1$, QSVT degree $5$ & AdamW ($0.05$) & 10-12 \\
+\texttt{discocat}  & 3-7  & IQP $L{=}1$ & SPSA & 120 \\
 \bottomrule
 \end{tabular}
 \caption{Per-model training configuration. Full configs and the exact commands are released
@@ -25,8 +25,8 @@ with the harness.}
 \end{table}
 
 \paragraph{Compute.} All experiments run on a single Apple M1 CPU (8\,GB RAM, no GPU). The audit
-is deterministic given a trained model---expectation values are computed exactly, not sampled---so
-the only stochasticity is training. Statevector simulation is memory-light at these sizes (a
+is deterministic given a trained model, since expectation values are computed exactly rather than
+sampled, so the only stochasticity is training. Statevector simulation is memory-light at these sizes (a
 $16$-qubit state is $\approx 1$\,MB); the binding constraint is training the attention models,
 not the audit. \texttt{claqs} is the exception: a faithful full-scale reproduction of its
 published $91.6\%$ on \textsc{sst-2} needs a GPU, so we run it at reduced scale (100 training
@@ -35,10 +35,10 @@ chance and we report the audit, not an accuracy reproduction.
 
 \paragraph{Robustness of \chistar\ to the tolerance.} Equation~\ref{eq:chistar} defines \chistar\
 against a tolerance $\tau$. We compute it under three definitions: $\tau_{\mathrm gen}$ (the
-model's train--test generalization gap, our default), $\tau_{\mathrm ci}$ (the half-width of a
+model's train-test generalization gap, our default), $\tau_{\mathrm ci}$ (the half-width of a
 $95\%$ bootstrap CI on full-$\chi$ accuracy), and $\tau_{\mathrm agree}$ (smallest $\chi$ with
 prediction agreement $\pi(\chi)\ge 0.95$). Across all runs the three agree on \chistar\ in the
-large majority of cases---$\chi{=}1$ for the attention/mixer models and $\chi{=}2$ for
-\texttt{discocat}---and where they differ they do so by a single bond-dimension step on
+large majority of cases, namely $\chi{=}1$ for the attention and mixer models and $\chi{=}2$ for
+\texttt{discocat}, and where they differ they do so by a single bond-dimension step on
 borderline, low-accuracy \textsc{rp} runs. The headline conclusion is therefore not an artefact
 of the tolerance choice.

@@ -1,0 +1,10 @@
+# SimCert base config. Override groups on the CLI, e.g.:
+#   python -m simcert.runner mode=both model=vqc_text dataset=mc seed=1
+seed: 20260704
+mode: both               # train | audit | both
+model_name: vqc_text
+dataset_name: mc
+audit_name: default
+paths:
+  results: results
+  checkpoints: checkpoints

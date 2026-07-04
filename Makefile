@@ -36,11 +36,18 @@ test:
 lint:
 	$(CONDA) run -n $(AUDIT_ENV) ruff check src tests
 
+MODEL ?= vqc_text
+DATASET ?= mc
+SEED ?= 1
+
 train:
-	$(CONDA) run -n $(AUDIT_ENV) python -m simcert.runner -m mode=train experiment=audit_all_sst2
+	$(CONDA) run -n $(AUDIT_ENV) python -m simcert.runner mode=train model=$(MODEL) dataset=$(DATASET) seed=$(SEED)
 
 audit:
-	$(CONDA) run -n $(AUDIT_ENV) python -m simcert.runner -m mode=audit experiment=audit_all_sst2
+	$(CONDA) run -n $(AUDIT_ENV) python -m simcert.runner mode=audit model=$(MODEL) dataset=$(DATASET) seed=$(SEED)
+
+demo:
+	$(CONDA) run -n $(AUDIT_ENV) python -m simcert.runner mode=both model=$(MODEL) dataset=$(DATASET) seed=$(SEED)
 
 figures:
 	$(CONDA) run -n $(AUDIT_ENV) python figures/scripts/fig_chi_curves.py

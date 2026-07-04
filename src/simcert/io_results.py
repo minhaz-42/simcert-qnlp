@@ -46,7 +46,8 @@ def result_path(results_dir: str | Path, dataset: str, model: str, rhash: str) -
 def save_result(path: str | Path, obj: dict) -> None:
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(obj, indent=2, default=_json_default, sort_keys=True))
+    # no sort_keys: chi-indexed dicts mix int and "full" keys; insertion order is deterministic
+    p.write_text(json.dumps(obj, indent=2, default=_json_default))
 
 
 def _json_default(o):

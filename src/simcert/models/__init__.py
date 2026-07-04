@@ -7,4 +7,7 @@ are added in milestones M1/M4; this package ships the interface first (harness-f
 
 from .base import BaselineModel, QNLPModel, TrainReport
 
-__all__ = ["QNLPModel", "BaselineModel", "TrainReport"]
+# Import concrete models so their @register decorators populate the registry.
+from . import baselines, vqc_text  # noqa: E402,F401
+
+__all__ = ["QNLPModel", "BaselineModel", "TrainReport", "baselines", "vqc_text"]

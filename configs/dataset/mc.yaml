@@ -1,0 +1,5 @@
+# Synthetic MC-style meaning classification (food vs IT). Real MC swaps in via qnlp-lambeq.
+name: mc
+n_per_class: 65
+val_frac: 0.2
+test_frac: 0.2

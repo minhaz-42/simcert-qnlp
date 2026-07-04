@@ -80,8 +80,7 @@ scipy==1.18.0
 scipy-openblas32==0.3.33.112.0
 setuptools==81.0.0
 shellingham==1.5.4
-# Editable Git install with no remote (simcert==0.1.0)
--e <repo>
+-e git+https://github.com/minhaz-42/simcert-qnlp.git@062f53941926c6fed99c7b62cf02478d702bce61#egg=simcert
 six==1.17.0
 stevedore==5.9.0
 sympy==1.14.0

@@ -1,0 +1,7 @@
+# Variational quantum text classifier (pipeline-validation + simple-PQC reference model)
+n_qubits: 6            # exact MPS bond dim = 2^3 = 8, so chi in {1,2,4} genuinely truncate
+n_layers: 2
+epochs: 40
+lr: 0.05
+published_accuracy: null   # this is our own reference model (no external number to match)
+baseline: logreg_bow        # matched classical baseline for the baseline_gap axis

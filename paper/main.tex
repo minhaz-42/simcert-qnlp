@@ -318,14 +318,17 @@ probes recovery rather than a strong classifier.}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.86\linewidth]{chi_curves.pdf}
-\caption{Accuracy retained versus bond dimension, one curve per model and dataset, averaged
+\includegraphics[width=\linewidth]{chi_curves.pdf}
+\caption{Two views of the same bond-dimension sweep, one curve per model and dataset, averaged
 over seeds. Color encodes the model and marker shape encodes the dataset, so each series stays
-distinguishable in grayscale. A curve that is flat down to $\chi{=}1$ is the signature of a
-bond-cheap model, since the classical surrogate loses nothing as it is weakened. The four models
-that reach full accuracy on \textsc{mc} coincide along the top edge, being flat at one. The only
-curves that climb are the three compositional \texttt{discocat} runs, which recover their accuracy
-at $\chi{=}2$; every other series is flat in $\chi$.}
+distinguishable in grayscale. Panel (a) plots test accuracy retained against $\chi$. A curve that
+is flat down to $\chi{=}1$ is the signature of a bond-cheap decision, since the classical surrogate
+loses no predictions as it is weakened to a product state. The only curves that climb are the three
+compositional \texttt{discocat} runs, which recover their accuracy at $\chi{=}2$; every other series
+is flat. Panel (b) plots the state fidelity $F(\chi)$ between the truncated and the full circuit for
+the same runs. This climbs from as low as $0.2$ at $\chi{=}1$ toward one, so the trained states do
+carry entanglement. Read together the panels reconcile the finding: the wavefunctions are entangled,
+yet the decisions built on them do not need that entanglement at the sizes tested.}
 \label{fig:curves}
 \end{figure}
 

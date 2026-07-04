@@ -59,12 +59,14 @@ def _export_records(circuits, exs, symbols, weights):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--dataset", default="mc")  # mc | mc_real | rp
     ap.add_argument("--n_layers", type=int, default=1)
     ap.add_argument("--epochs", type=int, default=120)
     ap.add_argument("--n_per_class", type=int, default=65)
     args = ap.parse_args()
 
-    ds = load_dataset("mc", seed=args.seed, n_per_class=args.n_per_class)
+    kw = {"n_per_class": args.n_per_class} if args.dataset == "mc" else {}
+    ds = load_dataset(args.dataset, seed=args.seed, **kw)
     ansatz = IQPAnsatz({AtomicType.NOUN: 1, AtomicType.SENTENCE: 1}, n_layers=args.n_layers)
     tr_c, tr_y = _circuits(ds.train, ansatz)
     va_c, va_y = _circuits(ds.val, ansatz)
@@ -84,12 +86,12 @@ def main():
 
     symbols = model.symbols
     weights = [float(w) for w in model.weights]
-    out = OUT_ROOT / f"seed{args.seed}"
+    out = OUT_ROOT / args.dataset / f"seed{args.seed}"
     out.mkdir(parents=True, exist_ok=True)
     for split, cs, exs in (("train", tr_c, ds.train), ("val", va_c, ds.val), ("test", te_c, ds.test)):
         (out / f"{split}.json").write_text(json.dumps(_export_records(cs, exs, symbols, weights)))
     manifest = {
-        "seed": args.seed, "n_layers": args.n_layers, "epochs": args.epochs,
+        "seed": args.seed, "dataset": args.dataset, "n_layers": args.n_layers, "epochs": args.epochs,
         "n_params": len(weights), "reader": "cups", "ansatz": "IQP",
         "train_acc": acc(tr_c, tr_y), "val_acc": acc(va_c, va_y), "test_acc": acc(te_c, te_y),
         "published_accuracy": PUBLISHED_MC,

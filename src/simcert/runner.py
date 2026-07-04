@@ -54,6 +54,7 @@ def load_config(argv: list[str]):
     if dotlist:
         cfg = OmegaConf.merge(cfg, OmegaConf.from_dotlist(dotlist))
     cfg.model.seed = cfg.seed  # models read seed from their own namespace
+    cfg.model.dataset = cfg.dataset_name  # e.g. DisCoCat consumer locates its artifacts
     return cfg
 
 
@@ -135,6 +136,19 @@ def main(argv=None):
             seed=int(cfg.seed),
             meta={"run_hash": rhash, "separable_test_accuracy": twin_test_acc},
         )
+
+        # Axis E: data-reuploading Fourier degree (models exposing a scalar_response hook)
+        if hasattr(model, "scalar_response"):
+            from .audit.fourier import effective_degree
+
+            cert.fourier_degree = effective_degree(model.scalar_response)
+        # Axis D: geometric difference g_CQ / sqrt(N) (models exposing kernel_data)
+        if hasattr(model, "kernel_data"):
+            from .audit.kernels import fidelity_kernel, geometric_difference, rbf_kernel
+
+            kstates, kfeats = model.kernel_data(ds.test)
+            gcq = geometric_difference(fidelity_kernel(kstates), rbf_kernel(kfeats))
+            cert.gcq_ratio = gcq / (len(ds.test) ** 0.5)
 
         out = {
             "run_hash": rhash,

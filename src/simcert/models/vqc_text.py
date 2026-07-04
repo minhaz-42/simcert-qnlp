@@ -134,6 +134,27 @@ class VQCTextModel(QNLPModel):
     def predict(self, batch) -> np.ndarray:
         return np.array([self.decision_from_expvals(np.array([z])) for z in self._z_values(batch)])
 
+    def kernel_data(self, batch):
+        """(trained statevectors, raw input features) for the g_CQ geometric-difference axis."""
+        from ..audit.mps_truncation import exact_statevector
+
+        torch = self._torch
+        states, feats = [], []
+        for ex in batch:
+            bc = self.export_circuits([ex])[0]
+            states.append(exact_statevector(bc.qfunc(), self.n_qubits))
+            with torch.no_grad():
+                feats.append(self._features(ex).cpu().numpy())
+        return np.array(states), np.array(feats)
+
+    def scalar_response(self, angle: float) -> float:
+        """<Z_0> as the qubit-0 encoding feature is swept (Fourier-degree probe, Axis E)."""
+        torch = self._torch
+        feats = torch.zeros(self.n_qubits, dtype=torch.float64)
+        feats[0] = float(angle)
+        with torch.no_grad():
+            return float(self._qnode()(feats, self.theta))
+
     def export_circuits(self, batch) -> list[BoundCircuit]:
         torch = self._torch
         theta_np = self.theta.detach().cpu().numpy()

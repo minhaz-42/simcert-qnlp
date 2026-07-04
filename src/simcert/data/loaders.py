@@ -58,6 +58,17 @@ def load_dataset(
         pairs = mc.generate(n_per_class=kwargs.get("n_per_class", 65), seed=seed)
         train, val, test = _split(pairs, val_frac, test_frac, seed)
         return Dataset(name=name, train=train, val=val, test=test, n_classes=2)
+    if name in ("mc_real", "rp"):
+        from .datasets import lorenz
+
+        splits = lorenz.mc() if name == "mc_real" else lorenz.rp()
+        to_ex = lambda seq: [TextExample(t, int(l)) for t, l in seq]
+        if name == "mc_real":  # ships train/dev/test
+            return Dataset(name, to_ex(splits["train"]), to_ex(splits["dev"]),
+                           to_ex(splits["test"]), n_classes=2)
+        # rp ships train/test only -> carve val out of train
+        train, val, _ = _split(splits["train"], val_frac, 0.0, seed)
+        return Dataset(name, train, val, to_ex(splits["test"]), n_classes=2)
     if name == "sst2":
         from .datasets import sst2
 

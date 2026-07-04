@@ -52,10 +52,11 @@ class DisCoCat(QNLPModel):
         import json
 
         seed = int(getattr(cfg, "seed", 1))
+        dataset = getattr(cfg, "dataset", "mc")
         root = Path(getattr(cfg, "artifact_dir", REPO / "results" / "circuits" / "discocat"))
         if not root.is_absolute():
             root = REPO / root
-        adir = root / f"seed{seed}"
+        adir = root / dataset / f"seed{seed}"
         self._manifest = json.loads((adir / "manifest.json").read_text())
         self.records = {}
         for split in ("train", "val", "test"):

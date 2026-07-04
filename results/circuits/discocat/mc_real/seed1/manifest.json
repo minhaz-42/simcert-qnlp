@@ -1,0 +1,1 @@
+{"seed": 1, "dataset": "mc_real", "n_layers": 1, "epochs": 120, "n_params": 20, "reader": "cups", "ansatz": "IQP", "train_acc": 0.8, "val_acc": 0.8, "test_acc": 0.7, "published_accuracy": 0.798}

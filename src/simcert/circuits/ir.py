@@ -13,10 +13,14 @@ from dataclasses import dataclass, field
 @dataclass
 class BoundCircuit:
     n_qubits: int
-    qasm: str  # OpenQASM 2.0, state-preparation only (no measurement instructions)
+    qasm: str = ""  # OpenQASM 2.0, state-prep only; empty when `state` is supplied directly
     observables: list[dict[int, str]] = field(default_factory=list)  # readout Pauli-dicts
     label: int | None = None  # ground-truth label for this example (optional)
     meta: dict = field(default_factory=dict)
+    # Some models (e.g. CLAQS: psi = U_FF P_c(M)|0>, a matrix polynomial, not a gate
+    # sequence) have no clean gate circuit. They provide the trained statevector directly;
+    # the audit truncates it just the same. `state` is transient (not serialised).
+    state: object = None  # np.ndarray | None
 
     def qfunc(self):
         """Return a PennyLane quantum function that applies the circuit's gates."""

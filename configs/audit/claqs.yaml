@@ -1,0 +1,4 @@
+# CLAQS: q=8 -> exact MPS bond 16, the first non-trivial truncation regime.
+chi_values: [1, 2, 4, 8, 16, null]
+cutoff: 1.0e-12
+entanglement_removal: false

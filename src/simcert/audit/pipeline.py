@@ -43,7 +43,11 @@ def audit_model(
         # let the model's composition map the (truncated) per-unit info to a label.
         units = model.audit_units(ex)
         sweeps = [
-            run_chi_sweep(u.qfunc(), u.n_qubits, u.observables, chi_values, cutoff) for u in units
+            run_chi_sweep(
+                None if u.state is not None else u.qfunc(),
+                u.n_qubits, u.observables, chi_values, cutoff, full_state=u.state,
+            )
+            for u in units
         ]
         nqs = [u.n_qubits for u in units]
         full_info = [

@@ -1,0 +1,9 @@
+q: 8
+layers: 1
+degree: 5
+d_e: 8
+max_tokens: 6
+epochs: 12
+lr: 0.05
+published_accuracy: 0.9164
+baseline: logreg_bow

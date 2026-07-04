@@ -1,0 +1,56 @@
+{
+  "model": "discocat",
+  "dataset": "mc_real",
+  "full_accuracy": 0.7,
+  "accuracy_by_chi": {
+    "1": 0.5,
+    "2": 0.7,
+    "4": 0.7,
+    "8": 0.7,
+    "full": 0.7
+  },
+  "fidelity_by_chi": {
+    "1": 0.2520430973420095,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "agreement_by_chi": {
+    "1": 0.8,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "chi_star": {
+    "tau_gen": 2,
+    "tau_ci": 2,
+    "tau_agree": 2
+  },
+  "scaling_slope": null,
+  "scaling_r2": null,
+  "delta_ent": null,
+  "entropy_mean": 0.6407270099023116,
+  "entropy_p99": 0.6931471802022753,
+  "gcq_ratio": null,
+  "fourier_degree": null,
+  "baseline_gap": -0.30000000000000004,
+  "mps_surrogate_repro": {},
+  "verdict": "CLASSICALLY_SIMULABLE",
+  "meta": {
+    "n_examples": 30,
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      null
+    ],
+    "tau_gen": 0.10000000000000009,
+    "tau_ci": 0.15000000000000002,
+    "train_accuracy": 0.8,
+    "run_hash": "0a31fea9a01a",
+    "separable_test_accuracy": null
+  }
+}

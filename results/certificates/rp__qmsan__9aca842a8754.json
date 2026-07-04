@@ -1,0 +1,56 @@
+{
+  "model": "qmsan",
+  "dataset": "rp",
+  "full_accuracy": 0.7419354838709677,
+  "accuracy_by_chi": {
+    "1": 0.7419354838709677,
+    "2": 0.7419354838709677,
+    "4": 0.7419354838709677,
+    "8": 0.7419354838709677,
+    "full": 0.7419354838709677
+  },
+  "fidelity_by_chi": {
+    "1": 0.9469007735011838,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "agreement_by_chi": {
+    "1": 0.9354838709677419,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "chi_star": {
+    "tau_gen": 1,
+    "tau_ci": 1,
+    "tau_agree": 2
+  },
+  "scaling_slope": null,
+  "scaling_r2": null,
+  "delta_ent": 0.0,
+  "entropy_mean": 0.12343556229668103,
+  "entropy_p99": 0.25196789692478083,
+  "gcq_ratio": null,
+  "fourier_degree": null,
+  "baseline_gap": 0.06451612903225812,
+  "mps_surrogate_repro": {},
+  "verdict": "AMBIGUOUS",
+  "meta": {
+    "n_examples": 31,
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      null
+    ],
+    "tau_gen": 0.24111536358665941,
+    "tau_ci": 0.16129032258064513,
+    "train_accuracy": 0.9830508474576272,
+    "run_hash": "9aca842a8754",
+    "separable_test_accuracy": 0.7419354838709677
+  }
+}

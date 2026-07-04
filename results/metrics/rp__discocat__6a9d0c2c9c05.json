@@ -1,0 +1,158 @@
+{
+  "run_hash": "6a9d0c2c9c05",
+  "config": {
+    "seed": 3,
+    "mode": "both",
+    "model_name": "discocat",
+    "dataset_name": "rp",
+    "audit_name": "discocat",
+    "paths": {
+      "results": "results",
+      "checkpoints": "checkpoints"
+    },
+    "model": {
+      "artifact_dir": "results/circuits/discocat",
+      "published_accuracy": 0.798,
+      "baseline": "logreg_bow",
+      "seed": 3,
+      "dataset": "rp"
+    },
+    "dataset": {
+      "name": "rp",
+      "val_frac": 0.2,
+      "test_frac": 0.0
+    },
+    "audit": {
+      "chi_values": [
+        1,
+        2,
+        4,
+        8,
+        null
+      ],
+      "cutoff": 1e-12,
+      "entanglement_removal": false
+    }
+  },
+  "dataset": {
+    "name": "rp",
+    "n_classes": 2,
+    "n_train": 59,
+    "n_val": 15,
+    "n_test": 31
+  },
+  "train_report": {
+    "train_accuracy": 0.7966101694915254,
+    "val_accuracy": 0.6,
+    "published_accuracy": 0.798,
+    "n_params": 118,
+    "epochs": null,
+    "extra": {
+      "reader": "cups",
+      "note": "trained by lambeq producer"
+    }
+  },
+  "certificate": {
+    "model": "discocat",
+    "dataset": "rp",
+    "full_accuracy": 0.6774193548387096,
+    "accuracy_by_chi": {
+      "1": 0.3870967741935484,
+      "2": 0.6774193548387096,
+      "4": 0.6774193548387096,
+      "8": 0.6774193548387096,
+      "full": 0.6774193548387096
+    },
+    "fidelity_by_chi": {
+      "1": 0.2603938377887598,
+      "2": 1.0,
+      "4": 1.0,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "agreement_by_chi": {
+      "1": 0.3870967741935484,
+      "2": 1.0,
+      "4": 1.0,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "chi_star": {
+      "tau_gen": 2,
+      "tau_ci": 2,
+      "tau_agree": 2
+    },
+    "scaling_slope": null,
+    "scaling_r2": null,
+    "delta_ent": null,
+    "entropy_mean": 0.6585640712957613,
+    "entropy_p99": 0.6931442476082785,
+    "gcq_ratio": null,
+    "fourier_degree": null,
+    "baseline_gap": 0.09677419354838701,
+    "mps_surrogate_repro": {},
+    "verdict": "AMBIGUOUS",
+    "meta": {
+      "n_examples": 31,
+      "chi_values": [
+        1,
+        2,
+        4,
+        8,
+        null
+      ],
+      "tau_gen": 0.11919081465281578,
+      "tau_ci": 0.16169354838709643,
+      "train_accuracy": 0.7966101694915254,
+      "run_hash": "6a9d0c2c9c05",
+      "separable_test_accuracy": null
+    }
+  },
+  "details": {
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      null
+    ],
+    "accuracy_by_chi": {
+      "1": 0.3870967741935484,
+      "2": 0.6774193548387096,
+      "4": 0.6774193548387096,
+      "8": 0.6774193548387096,
+      "full": 0.6774193548387096
+    },
+    "fidelity_by_chi": {
+      "1": 0.2603938377887598,
+      "2": 1.0,
+      "4": 1.0,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "agreement_by_chi": {
+      "1": 0.3870967741935484,
+      "2": 1.0,
+      "4": 1.0,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "full_accuracy": 0.6774193548387096,
+    "ci": [
+      0.515322580645162,
+      0.8387096774193549
+    ]
+  },
+  "env": {
+    "git_sha": "a8f6d4b",
+    "libs": {
+      "pennylane": "0.45.1",
+      "quimb": "1.14.0",
+      "qiskit": "2.3.0",
+      "qiskit_aer": "0.17.2",
+      "numpy": "2.4.6",
+      "torch": "2.12.1",
+      "transformers": "5.13.0"
+    }
+  }
+}

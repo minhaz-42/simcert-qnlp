@@ -1,0 +1,60 @@
+{
+  "model": "claqs",
+  "dataset": "mc",
+  "full_accuracy": 1.0,
+  "accuracy_by_chi": {
+    "1": 1.0,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "16": 1.0,
+    "full": 1.0
+  },
+  "fidelity_by_chi": {
+    "1": 0.5257204005515111,
+    "2": 0.8140276795838576,
+    "4": 0.9557330040779678,
+    "8": 0.9975801580256274,
+    "16": 1.0,
+    "full": 1.0
+  },
+  "agreement_by_chi": {
+    "1": 1.0,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "16": 1.0,
+    "full": 1.0
+  },
+  "chi_star": {
+    "tau_gen": 1,
+    "tau_ci": 1,
+    "tau_agree": 1
+  },
+  "scaling_slope": null,
+  "scaling_r2": null,
+  "delta_ent": null,
+  "entropy_mean": 0.9427266497205409,
+  "entropy_p99": 1.269417865654388,
+  "gcq_ratio": null,
+  "fourier_degree": null,
+  "baseline_gap": 0.0,
+  "mps_surrogate_repro": {},
+  "verdict": "CLASSICALLY_SIMULABLE",
+  "meta": {
+    "n_examples": 26,
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      null
+    ],
+    "tau_gen": 0.0,
+    "tau_ci": 1e-09,
+    "train_accuracy": 1.0,
+    "run_hash": "d7d3d01a6df0",
+    "separable_test_accuracy": null
+  }
+}

@@ -1,0 +1,35 @@
+# SimCert — audit environment (env: qnlp, Python 3.12)
+# The shared audit consumer + re-implemented models (QSANN/QMSAN/CLAQS/QBERT).
+# NOTE: floors below guarantee the features we need; exact reproducibility comes from
+#       envs/requirements-audit.lock.txt (generated with `pip freeze` after install).
+#       Do NOT install pennylane-lightning-gpu / lightning.tensor — those need CUDA.
+
+# --- quantum simulation core (the audit engine) ---
+pennylane>=0.40            # default.tensor(method="mps", max_bond_dim, cutoff) == the chi knob
+pennylane-lightning>=0.40  # lightning.qubit exact statevector (ground truth for chi=full); arm64 wheel
+quimb>=1.8                 # MPS/MPDO backend behind default.tensor; Schmidt spectrum + entanglement entropy
+qiskit>=1.2                # OpenQASM import/export (the shared IR)
+qiskit-aer>=0.15           # AerSimulator(method="matrix_product_state") cross-check + purified mixed-state path
+pennylane-qiskit>=0.40     # OpenQASM <-> PennyLane bridge (qml.from_qasm): the IR round-trip
+
+# --- classical ML / baselines / encoders ---
+torch>=2.2                 # MPS/Metal backend for classical arms only; statevector sim stays CPU
+transformers>=4.44         # hybrid quantum-BERT encoder
+scikit-learn>=1.4          # out-of-the-box classical baselines (SVC/MLP/LogReg)
+numpy>=1.26
+scipy>=1.11
+pandas>=2.0
+
+# --- experiment orchestration / config ---
+hydra-core>=1.3
+omegaconf>=2.3
+
+# --- reporting / figures ---
+matplotlib>=3.8
+
+# --- dev / test ---
+pytest>=8.0
+pytest-xdist>=3.5
+ruff>=0.6
+tqdm
+rich

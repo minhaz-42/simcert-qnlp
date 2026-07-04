@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# envs
+.venv*/
+env/
+venv/
+
+# Hydra / experiment run dirs
+outputs/
+multirun/
+
+# heavy, regenerable artifacts
+checkpoints/**
+*.ckpt
+*.pt
+*.pth
+mlruns/
+
+# data — keep only the tiny toy fixture used by test_smoke
+data/**
+!data/toy/
+!data/toy/**
+
+# keep the science (metrics, certificates, exported circuits, figures)
+!results/**
+!figures/**

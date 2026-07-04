@@ -1,0 +1,15 @@
+# SimCert — lambeq producer environment (env: qnlp-lambeq, Python 3.11)
+# ONLY trains DisCoCat/lambeq models and exports trained circuits to OpenQASM.
+# Kept isolated because lambeq pins pennylane<0.37, which conflicts with the audit env's
+# modern default.tensor MPS device. This env never imports modern PennyLane.
+
+lambeq>=0.5             # DisCoCat model + IQPAnsatz circuit generation
+pytket>=1.31            # diagram.to_pytket() -> bind params -> qasm
+pytket-qiskit>=0.21     # pytket.Circuit -> qiskit -> OpenQASM export path
+qiskit-aer<0.17         # lambeq TketModel shots backend (its own pin)
+torch>=2.0              # lambeq PytorchModel / NumpyModel training
+numpy<2.3               # guard: lambeq's tensornetwork dep is fragile on newest numpy
+scipy>=1.11
+spacy>=3.0
+pyyaml
+tqdm

@@ -1,0 +1,11 @@
+# SimCert audit environment.  Create with:
+#   conda env create -f envs/environment-audit.yml
+# conda owns ONLY the interpreter; the quantum stack is pip-installed (conda-forge lags PennyLane/lambeq).
+name: qnlp
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - -r requirements-audit.txt

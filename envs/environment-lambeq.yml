@@ -1,0 +1,10 @@
+# SimCert lambeq producer environment.  Create with:
+#   conda env create -f envs/environment-lambeq.yml
+name: qnlp-lambeq
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - -r requirements-lambeq.txt

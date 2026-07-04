@@ -68,6 +68,18 @@ class QNLPModel(ABC):
             return int(expvals[0] < 0)  # <Z> >= 0 -> class 0, else class 1
         return int(np.argmax(expvals))
 
+    # ---- the two-level auditable object ------------------------------------
+    # An example decomposes into atomic auditable *units* (per-token / per-window
+    # circuits) plus a *composition* that maps their (possibly truncated) expvals to a
+    # label. Single-circuit models are the degenerate one-unit case.
+    def audit_units(self, example) -> list[BoundCircuit]:
+        """Atomic auditable circuits for one example (default: the single circuit)."""
+        return self.export_circuits([example])
+
+    def compose(self, example, unit_expvals: list[np.ndarray]) -> int:
+        """Map the units' expectation values to one label (default: single-unit head)."""
+        return self.decision_from_expvals(unit_expvals[0])
+
     @abstractmethod
     def save(self, path) -> None: ...
 

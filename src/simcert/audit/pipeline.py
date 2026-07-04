@@ -31,7 +31,6 @@ def audit_model(
 ) -> tuple[SimCert, dict]:
     """Audit ``model`` on ``examples``. Returns ``(certificate, details_for_figures)``."""
     labels = np.array([ex.label for ex in examples])
-    bound = model.export_circuits(examples)
 
     keys = [_chi_key(c) for c in chi_values]
     preds_by_key: dict = {k: [] for k in keys}
@@ -39,15 +38,21 @@ def audit_model(
     full_preds: list[int] = []
     entropies: list[float] = []
 
-    for bc in bound:
-        sweep = run_chi_sweep(bc.qfunc(), bc.n_qubits, bc.observables, chi_values, cutoff)
-        full_pred = model.decision_from_expvals(sweep["full_expvals"])
-        full_preds.append(full_pred)
-        entropies.append(max_bipartite_entropy(sweep["full_state"], bc.n_qubits))
+    for ex in examples:
+        # Each example decomposes into atomic auditable units; truncate every unit, then
+        # let the model's composition map the (truncated) per-unit expvals to a label.
+        units = model.audit_units(ex)
+        sweeps = [
+            run_chi_sweep(u.qfunc(), u.n_qubits, u.observables, chi_values, cutoff) for u in units
+        ]
+        full_preds.append(model.compose(ex, [s["full_expvals"] for s in sweeps]))
+        entropies.append(
+            float(np.mean([max_bipartite_entropy(s["full_state"], u.n_qubits)
+                           for s, u in zip(sweeps, units)]))
+        )
         for k in keys:
-            cell = sweep["sweep"][k]
-            preds_by_key[k].append(model.decision_from_expvals(cell["expvals"]))
-            fid_by_key[k].append(cell["fidelity"])
+            preds_by_key[k].append(model.compose(ex, [s["sweep"][k]["expvals"] for s in sweeps]))
+            fid_by_key[k].append(float(np.mean([s["sweep"][k]["fidelity"] for s in sweeps])))
 
     full_preds = np.array(full_preds)
     full_accuracy = accuracy(labels, full_preds)

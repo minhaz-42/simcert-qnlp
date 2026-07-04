@@ -1,0 +1,11 @@
+# QSANN — Quantum Self-Attention Neural Network (arXiv:2205.05625), MC/RP scale.
+# n=2, D_enc=1 => d = n(D_enc+2) = 6 features; value obs {Z_i,X_i,Y_i} = 3n = 6.
+n_qubits: 2
+d_enc: 1
+d_qkv: 1
+epochs: 40
+lr: 0.05          # paper Table I uses 0.008 (Adam); raised for our synthetic MC convergence
+lam: 0.0          # MC uses no regularization
+gam: 0.0
+published_accuracy: 1.0   # QSANN reports 100% test on MC
+baseline: logreg_bow

@@ -1,0 +1,56 @@
+{
+  "model": "qsann",
+  "dataset": "mc",
+  "full_accuracy": 1.0,
+  "accuracy_by_chi": {
+    "1": 1.0,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "fidelity_by_chi": {
+    "1": 0.9387324539174648,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "agreement_by_chi": {
+    "1": 1.0,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "chi_star": {
+    "tau_gen": 1,
+    "tau_ci": 1,
+    "tau_agree": 1
+  },
+  "scaling_slope": null,
+  "scaling_r2": null,
+  "delta_ent": 0.0,
+  "entropy_mean": 0.2113327614941262,
+  "entropy_p99": 0.27105407061770703,
+  "gcq_ratio": null,
+  "fourier_degree": null,
+  "baseline_gap": 0.0,
+  "mps_surrogate_repro": {},
+  "verdict": "CLASSICALLY_SIMULABLE",
+  "meta": {
+    "n_examples": 26,
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      null
+    ],
+    "tau_gen": 0.0,
+    "tau_ci": 1e-09,
+    "train_accuracy": 1.0,
+    "run_hash": "e355e4d80d0b",
+    "separable_test_accuracy": 1.0
+  }
+}

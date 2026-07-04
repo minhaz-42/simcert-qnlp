@@ -1,3 +1,4 @@
 # Audit knobs. chi_values: null == full/untruncated. chi=1 == product state == entanglement-removed.
 chi_values: [1, 2, 4, 8, null]
 cutoff: 1.0e-12
+entanglement_removal: true   # Axis B: retrain a separable (product-state) twin -> delta_ent

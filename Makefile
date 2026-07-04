@@ -51,9 +51,11 @@ demo:
 
 figures:
 	$(CONDA) run -n $(AUDIT_ENV) python figures/scripts/fig_chi_curves.py
-	$(CONDA) run -n $(AUDIT_ENV) python figures/scripts/fig_cert_table.py
 
-paper:
-	cd paper && latexmk -pdf main.tex
+tables:
+	$(CONDA) run -n $(AUDIT_ENV) python paper/scripts/make_tables.py
 
-reproduce: figures paper
+paper: figures tables
+	cd paper && tectonic main.tex
+
+reproduce: figures tables paper   # regenerate figure + table + PDF from committed results/

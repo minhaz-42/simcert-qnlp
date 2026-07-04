@@ -25,6 +25,7 @@ def audit_model(
     cutoff: float = 1e-12,
     train_accuracy: float | None = None,
     baseline_preds=None,
+    delta_ent: float | None = None,
     seed: int = 0,
     meta: dict | None = None,
 ) -> tuple[SimCert, dict]:
@@ -80,6 +81,7 @@ def audit_model(
             "tau_ci": chi_star(accuracy_by_chi, full_accuracy, tau_ci),
             "tau_agree": chi_star_agree,
         },
+        delta_ent=delta_ent,
         entropy_mean=float(np.mean(entropies)) if entropies else None,
         entropy_p99=float(np.percentile(entropies, 99)) if entropies else None,
         baseline_gap=(full_accuracy - accuracy(labels, np.array(baseline_preds)))

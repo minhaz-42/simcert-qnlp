@@ -30,7 +30,7 @@
   },
   "scaling_slope": null,
   "scaling_r2": null,
-  "delta_ent": null,
+  "delta_ent": 0.0,
   "entropy_mean": 0.7608609249169496,
   "entropy_p99": 1.319516682943247,
   "gcq_ratio": null,
@@ -50,6 +50,7 @@
     "tau_gen": 0.0,
     "tau_ci": 1e-09,
     "train_accuracy": 1.0,
-    "run_hash": "616b6ac1bf93"
+    "run_hash": "ccf141974ffd",
+    "separable_test_accuracy": 1.0
   }
 }

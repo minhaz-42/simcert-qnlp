@@ -1,7 +1,7 @@
 {
-  "run_hash": "616b6ac1bf93",
+  "run_hash": "d54688106d46",
   "config": {
-    "seed": 1,
+    "seed": 2,
     "mode": "both",
     "model_name": "vqc_text",
     "dataset_name": "mc",
@@ -17,7 +17,7 @@
       "lr": 0.05,
       "published_accuracy": null,
       "baseline": "logreg_bow",
-      "seed": 1
+      "seed": 2
     },
     "dataset": {
       "name": "mc",
@@ -33,7 +33,8 @@
         8,
         null
       ],
-      "cutoff": 1e-12
+      "cutoff": 1e-12,
+      "entanglement_removal": true
     }
   },
   "dataset": {
@@ -63,9 +64,9 @@
       "full": 1.0
     },
     "fidelity_by_chi": {
-      "1": 0.6948739205157181,
-      "2": 0.8495824507845573,
-      "4": 0.9892106450528024,
+      "1": 0.5646141247444136,
+      "2": 0.971273806309598,
+      "4": 0.999472916810692,
       "8": 1.0,
       "full": 1.0
     },
@@ -83,14 +84,14 @@
     },
     "scaling_slope": null,
     "scaling_r2": null,
-    "delta_ent": null,
-    "entropy_mean": 0.7608609249169496,
-    "entropy_p99": 1.319516682943247,
+    "delta_ent": 0.07692307692307687,
+    "entropy_mean": 0.7473457848412116,
+    "entropy_p99": 0.9152794363954933,
     "gcq_ratio": null,
     "fourier_degree": null,
     "baseline_gap": 0.0,
     "mps_surrogate_repro": {},
-    "verdict": "CLASSICALLY_SIMULABLE",
+    "verdict": "AMBIGUOUS",
     "meta": {
       "n_examples": 26,
       "chi_values": [
@@ -103,7 +104,8 @@
       "tau_gen": 0.0,
       "tau_ci": 1e-09,
       "train_accuracy": 1.0,
-      "run_hash": "616b6ac1bf93"
+      "run_hash": "d54688106d46",
+      "separable_test_accuracy": 0.9230769230769231
     }
   },
   "details": {
@@ -122,9 +124,9 @@
       "full": 1.0
     },
     "fidelity_by_chi": {
-      "1": 0.6948739205157181,
-      "2": 0.8495824507845573,
-      "4": 0.9892106450528024,
+      "1": 0.5646141247444136,
+      "2": 0.971273806309598,
+      "4": 0.999472916810692,
       "8": 1.0,
       "full": 1.0
     },
@@ -142,7 +144,7 @@
     ]
   },
   "env": {
-    "git_sha": "062f539",
+    "git_sha": "16c2d35",
     "libs": {
       "pennylane": "0.45.1",
       "quimb": "1.14.0",

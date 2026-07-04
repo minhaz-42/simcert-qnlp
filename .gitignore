@@ -33,3 +33,6 @@ data/**
 # keep the science (metrics, certificates, exported circuits, figures)
 !results/**
 !figures/**
+
+# reference PDFs: keep local for reading, don't bloat the repo (index is in references/README.md)
+references/pdfs/

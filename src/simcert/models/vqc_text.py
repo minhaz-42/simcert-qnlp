@@ -25,16 +25,21 @@ from ..registry import register
 from .base import QNLPModel, TrainReport
 
 
-def _apply_ops(qml, features, theta, n_qubits: int, n_layers: int):
-    """Apply the VQC gate sequence. Works with torch tensors or python floats."""
+def _apply_ops(qml, features, theta, n_qubits: int, n_layers: int, entangling: bool = True):
+    """Apply the VQC gate sequence. Works with torch tensors or python floats.
+
+    ``entangling=False`` drops the CNOT ring -> a product-state ("separable") twin,
+    which is exactly the entanglement-removal ablation (Axis B, Bowles et al.).
+    """
     for layer in range(n_layers):
         for i in range(n_qubits):
             qml.RY(features[i], wires=i)  # data re-uploading
         for i in range(n_qubits):
             qml.RY(theta[layer][i][0], wires=i)
             qml.RZ(theta[layer][i][1], wires=i)
-        for i in range(n_qubits):
-            qml.CNOT(wires=[i, (i + 1) % n_qubits])
+        if entangling:
+            for i in range(n_qubits):
+                qml.CNOT(wires=[i, (i + 1) % n_qubits])
 
 
 @register("vqc_text")
@@ -44,6 +49,7 @@ class VQCTextModel(QNLPModel):
     def __init__(self):
         self.n_qubits = 4
         self.n_layers = 2
+        self.entangling = True
         self.vocab: dict[str, int] = {}
         self._torch = None
         self.embedding = None
@@ -57,6 +63,7 @@ class VQCTextModel(QNLPModel):
         self._torch = torch
         self.n_qubits = int(getattr(cfg, "n_qubits", 4))
         self.n_layers = int(getattr(cfg, "n_layers", 2))
+        self.entangling = bool(getattr(cfg, "entangling", True))
         self.vocab = vocab
         self._published_accuracy = getattr(cfg, "published_accuracy", None)
         g = torch.Generator().manual_seed(int(getattr(cfg, "seed", 0)))
@@ -75,7 +82,7 @@ class VQCTextModel(QNLPModel):
 
         @qml.qnode(dev, interface="torch", diff_method="backprop")
         def circuit(features, theta):
-            _apply_ops(qml, features, theta, self.n_qubits, self.n_layers)
+            _apply_ops(qml, features, theta, self.n_qubits, self.n_layers, self.entangling)
             return qml.expval(qml.PauliZ(0))
 
         return circuit
@@ -152,6 +159,8 @@ class VQCTextModel(QNLPModel):
 
         n_qubits, n_layers = self.n_qubits, self.n_layers
 
+        entangling = self.entangling
+
         def qf():
             _apply_ops(
                 qml,
@@ -160,6 +169,7 @@ class VQCTextModel(QNLPModel):
                  for l in range(n_layers)],
                 n_qubits,
                 n_layers,
+                entangling,
             )
 
         return qf
@@ -175,6 +185,7 @@ class VQCTextModel(QNLPModel):
                 {
                     "n_qubits": self.n_qubits,
                     "n_layers": self.n_layers,
+                    "entangling": self.entangling,
                     "vocab": self.vocab,
                     "published_accuracy": self._published_accuracy,
                 }
@@ -191,6 +202,7 @@ class VQCTextModel(QNLPModel):
         m._torch = torch
         m.n_qubits = meta["n_qubits"]
         m.n_layers = meta["n_layers"]
+        m.entangling = meta.get("entangling", True)
         m.vocab = meta["vocab"]
         m._published_accuracy = meta.get("published_accuracy")
         w = torch.load(p / "weights.pt")

@@ -101,6 +101,23 @@ def main(argv=None):
             baseline.fit(ds.train, ds.val, cfg.model)
             baseline_preds = baseline.predict(ds.test)
 
+        # Axis B: entanglement-removal ablation -- retrain a separable (product-state) twin
+        from .audit.metrics import accuracy as _acc
+
+        labels_test = [ex.label for ex in ds.test]
+        delta_ent = None
+        twin_test_acc = None
+        if cfg.audit.get("entanglement_removal", True):
+            twin_cfg = OmegaConf.merge(cfg.model, {"entangling": False})
+            twin = get_model(cfg.model_name)()
+            twin.build(twin_cfg, vocab)
+            twin.fit(ds.train, ds.val, twin_cfg)
+            twin_test_acc = _acc(labels_test, twin.predict(ds.test))
+            full_test_acc = _acc(labels_test, model.predict(ds.test))
+            delta_ent = full_test_acc - twin_test_acc
+            print(f"[simcert] entanglement-removal: full={full_test_acc:.3f} "
+                  f"separable={twin_test_acc:.3f} delta_ent={delta_ent:+.3f}")
+
         cert, details = audit_model(
             model,
             ds.test,
@@ -109,8 +126,9 @@ def main(argv=None):
             cutoff=float(cfg.audit.cutoff),
             train_accuracy=report.train_accuracy if report else None,
             baseline_preds=baseline_preds,
+            delta_ent=delta_ent,
             seed=int(cfg.seed),
-            meta={"run_hash": rhash},
+            meta={"run_hash": rhash, "separable_test_accuracy": twin_test_acc},
         )
 
         out = {

@@ -1,0 +1,64 @@
+{
+  "model": "vqc_text",
+  "dataset": "sst2",
+  "full_accuracy": 0.63,
+  "accuracy_by_chi": {
+    "1": 0.63,
+    "2": 0.62,
+    "4": 0.63,
+    "8": 0.63,
+    "16": 0.63,
+    "32": 0.63,
+    "full": 0.63
+  },
+  "fidelity_by_chi": {
+    "1": 0.5213682366997443,
+    "2": 0.8911010388497593,
+    "4": 1.0,
+    "8": 1.0,
+    "16": 1.0,
+    "32": 1.0,
+    "full": 1.0
+  },
+  "agreement_by_chi": {
+    "1": 1.0,
+    "2": 0.94,
+    "4": 1.0,
+    "8": 1.0,
+    "16": 1.0,
+    "32": 1.0,
+    "full": 1.0
+  },
+  "chi_star": {
+    "tau_gen": 1,
+    "tau_ci": 1,
+    "tau_agree": 1
+  },
+  "scaling_slope": null,
+  "scaling_r2": null,
+  "delta_ent": null,
+  "entropy_mean": 0.9461968790556223,
+  "entropy_p99": 1.0349322436201114,
+  "gcq_ratio": null,
+  "fourier_degree": null,
+  "baseline_gap": -0.020000000000000018,
+  "mps_surrogate_repro": {},
+  "verdict": "CLASSICALLY_SIMULABLE",
+  "meta": {
+    "n_examples": 200,
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      null
+    ],
+    "tau_gen": 0.3464705882352941,
+    "tau_ci": 0.06499999999999995,
+    "train_accuracy": 0.9764705882352941,
+    "run_hash": "7272dc3064c3",
+    "separable_test_accuracy": null
+  }
+}

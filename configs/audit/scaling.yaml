@@ -1,0 +1,5 @@
+# Scaling-study audit: wider chi sweep (up to 32 for n=10) and skip the separable twin
+# (we only need chi* from the trained model here, so halve the cost).
+chi_values: [1, 2, 4, 8, 16, 32, null]
+cutoff: 1.0e-12
+entanglement_removal: false

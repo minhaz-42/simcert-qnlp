@@ -1,41 +1,45 @@
-% Fig: representative circuits for the four literature models (simplified for the main text;
-% full per-model circuits are in the released harness).
+% Fig: representative circuits for the four literature models, gates colored by role
+% (orange = data encoding, green = trainable, blue = fixed structural, purple = composite block).
 \begin{figure}[t]
 \centering
 \begin{minipage}[t]{0.47\textwidth}\centering
 \begin{quantikz}[column sep=5pt, row sep=8pt]
-\lstick{$\ket{0}$} & \gate{H} & \gate{R_x} & \ctrl{1} & \gate{R_y(\theta)} & \meter{$Z$} \\
-\lstick{$\ket{0}$} & \gate{H} & \gate{R_x} & \targ{}  & \gate{R_y(\theta)} & \qw
+\lstick{$\ket{0}$} & \gate[style={fill=blue!12}]{H} & \gate[style={fill=orange!22}]{R_x} & \ctrl{1} & \gate[style={fill=green!25}]{R_y(\theta)} & \meter{$Z$} \\
+\lstick{$\ket{0}$} & \gate[style={fill=blue!12}]{H} & \gate[style={fill=orange!22}]{R_x} & \targ{}  & \gate[style={fill=green!25}]{R_y(\theta)} & \qw
 \end{quantikz}\\[2pt]
-{\scriptsize\textbf{(a) \texttt{QSANN}.} Per-token encoder $+$ query ansatz; key and value reuse the encoder, read as $\langle Z\rangle$ and a Pauli vector.}
+{\scriptsize\textbf{(a) \texttt{QSANN}.} Per-token encoder plus a query ansatz; key and value reuse the encoder, read as $\langle Z\rangle$ and a Pauli vector.}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\textwidth}\centering
 \begin{quantikz}[column sep=5pt, row sep=8pt]
-\lstick{$\ket{0}$} & \gate{R_x(x)} & \gate[2]{ZZ} & \gate{R_y} & \gate{R_x(x)} & \meter{$\rho$} \\
-\lstick{$\ket{0}$} & \gate{R_x(x)} &              & \gate{R_y} & \gate{R_x(x)} & \trash{tr}
+\lstick{$\ket{0}$} & \gate[style={fill=orange!22}]{R_x(x)} & \gate[2,style={fill=green!25}]{ZZ} & \gate[style={fill=green!25}]{R_y} & \gate[style={fill=orange!22}]{R_x(x)} & \meter{$\rho$} \\
+\lstick{$\ket{0}$} & \gate[style={fill=orange!22}]{R_x(x)} &              & \gate[style={fill=green!25}]{R_y} & \gate[style={fill=orange!22}]{R_x(x)} & \trash{tr}
 \end{quantikz}\\[2pt]
 {\scriptsize\textbf{(b) \texttt{QMSAN}.} Data re-upload with an IsingZZ ring; the last $n/2$ qubits are traced out, giving a mixed query/key state $\rho$.}
 \end{minipage}
 
-\vspace{8pt}
+\vspace{9pt}
 \begin{minipage}[t]{0.47\textwidth}\centering
 \begin{quantikz}[column sep=5pt, row sep=8pt]
-\lstick{$\ket{0}$} & \gate{R_y} & \ctrl{1} & \gate{R_y} & \gate[2]{\text{LCU}+\text{QSVT}} & \meter{$XYZ$} \\
-\lstick{$\ket{0}$} & \gate{R_y} & \gate{R_x} & \gate{R_y} &                                & \meter{$XYZ$}
+\lstick{$\ket{0}$} & \gate[style={fill=green!25}]{R_y} & \ctrl{1} & \gate[style={fill=green!25}]{R_y} & \gate[2,style={fill=violet!20}]{\text{LCU}+\text{QSVT}} & \meter{$XYZ$} \\
+\lstick{$\ket{0}$} & \gate[style={fill=green!25}]{R_y} & \gate[style={fill=green!25}]{R_x} & \gate[style={fill=green!25}]{R_y} &                                & \meter{$XYZ$}
 \end{quantikz}\\[2pt]
 {\scriptsize\textbf{(c) \texttt{CLAQS}.} Ansatz-14 token embedding; tokens are combined by a complex $\ell_1$-normalised LCU and a QSVT polynomial before an XYZ readout.}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.47\textwidth}\centering
 \begin{quantikz}[column sep=5pt, row sep=8pt]
-\lstick{noun} & \gate{R_x} & \ctrl{1} & \qw       & \qw \\
-\lstick{verb} & \gate[2]{\text{IQP}} & \targ{} & \gate{H} & \meter{$0$} \\
+\lstick{noun} & \gate[style={fill=green!25}]{R_x} & \ctrl{1} & \qw       & \qw \\
+\lstick{verb} & \gate[2,style={fill=green!25}]{\text{IQP}} & \targ{} & \gate[style={fill=blue!12}]{H} & \meter{$0$} \\
 \lstick{sent.}&            & \qw      & \qw       & \meter{$Z$}
 \end{quantikz}\\[2pt]
 {\scriptsize\textbf{(d) \texttt{DisCoCat}.} Word states with an IQP ansatz; a grammar cup is a Bell effect (CNOT, $H$, post-select $0$), leaving one open sentence wire.}
-\end{minipage}
+\end{minipage}\\[4pt]
+{\footnotesize\textcolor{orange!75!black}{$\blacksquare$}~data encoding \quad
+ \textcolor{green!55!black}{$\blacksquare$}~trainable \quad
+ \textcolor{blue!60!black}{$\blacksquare$}~fixed \quad
+ \textcolor{violet!70!black}{$\blacksquare$}~composite block}
 \caption{\textbf{Representative circuits for the audited models} (simplified; exact per-model
-circuits are released with the harness). \texttt{QMSAN} is read out as a reduced density matrix,
-which is why it uses the mixed-state audit path; \texttt{DisCoCat} post-selects the cup qubits and
-reads the single open wire by the Born rule.}
+circuits are released with the harness). Gates are colored by role. \texttt{QMSAN} is read out as a
+reduced density matrix, hence the mixed-state audit path; \texttt{DisCoCat} post-selects the cup
+qubits and reads the single open wire by the Born rule.}
 \label{fig:circuits_all}
 \end{figure}

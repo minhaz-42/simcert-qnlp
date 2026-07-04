@@ -1,60 +1,56 @@
-% Fig: tensor-network view of the audit as three clean stages (Shin-style).
+% Fig: dequantization picture in Shin (2024) Fig 1(b) style. The trained model's expectation is a
+% coefficient MPS (blue) contracted with basis functions (red triangles); truncating the MPS bond
+% dimension to chi gives a classical MPS that reproduces the output (basis-equivalent).
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[
   font=\small, >=Latex,
-  panel/.style={draw=black!25, rounded corners=4pt, fill=black!3},
-  tn/.style={draw=teal!70!black, thick, fill=teal!16, rounded corners=1pt, minimum size=7mm},
-  obs/.style={draw=red!60!black, fill=red!16, regular polygon, regular polygon sides=3, shape border rotate=180, minimum size=6mm, inner sep=0pt},
+  mps/.style={draw=blue!55!black, thick, fill=blue!14, rounded corners=1.5pt, minimum size=6.5mm},
+  cmps/.style={draw=teal!65!black, thick, fill=teal!16, rounded corners=1.5pt, minimum size=6.5mm},
+  tri/.style={draw=red!60!black, fill=red!16, regular polygon, regular polygon sides=3, shape border rotate=-90, minimum size=6.5mm, inner sep=0pt},
+  grp/.style={draw, dashed, rounded corners=3pt, inner sep=3.5pt},
 ]
-% ===== Panel 1: trained state as an MPS =====
-\draw[panel] (-0.15,-1.15) rectangle (4.05,1.7);
-\node[anchor=west, black!70] at (0.0,1.45) {\scriptsize\textbf{(1)} trained state as an MPS};
-\foreach \i in {1,...,4}{
-  \node[tn] (A\i) at (0.95*\i,0.15) {$A_{\i}$};
-  \draw[orange!85!black, thick] (A\i) -- ++(0,0.55) node[above, black, inner sep=1pt]{\scriptsize$q_{\i}$};
+\def\dy{0.92}
+% ===== quantum side: coefficient MPS x basis functions =====
+\node at (-1.35,0) {$\langle O\rangle_{\theta,x}=$};
+\foreach \k in {0,1,2,3}{
+  \node[mps]  (Q\k) at (0, -\dy*\k) {};
+  \node[tri]  (T\k) at (1.4, -\dy*\k) {};
+  \draw[thick, black!55] (Q\k) -- (T\k);          % contraction leg
 }
-\draw[blue!70, thick] (A1)--(A2)--(A3)--(A4);
-\draw[blue!70, thick] (A1)--++(-0.45,0); \draw[blue!70, thick] (A4)--++(0.45,0);
-\node[blue!65, anchor=west] at (0.35,-0.75) {\scriptsize bond legs (entanglement)};
+\draw[blue!55!black, thick] (Q0)--(Q1) (Q1)--(Q2) (Q2)--(Q3);
+\node[blue!55!black] at (-0.55,{-\dy*1.5}) {\scriptsize$\chi$};
+\node[draw=none] at (0,-\dy*3-0.7) {\scriptsize$\vdots$};
+% dashed group labels
+\node[grp, fit=(Q0)(Q3), blue!55!black] (Qbox) {};
+\node[blue!55!black, above=8pt of Qbox.north, xshift=-1mm] {\scriptsize coefficient MPS $\mathbf{C}^{q}(\theta)$};
+\node[grp, fit=(T0)(T3), red!55!black] (Tbox) {};
+\node[red!55!black, above=1pt of Tbox.north] {\scriptsize basis $\mathbf{T}(x)$};
 
-% ===== Panel 2: SVD truncation of a bond =====
-\draw[panel] (4.35,-1.15) rectangle (8.35,1.7);
-\node[anchor=west, black!70] at (4.5,1.45) {\scriptsize\textbf{(2)} truncate each bond at $\chi$};
-\begin{scope}[shift={(5.05,-0.55)}]
-  \foreach \i/\h/\col in {1/1.15/teal!70!black, 2/0.78/teal!70!black, 3/0.36/gray!55, 4/0.20/gray!55, 5/0.11/gray!55, 6/0.05/gray!55}{
-    \fill[\col] ({0.32*\i},0) rectangle ++(0.22,\h);
+% ===== basis-equivalence arrow =====
+\node (sim) at (2.55,-1.4*\dy) {$\underset{\text{\scriptsize basis-equivalent}}{\sim}$};
+
+% ===== classical side: bond-chi classical MPS x same basis =====
+\begin{scope}[shift={(4.0,0)}]
+  \foreach \k in {0,1,2,3}{
+    \node[cmps] (C\k) at (0, -\dy*\k) {};
+    \node[tri]  (U\k) at (1.4, -\dy*\k) {};
+    \draw[thick, black!55] (C\k) -- (U\k);
   }
-  \draw[->] (0.12,0)--(2.35,0); \draw[->] (0.32,-0.05)--(0.32,1.35);
-  \draw[red!70!black, thick, dashed] (0.86,-0.1) -- (0.86,1.3);
-  \node[black!70] at (1.25,1.42) {\scriptsize singular values};
-  \node[teal!55!black] at (0.35,-0.34) {\scriptsize keep $\chi$};
-  \node[gray!60!black] at (1.7,-0.34) {\scriptsize discard};
+  \draw[teal!65!black, thick] (C0)--(C1) (C1)--(C2) (C2)--(C3);
+  \node[draw=none] at (0,-\dy*3-0.7) {\scriptsize$\vdots$};
+  \node[grp, fit=(C0)(C3)(U0)(U3), teal!55!black] (Cbox) {};
+  \node[teal!55!black, above=1pt of Cbox.north, align=center] {\scriptsize classical MPS,\\[-2pt]\scriptsize bond $\le\chi$};
 \end{scope}
-
-% ===== Panel 3: contract + read out =====
-\draw[panel] (8.65,-1.15) rectangle (12.7,1.7);
-\node[anchor=west, black!70] at (8.8,1.45) {\scriptsize\textbf{(3)} contract and read out};
-\begin{scope}[shift={(9.2,0)}]
-  \foreach \i in {1,...,4}{ \node[tn, minimum size=6mm] (B\i) at (0.72*\i,0.15) {}; }
-  \draw[blue!70, thick] (B1)--(B2)--(B3)--(B4);
-  \node[blue!70, anchor=west] at (0.35,-0.7) {\scriptsize bond $\chi{=}1$ or $2$};
-  \foreach \i in {1,...,4}{ \draw[orange!85!black, thick] (B\i) -- ++(0,0.45); \node[obs] at (0.72*\i,0.95) {}; }
-  \draw[->] (1.44,1.3) -- ++(0,0.3) node[above, inner sep=1pt]{\scriptsize $\hat y^{(\chi)}(x)$};
-\end{scope}
-
-% arrows between panels
-\draw[->, very thick, black!55] (4.05,0.15) -- (4.35,0.15);
-\draw[->, very thick, black!55] (8.35,0.15) -- (8.65,0.15);
 \end{tikzpicture}
-\caption{\textbf{The audit in tensor-network terms.} Any trained variational model is a matrix
-product state whose bond dimension caps the entanglement it carries \citep{shin2024}.
-\textbf{(1)} We write the trained state $|\psi_\theta(x)\rangle$ as an MPS, with orange physical
-legs $q_i$ and blue bond legs. \textbf{(2)} For each bond we keep only the largest $\chi$ singular
-values and discard the rest, the standard MPS truncation. \textbf{(3)} \textsc{SimCert} contracts
-the $\chi$-capped MPS with the red readout observables and asks how small $\chi$ can be before the
-recovered prediction $\hat y^{(\chi)}$ changes. For every audited model the answer is $\chi{=}1$, a
-product state, or $\chi{=}2$, whereas an exact representation would need bond dimension
-$2^{\lfloor n/2\rfloor}$.}
+\caption{\textbf{The audit in tensor-network terms} (following the dequantization picture of
+\citealp{shin2024}). The trained model's expectation value is a \emph{coefficient} matrix product
+state $\mathbf{C}^{q}(\theta)$ (blue) contracted with a fixed set of basis functions
+$\mathbf{T}(x)$ (red), and its bond dimension caps the entanglement it can carry. If that bond
+dimension is small, a classical MPS of the same size (teal) contracts with the same basis functions
+to reproduce the output, so the model is basis-equivalent to a cheap classical one. \textsc{SimCert}
+measures this bond dimension directly: it truncates the trained state to bond dimension $\chi$ and
+finds the smallest $\chi$ that still recovers the predictions, which for every audited model is $1$
+or $2$, against an exact-representation bound of $2^{\lfloor n/2\rfloor}$.}
 \label{fig:tn}
 \end{figure}

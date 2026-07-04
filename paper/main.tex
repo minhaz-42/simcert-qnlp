@@ -319,12 +319,13 @@ probes recovery rather than a strong classifier.}
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.86\linewidth]{chi_curves.pdf}
-\caption{Accuracy retained versus bond dimension, one curve per model and dataset, mean
-and standard deviation over seeds. Color encodes the model and the line style and marker encode the
-dataset, so each series is distinguishable by shape as well as color. Flat curves down to $\chi{=}1$
-are the signature of a bond-cheap model, since the classical surrogate loses nothing as it is
-weakened. The \textsc{sst-2} series sit lower, being a real and non-separable task, but are equally
-flat in $\chi$.}
+\caption{Accuracy retained versus bond dimension, one curve per model and dataset, averaged
+over seeds. Color encodes the model and marker shape encodes the dataset, so each series stays
+distinguishable in grayscale. A curve that is flat down to $\chi{=}1$ is the signature of a
+bond-cheap model, since the classical surrogate loses nothing as it is weakened. The four models
+that reach full accuracy on \textsc{mc} coincide along the top edge, being flat at one. The only
+curves that climb are the three compositional \texttt{discocat} runs, which recover their accuracy
+at $\chi{=}2$; every other series is flat in $\chi$.}
 \label{fig:curves}
 \end{figure}
 

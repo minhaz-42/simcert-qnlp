@@ -39,3 +39,8 @@ references/pdfs/
 
 # anonymized snapshot artifact (regenerate via scripts/make_anon_snapshot.sh)
 simcert_anon_code.zip
+
+# LaTeX build artifacts
+paper/*.log
+paper/*.aux
+paper/*.out

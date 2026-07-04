@@ -1,6 +1,9 @@
 \section{Model circuits and glossary}\label{app:circuits}
 All models are reimplemented in PennyLane; \texttt{lambeq} produces the DisCoCat circuits. We
-give each model's trained state below; the audit truncates that state (Algorithm~\ref{alg:audit}).
+give each model's trained state below, and Figure~\ref{fig:circuits_all} shows a representative
+circuit for each; the audit truncates that state (Algorithm~\ref{alg:audit}).
+
+\input{figs/fig_circuits_all.tex}
 
 \paragraph{\texttt{vqc\_text} (reference).} Bag-of-embeddings feature $x\in\mathbb{R}^{n}$
 angle-encoded on $n$ qubits, $L$ layers of $R_y(x_i)$ (re-uploaded), trainable $R_y,R_z$, and a

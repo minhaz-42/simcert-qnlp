@@ -1,0 +1,41 @@
+% Fig: representative circuits for the four literature models (simplified for the main text;
+% full per-model circuits are in the released harness).
+\begin{figure}[t]
+\centering
+\begin{minipage}[t]{0.47\textwidth}\centering
+\begin{quantikz}[column sep=5pt, row sep=8pt]
+\lstick{$\ket{0}$} & \gate{H} & \gate{R_x} & \ctrl{1} & \gate{R_y(\theta)} & \meter{$Z$} \\
+\lstick{$\ket{0}$} & \gate{H} & \gate{R_x} & \targ{}  & \gate{R_y(\theta)} & \qw
+\end{quantikz}\\[2pt]
+{\scriptsize\textbf{(a) \texttt{QSANN}.} Per-token encoder $+$ query ansatz; key and value reuse the encoder, read as $\langle Z\rangle$ and a Pauli vector.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.47\textwidth}\centering
+\begin{quantikz}[column sep=5pt, row sep=8pt]
+\lstick{$\ket{0}$} & \gate{R_x(x)} & \gate[2]{ZZ} & \gate{R_y} & \gate{R_x(x)} & \meter{$\rho$} \\
+\lstick{$\ket{0}$} & \gate{R_x(x)} &              & \gate{R_y} & \gate{R_x(x)} & \trash{tr}
+\end{quantikz}\\[2pt]
+{\scriptsize\textbf{(b) \texttt{QMSAN}.} Data re-upload with an IsingZZ ring; the last $n/2$ qubits are traced out, giving a mixed query/key state $\rho$.}
+\end{minipage}
+
+\vspace{8pt}
+\begin{minipage}[t]{0.47\textwidth}\centering
+\begin{quantikz}[column sep=5pt, row sep=8pt]
+\lstick{$\ket{0}$} & \gate{R_y} & \ctrl{1} & \gate{R_y} & \gate[2]{\text{LCU}+\text{QSVT}} & \meter{$XYZ$} \\
+\lstick{$\ket{0}$} & \gate{R_y} & \gate{R_x} & \gate{R_y} &                                & \meter{$XYZ$}
+\end{quantikz}\\[2pt]
+{\scriptsize\textbf{(c) \texttt{CLAQS}.} Ansatz-14 token embedding; tokens are combined by a complex $\ell_1$-normalised LCU and a QSVT polynomial before an XYZ readout.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.47\textwidth}\centering
+\begin{quantikz}[column sep=5pt, row sep=8pt]
+\lstick{noun} & \gate{R_x} & \ctrl{1} & \qw       & \qw \\
+\lstick{verb} & \gate[2]{\text{IQP}} & \targ{} & \gate{H} & \meter{$0$} \\
+\lstick{sent.}&            & \qw      & \qw       & \meter{$Z$}
+\end{quantikz}\\[2pt]
+{\scriptsize\textbf{(d) \texttt{DisCoCat}.} Word states with an IQP ansatz; a grammar cup is a Bell effect (CNOT, $H$, post-select $0$), leaving one open sentence wire.}
+\end{minipage}
+\caption{\textbf{Representative circuits for the audited models} (simplified; exact per-model
+circuits are released with the harness). \texttt{QMSAN} is read out as a reduced density matrix,
+which is why it uses the mixed-state audit path; \texttt{DisCoCat} post-selects the cup qubits and
+reads the single open wire by the Born rule.}
+\label{fig:circuits_all}
+\end{figure}

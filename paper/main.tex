@@ -14,7 +14,7 @@
 \usepackage{algpseudocode}
 \usepackage{natbib}
 \usepackage{tikz}
-\usetikzlibrary{fit,backgrounds,positioning,arrows.meta,shapes.geometric}
+\usetikzlibrary{fit,backgrounds,positioning,arrows.meta,shapes.geometric,decorations.pathreplacing,calc}
 \usepackage{quantikz}
 \usepackage[hidelinks]{hyperref}
 \graphicspath{{../figures/}}
@@ -318,16 +318,29 @@ flat in $\chi$.}
 \end{figure}
 
 \subsection{Removing the quantum resource barely moves the result}
-Two further witnesses agree. The trained circuits are not trivial product states, since their mean
-bipartite entanglement entropy ranges from about $0.1$ to $1.3$ nats (Table~\ref{tab:results}), yet
-truncating to $\chi{=}1$ loses no predictions for the attention models, so the entanglement they
-build is not load-bearing for their decisions. The entanglement-removal ablation tells the same
+Two further witnesses agree (Figure~\ref{fig:witnesses}). The trained circuits are not trivial
+product states, since their mean bipartite entanglement entropy ranges from about $0.1$ to $1.3$
+nats (Figure~\ref{fig:witnesses}a), yet truncating to $\chi{=}1$ loses no predictions for the
+attention models (Figure~\ref{fig:witnesses}b), so the entanglement they build is not load-bearing
+for their decisions. The entanglement-removal ablation tells the same
 story on the easy tasks, where a retrained product-state twin matches the full model and
 $\Delta A_{\mathrm{ent}}$ is within noise of zero for \texttt{qsann} and \texttt{qmsan} on
 \textsc{mc}. The one place the state fidelity climbs gradually with $\chi$ is the eight-qubit mixer
 \texttt{claqs}, where fidelity rises from $0.72$ at $\chi{=}1$ to $0.99$ at $\chi{=}4$; this is also
 the one place the bond-dimension axis has room to resolve structure, and even there the predictions
 are recovered at $\chi{=}1$.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.98\linewidth]{witnesses.pdf}
+\caption{\textbf{Entanglement is present but, with one exception, not load-bearing} (MC, all five
+models). Left, the mean bipartite entanglement entropy $\bar S$ is non-zero for every model, so the
+trained states are genuinely entangled. Right, the full model and its $\chi{=}1$ product-state
+surrogate reach the same accuracy for the attention and mixer models, whereas for \texttt{discocat}
+the $\chi{=}1$ surrogate drops toward chance, marking the one place where the entanglement built by
+its grammar cups is load-bearing.}
+\label{fig:witnesses}
+\end{figure}
 
 \subsection{Effects we did \emph{not} observe}
 \label{sec:results-none}
@@ -361,14 +374,25 @@ circuits and is independent of this gap.}
 \label{tab:repro}
 \end{table}
 
-\paragraph{Reproduction, honestly.} Table~\ref{tab:repro} places our reimplementations against the
-published numbers. On \textsc{mc} the compositional model reproduces to within $0.02$. On
+\paragraph{Reproduction, honestly.} Table~\ref{tab:repro} and Figure~\ref{fig:repro} place our
+reimplementations against the published numbers. On \textsc{mc} the compositional model reproduces to within $0.02$. On
 \textsc{rp}, a task of only $74$ training items that the original papers themselves flag as fragile,
 our numbers run about $0.17$ to $0.22$ below published, which we attribute to our own token
 embeddings and, for DisCoCat, the offline reader standing in for the unavailable grammar parser. We
 flag this plainly, because it matters for one thing and not another. It weakens any claim about
 matching \textsc{rp} accuracy, but the simulability verdict is about our own trained circuits and is
 unaffected by whether they hit the published accuracy. The certificate audits the model in hand.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.66\linewidth]{repro.pdf}
+\caption{\textbf{Reproduction gap.} Our audited accuracy against the published number for the pairs
+with a published value; the annotation is ours minus published. \textsc{mc\_real} reproduces
+closely, whereas \textsc{rp}, a fragile task of only $74$ training items reimplemented with our own
+embeddings and an offline reader, runs below. The simulability verdict concerns our own trained
+circuits and does not depend on closing this gap.}
+\label{fig:repro}
+\end{figure}
 
 \section{Discussion, caveats, and open questions}
 \label{sec:discussion}

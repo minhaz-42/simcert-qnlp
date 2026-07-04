@@ -1,49 +1,58 @@
-% Fig: tensor-network view (Shin-style) -- the trained state as an MPS, bonds capped at chi,
-% contracted with the readout. Color-coded: site tensors (teal), physical legs (orange),
-% bond legs (blue, labelled chi), readout (red).
+% Fig: tensor-network view of the audit (Shin-style). MPS chain -> SVD spectrum of a bond,
+% truncated at chi -> chi-capped MPS contracted with the readout.
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[
-  font=\small, >=latex,
-  tensor/.style={draw, fill=teal!18, rounded corners=1pt, minimum size=8mm},
-  obs/.style={draw, fill=red!14, regular polygon, regular polygon sides=3, shape border rotate=180, minimum size=7mm, inner sep=0pt},
+  font=\small, >=Latex,
+  tn/.style={draw=teal!70!black, thick, fill=teal!16, rounded corners=1pt, minimum size=8mm},
+  obs/.style={draw=red!60!black, fill=red!16, regular polygon, regular polygon sides=3, shape border rotate=180, minimum size=6.5mm, inner sep=0pt},
 ]
-% --- left: exact state as an MPS with a growing bond ---
-\node[anchor=west] at (0.2,2.25) {\itshape trained state $|\psi_\theta(x)\rangle$ as an MPS};
+% ---------- (1) MPS chain ----------
+\node[anchor=west, teal!45!black] at (0.1,1.7) {\itshape $|\psi_\theta(x)\rangle$ as an MPS};
 \foreach \i in {1,...,5}{
-  \node[tensor] (A\i) at (1.15*\i,0.6) {$A_{\i}$};
-  \draw[orange!80!black, thick] (A\i) -- ++(0,0.7) node[above, black]{\scriptsize$q_{\i}$}; % physical leg
+  \node[tn] (A\i) at (1.0*\i,0.7) {$A_{\i}$};
+  \draw[orange!85!black, thick] (A\i) -- ++(0,0.62) node[above, black, inner sep=1pt]{\scriptsize$q_{\i}$};
 }
-\draw[blue!70, thick] (A1)--(A2); \draw[blue!70, thick] (A2)--(A3);
-\draw[blue!70, thick] (A3) -- node[above=1pt, black]{\scriptsize bond $\le\chi$} (A4);
+\draw[blue!70, thick] (A1)--(A2)--(A3);
+\draw[blue!70, thick] (A3)--(A4);
 \draw[blue!70, thick] (A4)--(A5);
-\draw[blue!70, thick] (A1)--++(-0.6,0); \draw[blue!70, thick] (A5)--++(0.6,0);
+\draw[blue!70, thick] (A1)--++(-0.5,0);  \draw[blue!70, thick] (A5)--++(0.5,0);
+% callout on the A3-A4 bond
+\draw[dashed, gray] ($(A3)!0.5!(A4)$) -- (3.6,-1.35);
 
-% --- arrow: truncate ---
-\node (trunc) at (7.55,0.6) {};
-\draw[->, very thick] (A5)++(0.65,0) -- ++(0.8,0)
-  node[midway, above, align=center]{\scriptsize truncate\\[-2pt]\scriptsize to $\chi$};
+% ---------- (2) SVD spectrum of that bond ----------
+\begin{scope}[shift={(2.5,-2.55)}]
+  \node[anchor=west] at (-0.2,1.35) {\scriptsize singular values of a bond};
+  \foreach \i/\h/\col in {1/1.1/teal!70!black, 2/0.72/teal!70!black, 3/0.34/gray!55, 4/0.19/gray!55, 5/0.10/gray!55, 6/0.05/gray!55}{
+    \fill[\col] ({0.34*\i},0) rectangle ++(0.24,\h);
+  }
+  \draw[->] (0.15,0)--(2.5,0); \draw[->] (0.34,-0.05)--(0.34,1.3);
+  \draw[red!70!black, thick, dashed] (0.34*2.7,-0.1) -- (0.34*2.7,1.25);
+  \node[teal!55!black] at (0.7,-0.32) {\scriptsize keep top $\chi$};
+  \node[gray!60!black] at (1.75,-0.32) {\scriptsize truncate};
+\end{scope}
+\node at (2.9,-0.95) {\scriptsize SVD, cap at $\chi$};
 
-% --- right: chi-capped MPS contracted with the readout ---
-\begin{scope}[xshift=8.7cm]
-\foreach \i in {1,...,5}{
-  \node[tensor] (B\i) at (0.85*\i,0.6) {};
-}
-\draw[blue!70, thick] (B1)--(B2)--(B3)--(B4)--(B5);
-\node[blue!70, anchor=west] at (0.5,-0.05) {\scriptsize bond $\chi{=}1$ or $2$};
-\foreach \i in {1,...,5}{ \draw[orange!80!black, thick] (B\i) -- ++(0,0.55); }
-% readout row (observables contracted onto physical legs)
-\foreach \i in {1,...,5}{ \node[obs] at (0.85*\i,1.45) {}; }
-\node[align=center] at (2.55,-0.35) {\scriptsize $\hat y^{(\chi)}(x)$};
-\draw[->] (2.55,0.05) -- (2.55,-0.18);
+% ---------- (3) chi-capped MPS + readout ----------
+\begin{scope}[shift={(6.7,0)}]
+  \draw[->, very thick] (-0.7,0.7) -- (-0.05,0.7) node[midway, above]{\scriptsize contract};
+  \foreach \i in {1,...,5}{ \node[tn, minimum size=7mm] (B\i) at (0.72*\i,0.7) {}; }
+  \draw[blue!70, thick] (B1)--(B2)--(B3)--(B4)--(B5);
+  \node[blue!70, anchor=west] at (0.4,-0.02) {\scriptsize bond $\chi{=}1$ or $2$};
+  \foreach \i in {1,...,5}{
+    \draw[orange!85!black, thick] (B\i) -- ++(0,0.5);
+    \node[obs] at (0.72*\i,1.5) {};
+  }
+  \draw[->] (2.16,1.95) -- ++(0,0.35) node[above]{\scriptsize $\hat y^{(\chi)}(x)$};
 \end{scope}
 \end{tikzpicture}
-\caption{\textbf{The audit in tensor-network terms.} Any trained variational model is a
-matrix product state (MPS) whose bond dimension caps the entanglement it
-carries~\citep{shin2024}. \textsc{SimCert} truncates that MPS to bond dimension $\chi$ (right;
-blue bond legs, orange physical legs $q_i$, red readout observables) and asks how small $\chi$
-can be before the recovered prediction $\hat y^{(\chi)}$ changes. For every audited model the
-answer is $\chi{=}1$ (a product state) or $\chi{=}2$, while an \emph{exact} representation would
-need bond dimension $2^{\lfloor n/2\rfloor}$.}
+\caption{\textbf{The audit in tensor-network terms.} Any trained variational model is a matrix
+product state (MPS) whose bond dimension caps the entanglement it carries \citep{shin2024}. For
+each bond we take the singular-value spectrum (centre) and keep only the largest $\chi$ values,
+discarding the rest, which is the standard MPS truncation. \textsc{SimCert} contracts the
+resulting $\chi$-capped MPS (right; teal tensors, orange physical legs $q_i$, red readout
+observables) and asks how small $\chi$ can be before the recovered prediction $\hat y^{(\chi)}$
+changes. For every audited model the answer is $\chi{=}1$, a product state, or $\chi{=}2$, whereas
+an exact representation would need bond dimension $2^{\lfloor n/2\rfloor}$.}
 \label{fig:tn}
 \end{figure}

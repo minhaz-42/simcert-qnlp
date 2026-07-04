@@ -51,7 +51,7 @@ def main():
         ent = [c["entropy_mean"] for c in certs]
         dent = [c["delta_ent"] for c in certs]
         lines.append(
-            f"\\texttt{{{model.replace('_', chr(92) + '_')}}} & {dataset} & {n} & "
+            f"\\texttt{{{model.replace('_', chr(92) + '_')}}} & {dataset.replace('_', chr(92)+'_')} & {n} & "
             f"{_fmt(full)} & {_fmt(acc1)} & {cstar_txt} & {_fmt(ent)} & {_fmt(dent)} \\\\"
         )
     lines += [r"\bottomrule", r"\end{tabular}"]

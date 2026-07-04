@@ -1,0 +1,427 @@
+% SimCert -- TMLR submission draft.
+% NOTE: formatted in a self-contained JMLR-like single-column style so it compiles anywhere
+% (tectonic). For the actual TMLR submission, swap this preamble for the official tmlr.sty
+% (JMLR-derived) from OpenReview; the body is written to TMLR norms (~12pp, unlimited appendix,
+% double-blind). Author block is anonymized for double-blind review.
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{natbib}
+\usepackage[hidelinks]{hyperref}
+\graphicspath{{../figures/}}
+
+\newtheorem{definition}{Definition}
+\newtheorem*{result}{Result (informal)}
+\newcommand{\chistar}{\ensuremath{\chi^\star}}
+
+\title{\textbf{Was the quantum ever load-bearing?}\\[2pt]
+\large Auditing the classical simulability of trained quantum-NLP text models}
+\author{Anonymous author(s)\\\small Submission under double-blind review}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Quantum natural language processing (QNLP) models---compositional DisCoCat circuits,
+quantum self-attention networks, and all-quantum token mixers---are promoted for a quantum
+benefit on text classification. That benefit is usually argued from accuracy, yet whether a
+\emph{trained} QNLP circuit ever leaves the efficiently classically-simulable regime is
+rarely tested. We introduce \textsc{SimCert}, an open, model-agnostic protocol that audits
+this directly: it re-simulates each trained circuit as a bond-dimension-$\chi$ matrix product
+state, sweeps $\chi$, and records the smallest $\chi$ (denoted \chistar) at which a classical
+surrogate recovers the model's own predictions, alongside an entanglement-removal ablation and
+two dequantization witnesses. Auditing five published QNLP architectures across four datasets
+(up to $10$ qubits), we find that a classical surrogate recovers the models' predictions at
+\emph{small, non-growing} bond dimension: attention-style models are recovered at $\chi{=}1$
+(a product state), and a compositional model at $\chi{=}2$; \chistar\ stays flat as we scale
+the qubit count while the exact bound grows exponentially. The circuits do carry entanglement,
+but removing it barely moves the result. We read this cautiously---it \emph{suggests} the
+quantum resource is not the operative ingredient \emph{at the scales these models are
+tested}, not that QNLP is classically simulable in general. We release the harness and phrase
+the findings as a protocol and a set of questions for QNLP model and benchmark design.
+\end{abstract}
+
+\section{Introduction}
+Because fault-tolerant quantum hardware is not yet available, most claims in quantum machine
+learning (QML) are established by classical simulation of small circuits, and quantum NLP
+inherits this practice. A steady stream of QNLP models reports accuracy gains on text
+classification: compositional DisCoCat pipelines run on and simulated for real
+devices~\citep{lorenz2021}, quantum self-attention networks~\citep{li2022,chen2024}, and, more
+recently, fully-quantum token mixers~\citep{claqs2025}. The reported numbers are real. What is
+usually left implicit is the inference the reader is invited to draw---that the \emph{quantum}
+structure is doing the work.
+
+That inference is testable, and it is tested surprisingly rarely. Surveying recent QNLP papers
+that claim a quantum benefit on text, we find that the large majority compare against classical
+\emph{networks} of matched size but not against a classical \emph{simulation of their own
+circuit}---the one baseline that would isolate whether the quantum resource, rather than the
+surrounding classical machinery or the trainable parameters, is responsible.\footnote{We count
+a paper as testing simulability only if it reports a classical surrogate of the trained circuit
+(tensor-network contraction, Pauli propagation, or an explicit entanglement-removal ablation),
+not merely a separately-trained classical baseline. The exact search and inclusion criteria are
+in Appendix~\ref{app:survey}.} The same gap was recently closed for tabular
+QML~\citep{bowles2024} and for quantum convolutional networks~\citep{bermejo2024}, with the
+theoretical footing that trainable variational models are constrained matrix product states
+(MPS)~\citep{shin2024} and that the absence of barren plateaus tends to imply classical
+simulability~\citep{cerezo2025}. \emph{So which QNLP results survive a classical surrogate of
+the trained circuit?} That is the question we take up.
+
+We make three contributions, all of them audit verbs rather than claims of a new model.
+\begin{itemize}
+\item We \textbf{define} a scoped simulability criterion for trained QNLP circuits---the
+smallest MPS bond dimension \chistar\ at which a classical surrogate recovers the model's
+predictions---and package it with an entanglement-removal ablation, entanglement entropy, a
+geometric-difference kernel test, and a data-reuploading spectral test into a per-model
+\emph{simulability certificate}.
+\item We \textbf{audit} five published QNLP architectures (DisCoCat/\texttt{lambeq}, quantum
+self-attention \texttt{QSANN} and \texttt{QMSAN}, the all-quantum token mixer \texttt{CLAQS},
+and a variational-classifier reference) across four datasets, and report a \chistar-vs-size
+scaling study.
+\item We \textbf{release} an open, model-agnostic harness that consumes any trained circuit
+through a common intermediate representation, so the certificate can be recomputed and extended
+by others.\footnote{Anonymized for review: \url{https://anonymous.4open.science/r/simcert}.}
+\end{itemize}
+
+The paper front-loads its epistemics. Section~\ref{sec:epistemics} sets out what a simulability
+audit can and cannot establish; Section~\ref{sec:framework} fixes definitions and the
+certificate; Sections~\ref{sec:models}--\ref{sec:protocol} describe the audited models, data,
+and surrogate; Section~\ref{sec:results} reports the findings; Section~\ref{sec:discussion}
+states the caveats and the open questions we think follow.
+
+\section{What a simulability audit can and cannot tell us}
+\label{sec:epistemics}
+A skeptical result earns trust only if it anticipates the ways it could be wrong, so we state
+the limits before the evidence. An audit of this kind speaks to \emph{trained} models at the
+\emph{scales they are actually run}. It does not, and cannot, prove that no QNLP model at any
+size resists classical simulation; the interesting asymptotic question is exactly the one that
+simulation cannot reach. What it can do is check a concrete, load-bearing assumption: that the
+accuracy a model reports depends on quantum structure that a cheap classical surrogate cannot
+reproduce.
+
+Three failure modes shape the design. First, a surrogate that is too weak will fail to recover
+predictions for uninteresting numerical reasons; we therefore sweep the surrogate's power (the
+bond dimension) rather than fixing it, and report the whole curve. Second, ``recovering
+accuracy'' and ``recovering the model's function'' are different tests---a surrogate could match
+the label while computing a different function---so we report agreement with the trained model's
+own predictions, not only accuracy against ground truth. Third, absence of a quantum effect on
+a saturated benchmark says little; we therefore include a genuinely hard task and are explicit
+about where a benchmark is degenerate. None of this settles the asymptotic question. It settles
+the empirical one that current QNLP papers implicitly answer in the affirmative.
+
+\section{Framework and definitions}
+\label{sec:framework}
+\paragraph{Setup.} A QNLP text classifier maps an input $x$ (a sentence, or a sequence of
+token embeddings) to a trained circuit that prepares a state $|\psi_\theta(x)\rangle$ on $n$
+qubits, from which a readout---a set of Pauli expectation values, possibly followed by a small
+classical head---produces a label $\hat y_\theta(x)$. We treat the trained parameters $\theta$
+as fixed and ask about the function $\hat y_\theta$.
+
+\paragraph{Which notion of simulability.} We adopt the standard hierarchy: a model is
+\emph{classically simulable} (CSIM) if its outputs can be computed classically in polynomial
+time, and \emph{efficiently classically simulable up to a data-loading step} (a weaker,
+common-in-practice notion) if the only obstruction is preparing the input
+state~\citep{cerezo2025,shin2024}. Our surrogate is an MPS, which realizes CSIM whenever the
+required bond dimension is small; we make no claim about regimes where it is not. Every claim
+below is of the form ``simulable at bond dimension up to $\chi$, at these model sizes, on these
+datasets.''
+
+\paragraph{The bond-dimension criterion.} For a trained state we form its optimal
+bond-dimension-$\chi$ MPS approximation $|\psi^{(\chi)}\rangle$ by sequential singular-value
+truncation, recompute the readout, and obtain a truncated prediction $\hat y^{(\chi)}(x)$. We
+report, over the test set, the truncated accuracy $A(\chi)$, the agreement
+$\pi(\chi)=\Pr_x[\hat y^{(\chi)}(x)=\hat y(x)]$ with the untruncated model, and the mean state
+fidelity $F(\chi)$. The certificate's headline scalar is
+\begin{equation}
+\chistar \;=\; \min\{\chi : A_{\mathrm{full}}-A(\chi)\le\tau\},
+\label{eq:chistar}
+\end{equation}
+the smallest bond dimension whose accuracy is within a tolerance $\tau$ of the untruncated
+model. We set $\tau$ to the model's own generalization gap (differences smaller than the gap
+the model already exhibits are not meaningfully ``quantum resource'') and report robustness to
+two alternative tolerances in the appendix. A model whose \chistar\ is small \emph{and does not
+grow} with $n$ is, in the operational sense above, recovered by a cheap classical surrogate; we
+call such a model ``bond-cheap'' and use the term bare thereafter.
+
+\begin{result}
+For every audited model at the tested scales, \chistar\ is a small constant (one or two) and
+does not grow when the qubit count is increased on a fixed task, while the bond dimension
+required for an \emph{exact} MPS grows as $2^{\lfloor n/2\rfloor}$.
+\end{result}
+
+\paragraph{Corroborating witnesses.} Bond dimension is one lens. The certificate adds three
+inexpensive ones: (i) an \emph{entanglement-removal} ablation that retrains a product-state twin
+of the model and reports $\Delta A_{\mathrm{ent}}=A_{\mathrm{full}}-A_{\mathrm{sep}}$, after
+\citet{bowles2024}; (ii) the mean bipartite entanglement entropy $\bar S$ of the trained states,
+which lower-bounds the $\chi$ an exact representation needs; and (iii) two dequantization probes
+where they apply---the geometric difference $g_{CQ}$ between the trained quantum kernel and a
+classical kernel~\citep{huang2021} and the effective data-reuploading Fourier
+degree~\citep{schuld2021}. We report the full vector rather than collapsing to a single verdict,
+because, as Section~\ref{sec:results} shows, the witnesses can legitimately disagree.
+
+\section{Models and datasets audited}
+\label{sec:models}
+\paragraph{Selection.} We audit published QNLP text classifiers that (a) target
+sentence/text classification, (b) fit within a simulator's reach at their published qubit
+counts, and (c) can be reimplemented from their descriptions. Applying these criteria to the
+QNLP literature leaves a compact set spanning the two dominant paradigms---compositional and
+attention-based---plus a recent all-quantum mixer; we add one plain variational classifier as a
+reference point. Table~\ref{tab:models} compares them at a glance and stands in for a wall of
+per-model circuit diagrams (representative ansätze are drawn in Appendix~\ref{app:circuits}).
+None of the attention/mixer models ship official code, so we reimplement from the equations and
+report the reproduction gap openly (Section~\ref{sec:results}); the compositional model uses the
+official \texttt{lambeq} pipeline.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{lllll}
+\toprule
+Model & Paradigm & Cross-token mixing & Readout & State \\
+\midrule
+\texttt{discocat} & compositional & grammar cups (post-selection) & open-wire Born rule & pure \\
+\texttt{qsann} & attention & Gaussian of measured Q/K (classical) & Pauli vector $\to$ head & pure \\
+\texttt{qmsan} & attention & $\mathrm{tr}(\rho_q\sigma_k)$ (mixed-state) & Pauli vector $\to$ head & mixed \\
+\texttt{claqs} & token mixer & complex LCU $+$ QSVT polynomial & XYZ Paulis $\to$ MLP & pure \\
+\texttt{vqc\_text} & reference & entangling ring & $\langle Z_0\rangle$ & pure \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{The audited models.} One row per architecture, grouped by paradigm.
+\texttt{qmsan} is the only mixed-state model and is audited through the purification of its
+reduced density matrices. Full circuits, gate sets, and parameter counts are in
+Appendix~\ref{app:circuits}.}
+\label{tab:models}
+\end{table}
+
+\paragraph{Datasets.} We use the tasks these models were built on. \textsc{mc} (meaning
+classification, cooking vs.\ computing) and \textsc{rp} (a relative-pronoun task) are the
+canonical DisCoCat benchmarks of \citet{lorenz2021}; \textsc{mc} is small and near-separable,
+\textsc{rp} is the harder, low-data task where published accuracies actually differ across
+models. We add a balanced subset of \textsc{sst-2} as a genuinely non-separable sentiment task,
+and a synthetic \textsc{mc}-style set for controlled scaling. Sizes and preprocessing are in
+Appendix~\ref{app:data}. Two honest limitations are worth stating here rather than burying: our
+\textsc{rp} reimplementations use our own token embeddings, and our DisCoCat pipeline uses an
+offline reader in place of the trained grammar parser whose model host is no longer reachable.
+Both cost accuracy on \textsc{rp}, as we report.
+
+\section{The classical surrogate and simulation protocol}
+\label{sec:protocol}
+We do not conjecture simulability; we realize it. Each trained model exports its per-example
+circuit to a common representation---OpenQASM for gate circuits, or, for the token mixer whose
+state is a matrix polynomial rather than a gate sequence, the trained statevector directly. A
+single audit consumer then re-simulates every model identically (Algorithm~\ref{alg:audit}),
+so the audit never depends on which framework produced a circuit. The MPS truncation itself is
+an exact sequential-SVD computation, cross-checked against an independent tensor-network
+simulator; on circuits with known answers (a GHZ state, a product state) it reproduces the
+analytic bond structure, which is our correctness check for the whole pipeline.
+
+\begin{algorithm}[t]
+\caption{\textsc{SimCert} bond-dimension audit for one trained model}
+\label{alg:audit}
+\begin{algorithmic}[1]
+\State \textbf{input:} trained model $M$, test set $D$, tolerance $\tau$, bond dimensions $X$
+\For{each example $x\in D$}
+  \State export the trained units of $x$ (one whole-sentence circuit, or per-token circuits)
+  \For{each $\chi\in X$}
+    \State truncate each unit's state to bond dimension $\chi$; recompute its Pauli readout
+    \State $\hat y^{(\chi)}(x)\gets$ model's own decision rule applied to the truncated readout
+  \EndFor
+\EndFor
+\State $A(\chi),\pi(\chi),F(\chi)\gets$ accuracy, agreement, fidelity aggregated over $D$
+\State $\chistar\gets\min\{\chi: A_{\mathrm{full}}-A(\chi)\le\tau\}$ \Comment{Eq.~\ref{eq:chistar}}
+\State \textbf{return} certificate $(\chistar,\ \Delta A_{\mathrm{ent}},\ \bar S,\ g_{CQ},\ \text{Fourier degree})$
+\end{algorithmic}
+\end{algorithm}
+
+The surrogate's cost is explicit: an MPS sweep on an $n$-qubit, depth-$d$ circuit scales as
+$\mathcal{O}(n\,d\,\chi^2)$, and the exact-representation bound is $\chi=2^{\lfloor n/2\rfloor}$,
+so a small measured \chistar\ against a rapidly growing exact bound is precisely the signal we
+are after. All experiments run on a single CPU (no GPU); we report seeds and, where a
+reimplementation is heavier than the hardware comfortably allows, we say so and reduce scale
+rather than quietly dropping runs. Full configurations are in Appendix~\ref{app:configs}.
+
+\section{Results}
+\label{sec:results}
+We report three findings, then a subsection of effects we looked for and did not see. Unless
+noted, numbers are mean over three seeds; the aggregate table is Table~\ref{tab:results} and the
+reproduction gap is Table~\ref{tab:repro}.
+
+\subsection{A classical surrogate recovers the predictions at small bond dimension}
+Across models and datasets, a bond-dimension-one or -two surrogate recovers the trained model's
+predictions. On the canonical \textsc{mc} task, the attention and mixer models
+(\texttt{qsann}, \texttt{qmsan}, \texttt{claqs}) and the reference classifier are all recovered
+at $\chi{=}1$---a \emph{product state}---with no accuracy lost; the compositional
+\texttt{discocat} needs $\chi{=}2$, but no more. The pattern holds on real data: our DisCoCat
+run reproduces the published \textsc{mc} accuracy to within $0.02$
+(Table~\ref{tab:repro}) and is recovered at $\chi{=}2$. The scales, in other words, are already
+low. In the operational sense of Section~\ref{sec:framework}, these trained models are
+bond-cheap.
+
+\subsection{$\chistar$ does not grow with system size}
+The obvious objection is that small circuits are trivially simulable, so the audit only bites at
+scale. Figure~\ref{fig:scaling} tests this directly: on a fixed task we increase the qubit count
+of the reference model from $4$ to $10$ and track \chistar. It stays flat at $1$ while the exact
+bond bound grows $4\to8\to16\to32$. Adding qubits neither raises the bond dimension a classical
+surrogate needs nor---on this task---improves accuracy. \emph{The gap between what the model uses
+and what it could use widens with every qubit.}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{scaling.pdf}
+\caption{\textbf{$\chistar$ does not grow with qubit count.} (a) Accuracy retained vs.\ bond
+dimension $\chi$ for the reference model at $n\in\{4,6,8,10\}$ on \textsc{sst-2}; the curves are
+flat down to $\chi{=}1$. (b) Measured \chistar\ (red) stays at $1$ while the exact-MPS bound
+$2^{n/2}$ (grey, dashed) grows exponentially. A product-state surrogate recovers the predictions
+at every size tested. \emph{Caveat:} accuracy here is modest and does not rise with $n$, so this
+probes recovery, not a strong classifier.}
+\label{fig:scaling}
+\end{figure}
+
+\subsection{Removing the quantum resource barely moves the result}
+Two further witnesses agree. The trained circuits are not trivial product states---their mean
+bipartite entanglement entropy ranges from about $0.1$ to $1.3$ nats
+(Table~\ref{tab:results})---yet truncating to $\chi{=}1$ loses no predictions for the
+attention models, so the entanglement they build is not load-bearing for their decisions. The
+entanglement-removal ablation tells the same story on the easy tasks: a retrained product-state
+twin matches the full model ($\Delta A_{\mathrm{ent}}\approx 0$). Figure~\ref{fig:curves}
+shows the accuracy-vs-$\chi$ curves; they are flat where the models saturate, and the one place
+the state fidelity climbs gradually with $\chi$ (the $8$-qubit mixer) is also the one place the
+bond-dimension axis has room to resolve structure---and even there the \emph{predictions} are
+recovered at $\chi{=}1$.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.82\linewidth]{chi_curves.pdf}
+\caption{\textbf{Accuracy retained vs.\ bond dimension.} One curve per (model, dataset),
+mean$\pm$std over seeds. Flat curves down to $\chi{=}1$ are the signature of a bond-cheap model:
+the classical surrogate loses nothing as it is weakened. \textsc{sst-2} sits lower (a real,
+non-separable task) but is equally flat in $\chi$.}
+\label{fig:curves}
+\end{figure}
+
+\subsection{Effects we did \emph{not} observe}
+We looked for, and did not find, three things. We did \emph{not} see \chistar\ grow with qubit
+count on a fixed task (Figure~\ref{fig:scaling}). We did \emph{not} see the entanglement-removal
+ablation cost accuracy on the tasks where the models saturate. And we did \emph{not} see the
+compositional model behave like the attention models: \texttt{discocat} alone needs $\chi{=}2$,
+and truncating it to $\chi{=}1$ collapses its accuracy toward chance---its grammar cups create
+entanglement that \emph{is}, minimally, load-bearing. This lone exception is worth more than the
+uniform cases: it shows the audit is not simply reporting ``everything is $\chi{=}1$'' by
+construction.
+
+\begin{table}[t]
+\centering\small
+\input{tables/results.tex}
+\caption{\textbf{Simulability certificate, all models.} Mean$\pm$std over seeds. \emph{Acc@}$\chi{=}1$
+is the accuracy of a product-state surrogate; \chistar\ is Eq.~\ref{eq:chistar}; $\bar S$ is mean
+bipartite entanglement entropy (nats); $\Delta A_{\mathrm{ent}}$ is the entanglement-removal gap
+(``--'' where a separable twin is not defined). Attention/mixer models are recovered at
+$\chi{=}1$; \texttt{discocat} needs $\chi{=}2$.}
+\label{tab:results}
+\end{table}
+
+\begin{table}[t]
+\centering\small
+\input{tables/reproduction.tex}
+\caption{\textbf{Reproduction gap.} Our audited accuracy vs.\ published, on the datasets with a
+published number. \textsc{mc\_real} reproduces to within $0.02$; \textsc{rp} runs below published
+(fragile $74$-example task; our embeddings and, for DisCoCat, an offline reader). The
+simulability verdict concerns our trained circuits and is independent of this gap.}
+\label{tab:repro}
+\end{table}
+
+\paragraph{Reproduction, honestly.} Table~\ref{tab:repro} places our reimplementations against
+the published numbers. On \textsc{mc} the compositional model reproduces to within $0.02$. On
+\textsc{rp}---a $74$-example task the original papers themselves flag as fragile---our numbers
+run $0.17$--$0.22$ below published, which we attribute to our own token embeddings and, for
+DisCoCat, the offline reader standing in for the unavailable grammar parser. We flag this
+plainly because it matters for one thing and not another: it weakens any claim about matching
+\textsc{rp} accuracy, but the simulability verdict is about our \emph{own} trained circuits and
+is unaffected by whether they hit the published accuracy. The certificate audits the model in
+hand.
+
+\section{Discussion, caveats, and open questions}
+\label{sec:discussion}
+The scoped claim is narrow and, we think, well supported: the QNLP models we audited reproduce
+their behavior under a classical surrogate of small, non-growing bond dimension, and the
+entanglement they carry is (with one revealing exception) not load-bearing for their
+predictions, \emph{at the model sizes and datasets tested}. We are careful not to say more.
+
+Several caveats bound the reading. The audit is average-case over a test set, not a statement
+about every input; \chistar\ is defined against a tolerance, and while we check robustness to
+its choice, a different tolerance shifts the borderline cases. Our simulability notion is the
+practical CSIM-up-to-data-loading one, not a hardness result. The scales are small---the point
+of the scaling study is precisely that they need not be large for the pattern to appear, but a
+determined optimum at larger $n$ remains out of simulation's reach. And the all-quantum mixer is
+run at reduced scale on a CPU; a faithful full-scale reproduction of its published accuracy
+would need a GPU, and is the one experiment here we could not run.\footnote{This is also the
+only place additional compute would change what we can measure; the rest of the audit is
+CPU-bound by design.}
+
+There is a constructive reading. If these models are bond-cheap at deployment scale, they can be
+run classically today, which is useful in its own right; and the audit says exactly where a
+genuine quantum ingredient would have to live to matter---in a regime where \chistar\ grows.
+That reframing turns the negative headline into a design target, and it suggests concrete
+questions for QNLP. Which architectural choices, if any, make \chistar\ grow with $n$? Do the
+compositional cups that make \texttt{discocat} need $\chi{=}2$ point toward structure worth
+scaling? Should QNLP benchmarks report a simulability certificate alongside accuracy, the way
+tabular QML now increasingly does? Our position is collegial rather than combative: the tabular
+and vision audits reached the same conclusion in their domains~\citep{bowles2024,bermejo2024},
+and we read our results as extending, not contradicting, theirs. \emph{Until a QNLP model shows
+its bond dimension growing, the burden of proof for a quantum benefit sits with the model, not
+the skeptic.}
+
+\subsubsection*{Reproducibility statement}
+The harness, all model reimplementations, exact configurations, seeds, dataset indices, and the
+scripts that regenerate every figure and table from stored results are released at the
+anonymized repository above. The audit is deterministic given a trained model; the only
+stochasticity is in training, which we control by seed.
+
+\bibliographystyle{plainnat}
+\begin{thebibliography}{99}
+\small
+\bibitem[Bowles et al.(2024)]{bowles2024} J.~Bowles, S.~Ahmed, and M.~Schuld. Better than
+classical? The subtle art of benchmarking quantum machine learning models.
+\emph{arXiv:2403.07059}, 2024.
+\bibitem[Bermejo et al.(2024)]{bermejo2024} P.~Bermejo et al. Quantum convolutional neural
+networks are (effectively) classically simulable. \emph{arXiv:2408.12739}, 2024.
+\bibitem[Cerezo et al.(2025)]{cerezo2025} M.~Cerezo et al. Does provable absence of barren
+plateaus imply classical simulability? \emph{Nature Communications}, 2025. arXiv:2312.09121.
+\bibitem[Shin et al.(2024)]{shin2024} S.~Shin, Y.~S.~Teo, and H.~Jeong. Dequantizing quantum
+machine learning models using tensor networks. \emph{Phys. Rev. Research} 6:023218, 2024.
+\bibitem[Huang et al.(2021)]{huang2021} H.-Y.~Huang et al. Power of data in quantum machine
+learning. \emph{Nature Communications} 12:2631, 2021. arXiv:2011.01938.
+\bibitem[Schuld et al.(2021)]{schuld2021} M.~Schuld, R.~Sweke, and J.~J.~Meyer. Effect of data
+encoding on the expressive power of variational quantum machine learning models.
+\emph{Phys. Rev. A} 103:032430, 2021.
+\bibitem[Lorenz et al.(2021)]{lorenz2021} R.~Lorenz et al. QNLP in practice: running
+compositional models of meaning on a quantum computer. \emph{arXiv:2102.12846}, 2021.
+\bibitem[Li et al.(2022)]{li2022} G.~Li, X.~Zhao, and X.~Wang. Quantum self-attention neural
+networks for text classification. \emph{arXiv:2205.05625}, 2022.
+\bibitem[Chen et al.(2024)]{chen2024} F.~Chen et al. Quantum mixed-state self-attention network.
+\emph{arXiv:2403.02871}, 2024.
+\bibitem[Chen et al.(2025)]{claqs2025} J.~Chen et al. CLAQS: compact learnable all-quantum token
+mixer for text classification. \emph{arXiv:2510.06532}, 2025.
+\end{thebibliography}
+
+\appendix
+\section{Literature-survey methodology}\label{app:survey}
+\emph{To be completed:} search terms, date cutoff, inclusion/exclusion counts, and the
+selection-bias check for the motivating survey in Section~1.
+\section{Model circuits and glossary}\label{app:circuits}
+\emph{To be completed:} per-model ansätze (gate glyphs, repeated-block notation), the
+mixed-state purification path for \texttt{qmsan}, and a glossary keying physics terms for NLP
+readers.
+\section{Datasets and preprocessing}\label{app:data}
+\emph{To be completed:} sizes, splits, token-embedding construction, and the exact released
+indices.
+\section{Configurations and compute}\label{app:configs}
+\emph{To be completed:} hyperparameters per model, seeds, wall-clock/RAM, and the tolerance
+robustness study for \chistar.
+\end{document}

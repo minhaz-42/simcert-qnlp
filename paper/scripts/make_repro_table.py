@@ -42,7 +42,7 @@ def main():
             continue  # skip synthetic mc etc.
         ours = f"{np.mean(accs):.3f}$\\pm${np.std(accs):.3f}"
         pub_s = f"{pub:.3f}" if pub is not None else "--"
-        rows.append(f"\\texttt{{{model.replace('_', chr(92)+'_')}}} & {dataset} & "
+        rows.append(f"\\texttt{{{model.replace('_', chr(92)+'_')}}} & {dataset.replace('_', chr(92)+'_')} & "
                     f"{len(accs)} & {ours} & {pub_s} \\\\")
         gap = f"{np.mean(accs)-pub:+.3f}" if pub is not None else "n/a"
         printed.append(f"{model:<13} {dataset:<9} {len(accs):>4}   "

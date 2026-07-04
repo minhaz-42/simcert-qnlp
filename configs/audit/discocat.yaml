@@ -1,0 +1,5 @@
+# DisCoCat audit: whole-sentence circuits are ~5-7 qubits (exact MPS bond <=8). No
+# separable twin (the model is trained externally by the producer, not retrainable here).
+chi_values: [1, 2, 4, 8, null]
+cutoff: 1.0e-12
+entanglement_removal: false

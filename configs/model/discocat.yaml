@@ -1,0 +1,5 @@
+# DisCoCat (Lorenz et al., arXiv:2102.12846) via lambeq. Trained by the producer
+# (qnlp-lambeq env); this config drives the qnlp-env audit that consumes the artifacts.
+artifact_dir: results/circuits/discocat
+published_accuracy: 0.798   # Lorenz et al. classical-sim MC test accuracy (real MC)
+baseline: logreg_bow

@@ -25,7 +25,8 @@ pre-registered search strings and dual coding, in the style of the tabular-QML a
 \citealp{bowles2024}) as future work.
 
 \begin{table}[h]
-\centering\small
+\centering
+\resizebox{\linewidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
 Paper & classical-network baseline & trained-circuit surrogate & reports $\chi$ / entanglement \\
@@ -35,7 +36,7 @@ DisCoCat / \texttt{lambeq} \citep{lorenz2021} & -\,$^{a}$ & no & no \\
 \texttt{QMSAN} \citep{chen2024} & yes & no & no \\
 \texttt{CLAQS} \citep{claqs2025} & yes & no & no \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \caption{Core reviewed set. $^{a}$DisCoCat compares to a bag-of-words/word-sequence baseline
 rather than a matched network. None reports a classical surrogate of the trained circuit or a
 simulability diagnostic.}

@@ -12,7 +12,7 @@ rsync -a --delete \
   --exclude='.git' --exclude='paper' --exclude='references/pdfs' \
   --exclude='data' --exclude='checkpoints' --exclude='*.egg-info' \
   --exclude='__pycache__' --exclude='*.pt' --exclude='*.ckpt' \
-  --exclude='outputs' --exclude='multirun' --exclude='*.zip' --exclude='scripts' \
+  --exclude='outputs' --exclude='multirun' --exclude='*.zip' --exclude='/scripts' \
   "$ROOT"/ "$STAGE"/
 
 # scrub identifiers
@@ -29,8 +29,15 @@ fi
 printf '\n> Anonymized code for double-blind review. Author and repository details removed.\n' \
   >> "$STAGE/README.md"
 
+# gate on residual identifiers BEFORE writing the zip, so a leaky snapshot is never produced
+echo "residual identifier check:"
+if grep -rinE "tanvir|gozayaan|minhaz|palash|north.?south" "$STAGE" 2>/dev/null; then
+  echo "LEAK: author identifiers survived in the staged tree; aborting without writing the zip." >&2
+  exit 1
+fi
+echo "  clean"
+
 OUT="$ROOT/simcert_anon_code.zip"
+rm -f "$OUT"   # start fresh; zip -r appends to an existing archive and would keep stale entries
 ( cd "$(dirname "$STAGE")" && zip -qr "$OUT" simcert )
 echo "wrote $OUT"
-echo "residual identifier check:"
-grep -rinE "tanvir|gozayaan|minhaz|palash|north.?south" "$STAGE" 2>/dev/null || echo "  clean"

@@ -46,10 +46,11 @@ to ten qubits, we find that a classical surrogate recovers the predictions at sm
 non-growing bond dimension. Attention-style models are recovered at $\chi{=}1$, that is by a
 product state, and a compositional model at $\chi{=}2$; \chistar\ stays flat as the qubit count
 grows while the exact bound grows exponentially. The circuits do carry entanglement, but removing
-it barely moves the result. We read this cautiously. It suggests that the quantum resource is not
-the operative ingredient at the scales these models are tested, not that QNLP is classically
-simulable in general. We release the harness and phrase the findings as a protocol and a set of
-questions for QNLP model and benchmark design.
+it barely moves the result. At the scales these models are tested, the quantum resource is therefore
+not the operative ingredient. This does not settle the asymptotic question, but it shifts the burden
+of proof: absent evidence that the required bond dimension grows with system size, the default
+reading of these models is classical. We release the audit as an open protocol and harness so that
+any QNLP model can be checked against this bar before a quantum benefit is claimed.
 \end{abstract}
 
 \section{Introduction}
@@ -391,7 +392,13 @@ our numbers run about $0.17$ to $0.22$ below published, which we attribute to ou
 embeddings and, for DisCoCat, the offline reader standing in for the unavailable grammar parser. We
 flag this plainly, because it matters for one thing and not another. It weakens any claim about
 matching \textsc{rp} accuracy, but the simulability verdict is about our own trained circuits and is
-unaffected by whether they hit the published accuracy. The certificate audits the model in hand.
+unaffected by whether they hit the published accuracy. The certificate audits the model in hand. One
+might still object that better-trained models would demand more bond dimension, so that our gap,
+rather than any real property, drives the verdict. The evidence cuts the other way. On \textsc{mc},
+where we reproduce the published accuracy, the attention models are already recovered at $\chi{=}1$,
+so the $\chi{=}1$ finding does not depend on the \textsc{rp} shortfall; and \chistar\ is flat in
+system size on a task we do fit (Figure~\ref{fig:scaling}), which is the opposite of what a
+training-quality artefact would produce.
 
 \begin{figure}[t]
 \centering
@@ -409,7 +416,8 @@ circuits and does not depend on closing this gap.}
 The scoped claim is narrow and, we think, well supported. The QNLP models we audited reproduce their
 behavior under a classical surrogate of small and non-growing bond dimension, and the entanglement
 they carry is, with one revealing exception, not load-bearing for their predictions, at the model
-sizes and datasets tested. We are careful not to say more.
+sizes and datasets tested. That scope is a real limit rather than a hedge, since small-scale
+simulation cannot reach the asymptotic question, but what it does reach it answers cleanly.
 
 Several caveats bound the reading. The audit is average-case over a test set, not a statement about
 every input. \chistar\ is defined against a tolerance, and while we check robustness to its choice,
@@ -419,14 +427,16 @@ study is that they need not be large for the pattern to appear, a determined opt
 remains out of simulation's reach. Our reimplementations also fall short of the published accuracies
 on \textsc{rp}, so for those models we audit weaker instances than the originals, though the verdict
 concerns the circuits we actually trained rather than the published ones. Finally, the all-quantum
-mixer runs at reduced scale on a CPU. A
-faithful full-scale reproduction of its published accuracy would need a GPU, and it is the one
-experiment here we could not run.\footnote{This is also the only place additional compute would
-change what we can measure, since the rest of the audit is CPU-bound by design.}
+mixer runs at reduced scale on a CPU, where its accuracy is near chance, so we treat it as a
+demonstration that the audit works at eight qubits rather than as an audit of the published model.
+That model remains untested at its full scale, which would need a GPU to reproduce, and we say so
+plainly rather than presenting a reduced-scale run as a full audit.\footnote{This is the only place
+additional compute would change what we can measure; the rest of the audit is CPU-bound by design.}
 
-There is a constructive reading. If these models are bond-cheap at deployment scale, they can be run
-classically today, which is useful in its own right, and the audit says exactly where a genuine
-quantum ingredient would have to live to matter, in a regime where \chistar\ grows. That reframing
+There is a constructive reading. If these models are bond-cheap at deployment scale, their quantum
+implementation earns its overhead only where a classical MPS cannot follow, that is where \chistar\
+grows with system size, and none of the audited models show it growing. The audit therefore names
+the target a genuine quantum ingredient must hit rather than merely cataloguing a shortfall. That reframing
 turns the negative headline into a design target and suggests concrete questions for QNLP. Which
 architectural choices, if any, make \chistar\ grow with $n$? Do the compositional cups that make
 \texttt{discocat} need $\chi{=}2$ point toward structure worth scaling? Should QNLP benchmarks report

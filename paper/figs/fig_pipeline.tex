@@ -31,7 +31,7 @@
 \draw[->, teal!70!black] (audit) -- (verdict);
 % (colors are explained in the caption: blue = classical, orange = quantum core, teal = audit)
 \end{tikzpicture}
-\caption{\textbf{What the audit interrogates.} A trained QNLP classifier (top) threads a sentence
+\caption{A trained QNLP classifier (top) threads a sentence
 $x$ through a classical embedding (blue), a quantum core (orange: encode, entangle, measure) that
 prepares $|\psi_\theta(x)\rangle$, and a classical head, producing a label $\hat y$.
 \textsc{SimCert} (bottom, teal) replaces the quantum core with a classical matrix-product-state

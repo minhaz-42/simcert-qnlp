@@ -219,7 +219,7 @@ Model & Paradigm & Cross-token mixing & Readout & State \\
 \texttt{vqc\_text} & reference & entangling ring & $\langle Z_0\rangle$ & pure \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{The audited models.} One row per architecture, grouped by paradigm.
+\caption{The five audited models, one row per architecture, grouped by paradigm.
 \texttt{qmsan} is the only mixed-state model and is audited through the purification of its reduced
 density matrices. Full circuits, gate sets, and parameter counts are in Appendix~\ref{app:circuits}.}
 \label{tab:models}
@@ -306,7 +306,7 @@ every qubit.}
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.98\linewidth]{scaling.pdf}
-\caption{\textbf{\chistar\ does not grow with qubit count.} Left, accuracy retained versus bond
+\caption{The required bond dimension \chistar\ does not grow with qubit count. Left, accuracy retained versus bond
 dimension for the reference model at $n\in\{4,6,8,10\}$ on \textsc{sst-2}; each curve is flat down
 to $\chi{=}1$. Right, the measured \chistar\ (orange) stays at $1$ while the exact-MPS bound
 $2^{n/2}$ (grey, dashed) grows exponentially on the log axis. A product-state surrogate recovers
@@ -318,7 +318,7 @@ probes recovery rather than a strong classifier.}
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.86\linewidth]{chi_curves.pdf}
-\caption{\textbf{Accuracy retained versus bond dimension}, one curve per model and dataset, mean
+\caption{Accuracy retained versus bond dimension, one curve per model and dataset, mean
 and standard deviation over seeds. Color encodes the model and the line style and marker encode the
 dataset, so each series is distinguishable by shape as well as color. Flat curves down to $\chi{=}1$
 are the signature of a bond-cheap model, since the classical surrogate loses nothing as it is
@@ -343,7 +343,7 @@ are recovered at $\chi{=}1$.
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.98\linewidth]{witnesses.pdf}
-\caption{\textbf{Entanglement is present but, with one exception, not load-bearing} (MC, all five
+\caption{Entanglement is present but, with one exception, not load-bearing, on MC for all five
 models). Left, the mean bipartite entanglement entropy $\bar S$ is non-zero for every model, so the
 trained states are genuinely entangled. Right, the full model and its $\chi{=}1$ product-state
 surrogate reach the same accuracy for the attention and mixer models, whereas for \texttt{discocat}
@@ -365,7 +365,7 @@ reporting $\chi{=}1$ by construction.
 \begin{table}[t]
 \centering\small
 \input{tables/results.tex}
-\caption{\textbf{Simulability certificate, all models.} Mean and standard deviation over seeds.
+\caption{Simulability certificate for all models. Mean and standard deviation over seeds.
 Acc@$\chi{=}1$ is the accuracy of a product-state surrogate; \chistar\ is Eq.~\ref{eq:chistar};
 $\bar S$ is the mean bipartite entanglement entropy in nats; $\Delta A_{\mathrm{ent}}$ is the
 entanglement-removal gap, with a dash where a separable twin is not defined. Attention and mixer
@@ -376,7 +376,7 @@ models are recovered at $\chi{=}1$, and \texttt{discocat} at $\chi{=}2$.}
 \begin{table}[t]
 \centering\small
 \input{tables/reproduction.tex}
-\caption{\textbf{Reproduction gap.} Our audited accuracy against the published number, on the
+\caption{Reproduction gap: our audited accuracy against the published number, on the
 datasets with a published value. \textsc{mc\_real} reproduces to within $0.02$, whereas \textsc{rp}
 runs below published, being a fragile task of only $74$ training items reimplemented with our own
 embeddings and, for DisCoCat, an offline reader. The simulability verdict concerns our own trained
@@ -396,7 +396,7 @@ unaffected by whether they hit the published accuracy. The certificate audits th
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.66\linewidth]{repro.pdf}
-\caption{\textbf{Reproduction gap.} Our audited accuracy against the published number for the pairs
+\caption{Reproduction gap: our audited accuracy against the published number for the pairs
 with a published value; the annotation is ours minus published. \textsc{mc\_real} reproduces
 closely, whereas \textsc{rp}, a fragile task of only $74$ training items reimplemented with our own
 embeddings and an offline reader, runs below. The simulability verdict concerns our own trained

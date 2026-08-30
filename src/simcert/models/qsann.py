@@ -161,15 +161,33 @@ class QSANN(QNLPModel):
         opt = torch.optim.Adam(self._params(), lr=float(getattr(cfg, "lr", 0.05)))
         epochs = int(getattr(cfg, "epochs", 40))
         lam, gam = float(getattr(cfg, "lam", 0.0)), float(getattr(cfg, "gam", 0.0))
+        # Full-batch by default (unchanged). With train_chunk set, accumulate the same
+        # gradient over chunks instead: backprop through a per-token statevector
+        # simulator keeps the whole graph alive until backward(), so on a 600-example
+        # set that graph, not the 2^n statevector, is what exhausts memory. Summing
+        # chunk losses divided by the full n reproduces the full-batch mean exactly, so
+        # this bounds peak memory without changing the update.
+        chunk = getattr(cfg, "train_chunk", None)
+        n = len(train)
         for _ in range(epochs):
             opt.zero_grad()
-            logits = torch.stack([self._forward_logit(ex) for ex in train])
-            probs = torch.sigmoid(logits)
-            y = torch.tensor([float(ex.label) for ex in train], dtype=probs.dtype)
-            loss = ((probs - y) ** 2).mean()
-            if lam:
-                loss = loss + lam / self.d * (self.w @ self.w)
-            loss.backward()
+            if not chunk or chunk >= n:
+                logits = torch.stack([self._forward_logit(ex) for ex in train])
+                probs = torch.sigmoid(logits)
+                y = torch.tensor([float(ex.label) for ex in train], dtype=probs.dtype)
+                loss = ((probs - y) ** 2).mean()
+                if lam:
+                    loss = loss + lam / self.d * (self.w @ self.w)
+                loss.backward()
+            else:
+                for i in range(0, n, int(chunk)):
+                    part = train[i:i + int(chunk)]
+                    logits = torch.stack([self._forward_logit(ex) for ex in part])
+                    probs = torch.sigmoid(logits)
+                    y = torch.tensor([float(ex.label) for ex in part], dtype=probs.dtype)
+                    (((probs - y) ** 2).sum() / n).backward()
+                if lam:  # batch-independent, so it enters the gradient exactly once
+                    (lam / self.d * (self.w @ self.w)).backward()
             opt.step()
         return TrainReport(
             train_accuracy=self._accuracy(train),

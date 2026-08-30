@@ -172,12 +172,25 @@ class CLAQS(QNLPModel):
         opt = torch.optim.AdamW(self._params(), lr=float(getattr(cfg, "lr", 0.05)))
         epochs = int(getattr(cfg, "epochs", 12))
         lossf = torch.nn.CrossEntropyLoss()
+        # See the note in qsann.fit: train_chunk accumulates the identical gradient in
+        # bounded memory by summing chunk losses that are divided by the full n, which
+        # is what CrossEntropyLoss's default mean reduction computes in one go.
+        chunk = getattr(cfg, "train_chunk", None)
+        n = len(train)
+        lossf_sum = torch.nn.CrossEntropyLoss(reduction="sum")
         for _ in range(epochs):
             opt.zero_grad()
-            logits = torch.stack([self._forward_logits(ex) for ex in train])
-            y = torch.tensor([ex.label for ex in train])
-            loss = lossf(logits, y)
-            loss.backward()
+            if not chunk or chunk >= n:
+                logits = torch.stack([self._forward_logits(ex) for ex in train])
+                y = torch.tensor([ex.label for ex in train])
+                loss = lossf(logits, y)
+                loss.backward()
+            else:
+                for i in range(0, n, int(chunk)):
+                    part = train[i:i + int(chunk)]
+                    logits = torch.stack([self._forward_logits(ex) for ex in part])
+                    y = torch.tensor([ex.label for ex in part])
+                    (lossf_sum(logits, y) / n).backward()
             opt.step()
         return TrainReport(
             train_accuracy=self._accuracy(train), val_accuracy=self._accuracy(val),

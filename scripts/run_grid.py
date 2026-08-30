@@ -6,15 +6,28 @@ them until it is re-audited. This driver walks the grid, skips any run whose sto
 result already has the current statistics, and keeps going when one entry fails so a
 single bad model cannot strand the rest.
 
-    conda run -n qnlp python scripts/run_grid.py                # everything still missing
-    conda run -n qnlp python scripts/run_grid.py --workers 6    # across cores
-    conda run -n qnlp python scripts/run_grid.py --dry-run      # just show the plan
+    conda run -n qnlp python scripts/run_grid.py                 # memory-safe defaults
+    conda run -n qnlp python scripts/run_grid.py --workers 3
+    conda run -n qnlp python scripts/run_grid.py --dry-run       # just show the plan
 
 Jobs are independent processes with their own seed, so running them concurrently
-changes nothing about the numbers. Each worker is pinned to a single BLAS thread:
-the arrays here are small (a 10-qubit statevector is 16 KB) so threaded BLAS buys
-nothing, and letting every worker spawn a full thread pool only makes them fight
-over the same cores.
+changes nothing about the numbers. Each worker is pinned to a single BLAS thread: the
+arrays here are small (a 10-qubit statevector is 16 KB) so threaded BLAS buys nothing,
+and letting every worker spawn a full thread pool only makes them fight over cores.
+
+Memory, not CPU, is the binding constraint on a 16 GB laptop that is also running an
+editor. Six workers once drove the machine into 19.5 GB of swap and took it down, so
+scheduling here is admission-controlled rather than fixed-width:
+
+  * a job only starts when the system genuinely has --min-free-gb available, so the
+    driver throttles itself when something outside this process tree takes memory;
+  * every running job is sampled once a second and killed if its own resident set
+    passes --max-rss-gb, which turns a runaway job into one recorded failure instead
+    of a system-wide stall;
+  * workers default to 2 and jobs run at low priority, so the machine stays usable.
+
+Nothing is lost to a kill or a crash: a run counts as done only once its certificate
+is on disk with the current statistics, so re-invoking resumes exactly where it left.
 """
 
 from __future__ import annotations
@@ -24,20 +37,21 @@ import json
 import os
 import subprocess
 import sys
+import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
+import psutil
+from omegaconf import OmegaConf
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
-
-from omegaconf import OmegaConf  # noqa: E402
 
 from simcert.io_results import run_hash  # noqa: E402
 from simcert.runner import load_config  # noqa: E402
 
 # (model, dataset, audit, seeds). Ordered cheapest-first so the grid produces usable
-# coverage early: discocat replays cached circuits in seconds, sst2 costs ~10 min a seed.
+# coverage early: discocat replays cached circuits in seconds, sst2 costs minutes a seed.
 GRID = [
     ("discocat", "mc",      "discocat", range(1, 4)),   # cached circuits, seeds 1-3 only
     ("discocat", "mc_real", "discocat", range(1, 4)),
@@ -49,17 +63,28 @@ GRID = [
     ("vqc_text", "mc",      "default",  range(1, 9)),
     ("vqc_text", "rp",      "default",  range(1, 9)),
     ("claqs",    "mc",      "claqs",    range(1, 4)),   # 8 qubits, minutes per seed
-    ("vqc_text", "sst2",    "default",  range(1, 9)),   # ~10 min a seed
+    ("vqc_text", "sst2",    "default",  range(1, 9)),
     ("claqs",    "sst2",    "claqs",    range(1, 2)),
 ]
 
 # chi*-vs-n scaling sweep: a second model so the headline figure is not single-model.
 SCALING = [("qsann", "sst2", n) for n in (4, 6, 8, 10)]
 
+# Per-token models backprop through a statevector simulator, so the autograd graph spans
+# the whole training set and it is that graph, not the 2^n statevector, that exhausts
+# memory: every qsann/sst2 sweep peaked at ~6 GB identically at n=4 and n=10. Chunking
+# accumulates the same gradient in bounded memory (tests/test_grad_accumulation.py proves
+# the gradients match), so these runs carry a chunk size while the small mc/rp runs keep
+# the untouched full-batch path. The chunk sizes differ because the per-example graph
+# does: qsann costs a few MB an example, claqs about 83 MB (q=8 with LCU and a degree-5
+# QSVT polynomial), so claqs needs a much smaller chunk to stay inside a laptop.
+CHUNKED = {("qsann", "sst2"): 32, ("claqs", "sst2"): 8}
+
+GB = 1024 ** 3
+
 
 def _hash_for(argv):
-    cfg = load_config(argv)
-    return run_hash(OmegaConf.to_container(cfg, resolve=True))
+    return run_hash(OmegaConf.to_container(load_config(argv), resolve=True))
 
 
 def _is_done(model, dataset, argv):
@@ -77,81 +102,163 @@ def _is_done(model, dataset, argv):
 def _jobs():
     for model, dataset, audit, seeds in GRID:
         for seed in seeds:
-            yield (model, dataset,
-                   [f"mode=both", f"model={model}", f"dataset={dataset}",
-                    f"audit={audit}", f"seed={seed}"],
-                   f"{model}/{dataset}/seed{seed}")
+            argv = ["mode=both", f"model={model}", f"dataset={dataset}",
+                    f"audit={audit}", f"seed={seed}"]
+            if (model, dataset) in CHUNKED:
+                argv.append(f"model.train_chunk={CHUNKED[(model, dataset)]}")
+            yield (model, dataset, argv, f"{model}/{dataset}/seed{seed}")
     for model, dataset, n in SCALING:
-        yield (model, dataset,
-               [f"mode=both", f"model={model}", f"dataset={dataset}",
-                "audit=scaling", "seed=1", f"model.n_qubits={n}"],
-               f"{model}/{dataset}/scaling-n{n}")
+        argv = ["mode=both", f"model={model}", f"dataset={dataset}",
+                "audit=scaling", "seed=1", f"model.n_qubits={n}"]
+        if (model, dataset) in CHUNKED:
+            argv.append(f"model.train_chunk={CHUNKED[(model, dataset)]}")
+        yield (model, dataset, argv, f"{model}/{dataset}/scaling-n{n}")
 
 
-def _run_one(job, index, total, lock):
+def _tree_rss(proc: psutil.Process) -> int:
+    """Resident bytes for a job, counting any children it spawned."""
+    total = 0
+    try:
+        total += proc.memory_info().rss
+        for c in proc.children(recursive=True):
+            try:
+                total += c.memory_info().rss
+            except psutil.Error:
+                pass
+    except psutil.Error:
+        pass
+    return total
+
+
+def _run_one(job, index, total, lock, max_rss_gb):
+    """Run one job under a resident-set watchdog. Returns (label, ok, peak_gb, note)."""
     _, _, argv, label = job
     env = dict(os.environ)
-    # one BLAS thread per worker; see the module docstring
     for var in ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS",
                 "VECLIB_MAXIMUM_THREADS", "NUMEXPR_NUM_THREADS"):
         env[var] = "1"
+
     start = time.time()
-    r = subprocess.run([sys.executable, "-m", "simcert.runner", *argv],
-                       cwd=REPO, capture_output=True, text=True, env=env)
+    p = subprocess.Popen(
+        [sys.executable, "-m", "simcert.runner", *argv],
+        cwd=REPO, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env,
+        preexec_fn=lambda: os.nice(10),  # keep the machine usable while this runs
+    )
+    try:
+        watched = psutil.Process(p.pid)
+    except psutil.Error:
+        watched = None
+
+    peak = 0
+    killed = False
+    while p.poll() is None:
+        if watched is not None:
+            peak = max(peak, _tree_rss(watched))
+            if peak > max_rss_gb * GB:
+                killed = True
+                for c in watched.children(recursive=True):
+                    try:
+                        c.kill()
+                    except psutil.Error:
+                        pass
+                p.kill()
+                break
+        time.sleep(1.0)
+    out, err = p.communicate()
     dt = time.time() - start
+    peak_gb = peak / GB
+
+    ok = (p.returncode == 0) and not killed
     with lock:
         stamp = time.strftime("%H:%M:%S")
-        if r.returncode != 0:
-            print(f"[{stamp}] ({index}/{total}) FAIL {label} ({dt:.0f}s)", flush=True)
-            print((r.stdout or "")[-1200:], flush=True)
-            print((r.stderr or "")[-1200:], flush=True)
+        head = f"[{stamp}] ({index}/{total})"
+        if killed:
+            print(f"{head} KILLED {label} ({dt:.0f}s, peak {peak_gb:.2f} GB > "
+                  f"{max_rss_gb} GB cap)", flush=True)
+        elif not ok:
+            print(f"{head} FAIL {label} ({dt:.0f}s, rc={p.returncode}, "
+                  f"peak {peak_gb:.2f} GB)", flush=True)
+            tail = (err or out or "").strip().splitlines()
+            for line in tail[-12:]:
+                print(f"    {line}", flush=True)
+            if not tail:
+                print("    (no output: the process was terminated by a signal, "
+                      "typically the OS reclaiming memory)", flush=True)
         else:
-            for line in (r.stdout or "").splitlines():
-                if "VERDICT" in line:
-                    print(f"[{stamp}] ({index}/{total}) OK {label} ({dt:.0f}s)  {line.strip()}",
-                          flush=True)
-                    break
-            else:
-                print(f"[{stamp}] ({index}/{total}) OK {label} ({dt:.0f}s)", flush=True)
-    return label, r.returncode
+            verdict = next((ln.strip() for ln in (out or "").splitlines()
+                            if "VERDICT" in ln), "")
+            print(f"{head} OK {label} ({dt:.0f}s, peak {peak_gb:.2f} GB)  {verdict}",
+                  flush=True)
+    return label, ok, peak_gb
+
+
+def _await_memory(min_free_gb, lock, label):
+    """Block until the system really has room, so we never start a job into swap."""
+    warned = False
+    while psutil.virtual_memory().available < min_free_gb * GB:
+        if not warned:
+            with lock:
+                print(f"[{time.strftime('%H:%M:%S')}] waiting for memory before {label} "
+                      f"({psutil.virtual_memory().available / GB:.1f} GB free, "
+                      f"need {min_free_gb} GB)", flush=True)
+            warned = True
+        time.sleep(5.0)
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--workers", type=int, default=1,
-                    help="concurrent runs; each is an independent process")
+    ap.add_argument("--workers", type=int, default=2,
+                    help="max concurrent runs (default 2; memory, not CPU, is the limit)")
+    ap.add_argument("--max-rss-gb", type=float, default=4.0,
+                    help="kill a single run whose resident set exceeds this")
+    ap.add_argument("--min-free-gb", type=float, default=3.0,
+                    help="required free system memory before starting a run")
     args = ap.parse_args()
 
     jobs = list(_jobs())
     todo = [j for j in jobs if not _is_done(j[0], j[1], j[2])]
-    print(f"[grid] {len(jobs)} jobs, {len(jobs) - len(todo)} already current, {len(todo)} to run, "
-          f"{args.workers} worker(s)", flush=True)
+    vm = psutil.virtual_memory()
+    print(f"[grid] {len(jobs)} jobs, {len(jobs) - len(todo)} already current, "
+          f"{len(todo)} to run", flush=True)
+    print(f"[grid] {args.workers} worker(s), cap {args.max_rss_gb} GB/run, "
+          f"start gate {args.min_free_gb} GB free; system has {vm.available / GB:.1f} GB "
+          f"of {vm.total / GB:.1f} GB free now", flush=True)
     if args.dry_run:
         for _, _, _, label in todo:
             print(f"  TODO {label}", flush=True)
         return
 
-    # Longest first: sst2 seeds and the scaling sweep dominate, so starting them early
-    # keeps every worker busy instead of trailing one long job at the end.
+    # Longest first so the slow jobs are not left trailing behind everything else.
     todo.sort(key=lambda j: (0 if ("sst2" in j[1] or "scaling" in j[3]) else 1))
 
-    import threading
     lock = threading.Lock()
+    sem = threading.Semaphore(max(1, args.workers))
+    results = []
     t0 = time.time()
-    failures = []
-    with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
-        futs = [pool.submit(_run_one, j, i, len(todo), lock)
-                for i, j in enumerate(todo, 1)]
-        for f in futs:
-            label, rc = f.result()
-            if rc != 0:
-                failures.append(label)
 
-    print(f"\n[grid] done in {(time.time()-t0)/60:.1f} min; "
-          f"{len(todo)-len(failures)} ok, {len(failures)} failed", flush=True)
-    for f in failures:
-        print(f"  FAILED {f}", flush=True)
+    def worker(job, idx):
+        with sem:
+            _await_memory(args.min_free_gb, lock, job[3])
+            results.append(_run_one(job, idx, len(todo), lock, args.max_rss_gb))
+
+    threads = []
+    for i, j in enumerate(todo, 1):
+        t = threading.Thread(target=worker, args=(j, i), daemon=False)
+        t.start()
+        threads.append(t)
+        time.sleep(2.0)  # stagger starts so imports do not spike together
+    for t in threads:
+        t.join()
+
+    bad = [lab for lab, ok, _ in results if not ok]
+    peak = max((p for _, _, p in results), default=0.0)
+    print(f"\n[grid] done in {(time.time() - t0) / 60:.1f} min; "
+          f"{len(results) - len(bad)} ok, {len(bad)} failed; "
+          f"worst single-run peak {peak:.2f} GB", flush=True)
+    for b in bad:
+        print(f"  FAILED {b}", flush=True)
+    sys.exit(1 if bad else 0)
 
 
 if __name__ == "__main__":

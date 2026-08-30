@@ -1,0 +1,104 @@
+{
+  "model": "vqc_text",
+  "dataset": "sst2",
+  "full_accuracy": 0.665,
+  "accuracy_by_chi": {
+    "1": 0.665,
+    "2": 0.675,
+    "4": 0.665,
+    "8": 0.665,
+    "full": 0.665
+  },
+  "accuracy_ci_by_chi": {
+    "1": [
+      0.59,
+      0.725
+    ],
+    "2": [
+      0.6098750000000001,
+      0.735
+    ],
+    "4": [
+      0.59,
+      0.725
+    ],
+    "8": [
+      0.59,
+      0.725
+    ],
+    "full": [
+      0.59,
+      0.725
+    ]
+  },
+  "mcnemar_by_chi": {
+    "1": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    },
+    "2": {
+      "b": 3,
+      "c": 5,
+      "n_discordant": 8,
+      "p_value": 0.7265625
+    },
+    "4": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    },
+    "8": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    }
+  },
+  "fidelity_by_chi": {
+    "1": 0.35013812290261803,
+    "2": 0.6849729404380287,
+    "4": 0.9967454828691679,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "agreement_by_chi": {
+    "1": 1.0,
+    "2": 0.96,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "chi_star": {
+    "tau_gen": 1,
+    "tau_ci": 1,
+    "tau_agree": 1
+  },
+  "scaling_slope": null,
+  "scaling_r2": null,
+  "delta_ent": 0.16500000000000004,
+  "entropy_mean": 1.1932393063180442,
+  "entropy_p99": 1.30535190788962,
+  "gcq_ratio": 1.1126164535685061,
+  "fourier_degree": 1,
+  "baseline_gap": 0.050000000000000044,
+  "mps_surrogate_repro": {},
+  "verdict": "AMBIGUOUS",
+  "meta": {
+    "n_examples": 200,
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      null
+    ],
+    "tau_gen": 0.32715686274509803,
+    "tau_ci": 0.0675,
+    "train_accuracy": 0.9921568627450981,
+    "run_hash": "d1f19bba9b89",
+    "separable_test_accuracy": 0.5
+  }
+}

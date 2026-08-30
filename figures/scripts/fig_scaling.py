@@ -24,8 +24,8 @@ NCOLORS = {4: "#0072B2", 6: "#009E73", 8: "#E69F00", 10: "#D55E00"}
 NMARKERS = {4: "o", 6: "s", 8: "^", 10: "D"}
 # panel (b): one style per model
 MODEL_STYLE = {
-    "vqc_text": dict(color="#D55E00", marker="o", label=r"measured $\chi^\star$, \texttt{vqc\_text}"),
-    "qsann": dict(color="#0072B2", marker="^", label=r"measured $\chi^\star$, \texttt{qsann}"),
+    "vqc_text": dict(color="#D55E00", marker="o", label=r"measured $\chi^\star$, $\mathtt{vqc\_text}$"),
+    "qsann": dict(color="#0072B2", marker="^", label=r"measured $\chi^\star$, $\mathtt{qsann}$"),
 }
 
 
@@ -68,8 +68,8 @@ def main():
     ax1.set_xscale("log", base=2)
     ax1.set_xlabel(r"bond dimension $\chi$  (log$_2$)")
     ax1.set_ylabel("SST-2 test accuracy retained")
-    ax1.set_title(r"(a) \texttt{vqc\_text}: accuracy flat in $\chi$ at every $n$")
-    ax1.legend()
+    ax1.set_title(r"(a) $\mathtt{vqc\_text}$: accuracy flat in $\chi$ at every $n$")
+    ax1.legend(loc="center right", framealpha=0.92)
 
     # (b) chi* vs n against the exact bound, for every model with a scaling sweep
     all_ns = sorted({n for r in scaling.values() for n in r})

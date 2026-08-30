@@ -15,12 +15,14 @@ seed, the newest.
 from __future__ import annotations
 
 import glob
-import json
-import os
+import sys
 from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+from simcert.io_results import select_runs  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "paper" / "tables" / "results.tex"
@@ -56,44 +58,9 @@ def _fmt_d(vals):
     return "0" if m == 0 else f"{m:.1f}"
 
 
-def select_runs(files):
-    """Group stored runs into one comparable set of seeds per (model, dataset).
-
-    Drops the scaling-sweep audits, pins each row to the qubit count and audit config of
-    its most recent run, and de-duplicates seeds by keeping the newest file. Returns
-    {(model, dataset): [certificate, ...]}.
-    """
-    recs = []
-    for f in sorted(files, key=os.path.getmtime):  # oldest -> newest
-        d = json.load(open(f))
-        cfg = d.get("config", {})
-        if cfg.get("audit_name") == "scaling":
-            continue  # belongs to the chi*-vs-n figure, not the per-seed certificate table
-        c = d["certificate"]
-        recs.append({
-            "key": (c["model"], c["dataset"]),
-            "variant": ((cfg.get("model") or {}).get("n_qubits"), cfg.get("audit_name")),
-            "seed": cfg.get("seed"),
-            "cert": c,
-        })
-
-    groups = defaultdict(list)
-    for r in recs:
-        groups[r["key"]].append(r)
-
-    out = {}
-    for key, rs in groups.items():
-        current = rs[-1]["variant"]  # newest run defines the current configuration
-        rs = [r for r in rs if r["variant"] == current]
-        by_seed = {}
-        for r in rs:  # ascending mtime, so the last write per seed wins
-            by_seed[r["seed"]] = r["cert"]
-        out[key] = [by_seed[s] for s in sorted(by_seed, key=lambda x: (x is None, x))]
-    return out
-
-
 def main():
-    groups = select_runs(glob.glob(str(REPO / "results" / "metrics" / "*.json")))
+    runs = select_runs(glob.glob(str(REPO / "results" / "metrics" / "*.json")))
+    groups = {k: [d["certificate"] for d in v] for k, v in runs.items()}
 
     lines = [
         r"\begin{tabular}{llcccccccc}",

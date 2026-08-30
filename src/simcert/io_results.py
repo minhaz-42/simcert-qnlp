@@ -65,3 +65,53 @@ def _json_default(o):
     if isinstance(o, (np.floating, np.integer)):
         return o.item()
     raise TypeError(f"not JSON serialisable: {type(o)}")
+
+
+def select_runs(files) -> dict:
+    """Group stored runs into one comparable set of seeds per (model, dataset).
+
+    ``results/metrics`` accumulates every run ever stored, which includes the chi*-vs-n
+    scaling sweeps (a different audit config at several qubit counts) and runs superseded
+    by later code or config revisions. Averaging those into one row or curve reports runs
+    at n=4,6,8,10 as though they were seeds of a single configuration.
+
+    Selection keeps only non-scaling audits, pins each group to the qubit count and audit
+    config of its most recent run, and keeps one run per seed, the newest. Returns
+    ``{(model, dataset): [full_result_dict, ...]}`` so callers can reach both
+    ``certificate`` and ``details``.
+    """
+    import json as _json
+    import os as _os
+    from collections import defaultdict as _dd
+
+    recs = []
+    for f in sorted(files, key=_os.path.getmtime):  # oldest -> newest
+        try:
+            d = _json.loads(Path(f).read_text())
+        except Exception:
+            continue
+        if "certificate" not in d:
+            continue
+        cfg = d.get("config", {})
+        if cfg.get("audit_name") == "scaling":
+            continue  # belongs to the chi*-vs-n figure, not a per-seed aggregate
+        recs.append({
+            "key": (d["certificate"]["model"], d["certificate"]["dataset"]),
+            "variant": ((cfg.get("model") or {}).get("n_qubits"), cfg.get("audit_name")),
+            "seed": cfg.get("seed"),
+            "run": d,
+        })
+
+    groups = _dd(list)
+    for r in recs:
+        groups[r["key"]].append(r)
+
+    out = {}
+    for key, rs in groups.items():
+        current = rs[-1]["variant"]  # the newest run defines the current configuration
+        rs = [r for r in rs if r["variant"] == current]
+        by_seed = {}
+        for r in rs:  # ascending mtime, so the last write for a seed wins
+            by_seed[r["seed"]] = r["run"]
+        out[key] = [by_seed[s] for s in sorted(by_seed, key=lambda x: (x is None, x))]
+    return out

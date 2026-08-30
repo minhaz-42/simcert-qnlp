@@ -18,7 +18,9 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from _style import MARKER, PALETTE, apply_rc  # noqa: E402
+from simcert.io_results import select_runs  # noqa: E402
 
 import matplotlib.pyplot as plt  # noqa: E402
 
@@ -48,15 +50,12 @@ def _series_style(model, dataset):
 
 def main():
     apply_rc()
-    groups = defaultdict(list)
-    for f in sorted(METRICS.glob("*.json")):
-        d = json.loads(f.read_text())
-        if "details" not in d or "certificate" not in d:
-            continue
-        c = d["certificate"]
-        if "16" in d["details"]["accuracy_by_chi"] and c["model"] == "vqc_text" and c["dataset"] == "sst2":
-            continue  # the scaling sweep has its own figure
-        groups[(c["model"], c["dataset"])].append(d)
+    # Shared selection: drops every scaling sweep (they have their own figure), pins each
+    # series to one configuration, and keeps one run per seed so duplicates cannot be
+    # averaged in twice.
+    groups = {k: [d for d in v if "details" in d]
+              for k, v in select_runs(METRICS.glob("*.json")).items()}
+    groups = {k: v for k, v in groups.items() if v}
     if not groups:
         print("no results yet")
         return

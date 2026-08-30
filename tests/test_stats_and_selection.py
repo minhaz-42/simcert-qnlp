@@ -14,10 +14,7 @@ from pathlib import Path
 import numpy as np
 
 from simcert.audit.metrics import mcnemar
-from simcert.io_results import run_hash
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "paper" / "scripts"))
-from make_tables import select_runs  # noqa: E402
+from simcert.io_results import run_hash, select_runs
 
 
 def test_mcnemar_identical_predictions_is_maximally_nonsignificant():
@@ -103,7 +100,7 @@ def test_select_runs_drops_scaling_sweeps_and_dedupes_seeds(tmp_path):
         os.utime(f, (1_700_000_000 + i, 1_700_000_000 + i))
 
     got = select_runs([str(f) for f in files])
-    certs = got[("vqc", "sst2")]
+    certs = [r["certificate"] for r in got[("vqc", "sst2")]]
     assert len(certs) == 2, "one run per seed, scaling sweeps excluded"
     accs = sorted(c["full_accuracy"] for c in certs)
     assert accs == [0.70, 0.80], "the newer run must supersede the older one"
@@ -122,7 +119,7 @@ def test_select_runs_pins_to_the_current_audit_config(tmp_path):
     ]
     for i, f in enumerate(files):
         os.utime(f, (1_700_000_000 + i, 1_700_000_000 + i))
-    certs = select_runs([str(f) for f in files])[("dc", "mc")]
+    certs = [r["certificate"] for r in select_runs([str(f) for f in files])[("dc", "mc")]]
     assert sorted(c["full_accuracy"] for c in certs) == [0.85, 0.95]
 
 
@@ -140,6 +137,6 @@ def test_select_runs_pins_to_the_current_qubit_count(tmp_path):
     for i, f in enumerate(files):
         os.utime(f, (1_700_000_000 + i, 1_700_000_000 + i))
 
-    certs = select_runs([str(f) for f in files])[("vqc", "rp")]
+    certs = [r["certificate"] for r in select_runs([str(f) for f in files])[("vqc", "rp")]]
     assert len(certs) == 1
     assert certs[0]["full_accuracy"] == 0.62

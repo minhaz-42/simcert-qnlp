@@ -52,3 +52,4 @@ paper/*.out
 # grid driver logs (regenerable; the science lives in results/)
 grid.log
 rerun_grid.log
+grid_sequential.log

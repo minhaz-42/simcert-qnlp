@@ -1,0 +1,18 @@
+[grid] 73 jobs, 65 already current, 8 to run
+[grid] 3 worker(s), cap 2.5 GB/run, start gate 3.0 GB free; system has 9.3 GB of 16.0 GB free now
+[23:44:00] (1/8) KILLED claqs/sst2/seed1 (3s, peak 3.04 GB > 2.5 GB cap)
+[00:17:41] (2/8) OK qsann/sst2/scaling-n4 (2022s, peak 1.18 GB)  [simcert] VERDICT: CLASSICALLY_SIMULABLE  chi*={'tau_gen': 1, 'tau_ci': 1, 'tau_agree': 2}  full_acc=0.660
+[00:17:56] (5/8) KILLED qsann/sst2/scaling-n10 (15s, peak 2.60 GB > 2.5 GB cap)
+[00:17:59] (6/8) KILLED claqs/mc/seed1 (3s, peak 2.79 GB > 2.5 GB cap)
+[00:18:02] (7/8) KILLED claqs/mc/seed2 (3s, peak 3.02 GB > 2.5 GB cap)
+[00:18:05] (8/8) KILLED claqs/mc/seed3 (3s, peak 3.56 GB > 2.5 GB cap)
+[00:34:57] (3/8) OK qsann/sst2/scaling-n6 (3056s, peak 1.59 GB)  [simcert] VERDICT: CLASSICALLY_SIMULABLE  chi*={'tau_gen': 1, 'tau_ci': 1, 'tau_agree': 2}  full_acc=0.620
+[00:56:11] (4/8) OK qsann/sst2/scaling-n8 (4328s, peak 2.16 GB)  [simcert] VERDICT: CLASSICALLY_SIMULABLE  chi*={'tau_gen': 1, 'tau_ci': 1, 'tau_agree': 1}  full_acc=0.625
+
+[grid] done in 72.2 min; 3 ok, 5 failed; worst single-run peak 3.56 GB
+  FAILED claqs/sst2/seed1
+  FAILED qsann/sst2/scaling-n10
+  FAILED claqs/mc/seed1
+  FAILED claqs/mc/seed2
+  FAILED claqs/mc/seed3
+ERROR conda.cli.main_run:execute(127): `conda run python scripts/run_grid.py --workers 3 --max-rss-gb 2.5 --min-free-gb 3` failed. (See above for error)

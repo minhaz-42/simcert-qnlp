@@ -286,10 +286,17 @@ We quantify uncertainty in two ways that do not rely on the seed count alone. Fo
 surrogate we compute a $95\%$ example-level bootstrap confidence interval on its retained accuracy,
 and we compare it against the full model with an exact paired McNemar test on the test predictions.
 A large McNemar p-value means the surrogate is not significantly different from the full model, which
-is the simulability signal; a small p-value flags a surrogate that is significantly worse. The
-product-state surrogate is not significantly different from the full model on any task where the
-models saturate, and it is significantly worse only for \texttt{discocat} at $\chi{=}1$, which is
-exactly the case that needs $\chi{=}2$ (Table~\ref{tab:results}).
+is the simulability signal; a small p-value flags a surrogate that is significantly worse. On the
+attention and mixer models the product-state surrogate does not merely fail to differ significantly
+from the full model, it reproduces every test prediction, so the contingency table is empty and the
+comparison is decided by $d^{\chi=1}{=}0$ rather than by the p-value alone. The one model whose
+decisions truncation to $\chi{=}1$ does change is \texttt{discocat}, where the surrogate is
+significantly worse on \textsc{mc} ($p{=}0.014$) and sits at the conventional boundary on
+\textsc{mc-real} ($p{=}0.050$), which is exactly the pair of tasks whose certificate reports
+$\chi^\star{=}2$. On \textsc{rp} that same comparison is not significant ($p{=}0.52$), which is a
+statement about the task rather than about the model: \texttt{discocat} sits close to chance on
+\textsc{rp} (Table~\ref{tab:repro}), so there is little decision content left for truncation to
+destroy (Table~\ref{tab:results}).
 
 \subsection{A classical surrogate recovers the predictions at small bond dimension}
 Across models and datasets, a bond-dimension-one or bond-dimension-two surrogate recovers the

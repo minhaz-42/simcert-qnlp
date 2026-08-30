@@ -286,10 +286,13 @@ We quantify uncertainty in two ways that do not rely on the seed count alone. Fo
 surrogate we compute a $95\%$ example-level bootstrap confidence interval on its retained accuracy,
 and we compare it against the full model with an exact paired McNemar test on the test predictions.
 A large McNemar p-value means the surrogate is not significantly different from the full model, which
-is the simulability signal; a small p-value flags a surrogate that is significantly worse. On the
-attention and mixer models the product-state surrogate does not merely fail to differ significantly
-from the full model, it reproduces every test prediction, so the contingency table is empty and the
-comparison is decided by $d^{\chi=1}{=}0$ rather than by the p-value alone. The one model whose
+is the simulability signal; a small p-value flags a surrogate that is significantly worse. Wherever
+the attention and mixer models saturate, the product-state surrogate does not merely fail to differ
+significantly from the full model, it reproduces every test prediction, so the contingency table is
+empty and the comparison is decided by $d^{\chi=1}{=}0$ rather than by a p-value. On the harder
+real-data tasks the surrogate does flip a few decisions, on average between $0.4$ and $5$ test
+examples, but never significantly, with p-values from $0.375$ to $0.953$. The reference model
+\texttt{vqc\_text} reaches $d^{\chi=1}{=}0$ on all three of its datasets. The one model whose
 decisions truncation to $\chi{=}1$ does change is \texttt{discocat}, where the surrogate is
 significantly worse on \textsc{mc} ($p{=}0.014$) and sits at the conventional boundary on
 \textsc{mc-real} ($p{=}0.050$), which is exactly the pair of tasks whose certificate reports

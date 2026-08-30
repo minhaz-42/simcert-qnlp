@@ -384,11 +384,13 @@ reporting $\chi{=}1$ by construction.
 Acc@$\chi{=}1$ is the accuracy of a product-state surrogate; $p_{\mathrm{McN}}^{\chi=1}$ is the
 mean exact-McNemar p-value comparing that surrogate against the full model, where a large value
 means the two are not significantly different and a small value flags a surrogate that is
-significantly worse; \chistar\ is Eq.~\ref{eq:chistar}; $\bar S$ is the mean bipartite entanglement
-entropy in nats; $\Delta A_{\mathrm{ent}}$ is the entanglement-removal gap, with a dash where a
-separable twin is not defined. Attention and mixer models are recovered at $\chi{=}1$
-($p_{\mathrm{McN}}^{\chi=1}$ near one), and \texttt{discocat} needs $\chi{=}2$
-($p_{\mathrm{McN}}^{\chi=1}$ small).}
+significantly worse; $d^{\chi=1}$ is the mean number of test examples on which the surrogate and
+the full model disagree, which is what separates a p-value of one obtained because the two models
+predict identically ($d{=}0$) from one obtained because their disagreements happen to be balanced;
+\chistar\ is Eq.~\ref{eq:chistar}; $\bar S$ is the mean bipartite entanglement entropy in nats;
+$\Delta A_{\mathrm{ent}}$ is the entanglement-removal gap, with a dash where a separable twin is
+not defined. Attention and mixer models are recovered at $\chi{=}1$ with no disagreements at all,
+and \texttt{discocat} needs $\chi{=}2$.}
 \label{tab:results}
 \end{table}
 

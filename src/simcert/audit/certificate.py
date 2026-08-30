@@ -66,7 +66,7 @@ class SimCert:
     full_accuracy: float
     accuracy_by_chi: dict = field(default_factory=dict)  # {int chi | "full": accuracy}
     accuracy_ci_by_chi: dict = field(default_factory=dict)  # {int chi | "full": [lo, hi]} 95% bootstrap
-    mcnemar_p_by_chi: dict = field(default_factory=dict)  # {int chi: p} full vs truncated (exact McNemar)
+    mcnemar_by_chi: dict = field(default_factory=dict)  # {int chi: {b, c, n_discordant, p_value}}
     fidelity_by_chi: dict = field(default_factory=dict)  # {int chi | "full": mean fidelity}
     agreement_by_chi: dict = field(default_factory=dict)  # {int chi | "full": pi(chi)}
     chi_star: dict = field(default_factory=dict)  # {"tau_gen"|"tau_ci"|"tau_agree": chi|None}

@@ -1,0 +1,104 @@
+{
+  "model": "discocat",
+  "dataset": "mc",
+  "full_accuracy": 0.8461538461538461,
+  "accuracy_by_chi": {
+    "1": 0.5384615384615384,
+    "2": 0.8461538461538461,
+    "4": 0.8461538461538461,
+    "8": 0.8461538461538461,
+    "full": 0.8461538461538461
+  },
+  "accuracy_ci_by_chi": {
+    "1": [
+      0.34615384615384615,
+      0.7307692307692307
+    ],
+    "2": [
+      0.6923076923076923,
+      0.9615384615384616
+    ],
+    "4": [
+      0.6923076923076923,
+      0.9615384615384616
+    ],
+    "8": [
+      0.6923076923076923,
+      0.9615384615384616
+    ],
+    "full": [
+      0.6923076923076923,
+      0.9615384615384616
+    ]
+  },
+  "mcnemar_by_chi": {
+    "1": {
+      "b": 9,
+      "c": 1,
+      "n_discordant": 10,
+      "p_value": 0.021484375
+    },
+    "2": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    },
+    "4": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    },
+    "8": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    }
+  },
+  "fidelity_by_chi": {
+    "1": 0.23790480062878286,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "agreement_by_chi": {
+    "1": 0.6153846153846154,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "chi_star": {
+    "tau_gen": 2,
+    "tau_ci": 2,
+    "tau_agree": 2
+  },
+  "scaling_slope": null,
+  "scaling_r2": null,
+  "delta_ent": null,
+  "entropy_mean": 0.6676196209639436,
+  "entropy_p99": 0.6930201800372333,
+  "gcq_ratio": null,
+  "fourier_degree": null,
+  "baseline_gap": -0.15384615384615385,
+  "mps_surrogate_repro": {},
+  "verdict": "CLASSICALLY_SIMULABLE",
+  "meta": {
+    "n_examples": 26,
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      null
+    ],
+    "tau_gen": 0.012820512820512775,
+    "tau_ci": 0.13461538461538464,
+    "train_accuracy": 0.8589743589743589,
+    "run_hash": "bfc11d24fb40",
+    "separable_test_accuracy": null
+  }
+}

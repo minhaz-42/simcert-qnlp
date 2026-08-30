@@ -48,3 +48,7 @@ paper/*.out
 # arXiv build artifacts
 /arxiv/
 /arxiv_submission.tar.gz
+
+# grid driver logs (regenerable; the science lives in results/)
+grid.log
+rerun_grid.log

@@ -12,7 +12,14 @@ import subprocess
 from pathlib import Path
 
 
-def run_hash(cfg: dict, drop_keys=("paths", "run_hash")) -> str:
+def run_hash(cfg: dict, drop_keys=("paths", "run_hash", "mode")) -> str:
+    """Content hash of a run configuration.
+
+    ``mode`` is excluded on purpose: train, audit and both describe *when* work happens,
+    not *what* is computed, so a checkpoint written by ``mode=train`` has to be findable
+    by the ``mode=audit`` pass that consumes it. Including it silently gave the two steps
+    different hashes and made the documented two-step workflow miss its own checkpoint.
+    """
     filtered = {k: v for k, v in cfg.items() if k not in drop_keys}
     canonical = json.dumps(filtered, sort_keys=True, separators=(",", ":"), default=str)
     return hashlib.sha1(canonical.encode()).hexdigest()[:12]

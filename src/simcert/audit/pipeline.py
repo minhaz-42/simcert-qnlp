@@ -74,7 +74,7 @@ def audit_model(
     accuracy_ci_by_chi: dict = {}
     agreement_by_chi: dict = {}
     fidelity_by_chi: dict = {}
-    mcnemar_p_by_chi: dict = {}
+    mcnemar_by_chi: dict = {}
     for k in keys:
         p = np.array(preds_by_key[k])
         accuracy_by_chi[k] = accuracy(labels, p)
@@ -83,7 +83,10 @@ def audit_model(
         agreement_by_chi[k] = prediction_agreement(full_preds, p)
         fidelity_by_chi[k] = float(np.mean(fid_by_key[k]))
         if isinstance(k, int):  # paired McNemar of the truncated surrogate against the full model
-            mcnemar_p_by_chi[k] = mcnemar(labels, full_preds, p)["p_value"]
+            # Keep the discordant counts, not just p: a p-value of 1.0 from zero discordant
+            # pairs (identical predictions) is a much stronger statement than one from a
+            # balanced split, and the table needs to be able to tell the two apart.
+            mcnemar_by_chi[k] = mcnemar(labels, full_preds, p)
 
     # tolerances for chi*
     tau_gen = max(0.0, (train_accuracy - full_accuracy)) if train_accuracy is not None else 0.02
@@ -99,7 +102,7 @@ def audit_model(
         full_accuracy=full_accuracy,
         accuracy_by_chi=accuracy_by_chi,
         accuracy_ci_by_chi=accuracy_ci_by_chi,
-        mcnemar_p_by_chi=mcnemar_p_by_chi,
+        mcnemar_by_chi=mcnemar_by_chi,
         fidelity_by_chi=fidelity_by_chi,
         agreement_by_chi=agreement_by_chi,
         chi_star={
@@ -128,7 +131,7 @@ def audit_model(
         "chi_values": list(chi_values),
         "accuracy_by_chi": accuracy_by_chi,
         "accuracy_ci_by_chi": accuracy_ci_by_chi,
-        "mcnemar_p_by_chi": mcnemar_p_by_chi,
+        "mcnemar_by_chi": mcnemar_by_chi,
         "fidelity_by_chi": fidelity_by_chi,
         "agreement_by_chi": agreement_by_chi,
         "full_accuracy": full_accuracy,

@@ -17,7 +17,8 @@ The audit itself has been done for tabular QML and vision QCNNs (Bowles/Ahmed/Sc
 `arXiv:2403.07059`; Cerezo et al. `arXiv:2312.09121`; Bermejo et al. `arXiv:2408.12739`) and the
 theory is in place (Shin/Teo/Jeong, *Phys. Rev. Research* 6, 023218 — every VQML function is a
 constrained-coefficient MPS). It has **never** been run on text/DisCoCat/quantum-attention
-circuits. Target venue: **EMNLP 2026** (analysis track); fallbacks TACL / *Quantum Machine Intelligence*.
+circuits. Venue: a non-archival abstract at **QTML 2026** (submitted) and the full archival paper to
+**TMLR** (rolling, OpenReview, double-blind).
 
 ## Architecture: producer → IR → consumer
 
@@ -56,7 +57,7 @@ src/simcert/runner.py   # Hydra entrypoint (mode=train|audit), deterministic run
 configs/                # Hydra config groups: model/ dataset/ audit/ experiment/
 results/                # COMMITTED: metrics/*.json, certificates/*.json, circuits/*.qasm
 figures/                # COMMITTED PDFs + scripts that regenerate them from results/
-paper/                  # ACL/EMNLP LaTeX scaffold
+paper/                  # TMLR LaTeX sources (tmlr.sty) + QTML abstract
 ```
 
 ## Status

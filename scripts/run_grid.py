@@ -77,8 +77,10 @@ SCALING = [("qsann", "sst2", n) for n in (4, 6, 8, 10)]
 # the gradients match), so these runs carry a chunk size while the small mc/rp runs keep
 # the untouched full-batch path. The chunk sizes differ because the per-example graph
 # does: qsann costs a few MB an example, claqs about 83 MB (q=8 with LCU and a degree-5
-# QSVT polynomial), so claqs needs a much smaller chunk to stay inside a laptop.
-CHUNKED = {("qsann", "sst2"): 32, ("claqs", "sst2"): 8}
+# QSVT polynomial). Measured on claqs/sst2, chunk=1 is both the smallest and the fastest
+# (0.53 GB and ~25 min, against 1.17 GB and ~42 min at chunk=4), because the per-example
+# graph is large enough that building several at once costs more than it saves.
+CHUNKED = {("qsann", "sst2"): 32, ("claqs", "sst2"): 1}
 
 GB = 1024 ** 3
 

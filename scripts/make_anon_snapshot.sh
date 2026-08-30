@@ -12,7 +12,8 @@ rsync -a --delete \
   --exclude='.git' --exclude='paper' --exclude='references/pdfs' \
   --exclude='data' --exclude='checkpoints' --exclude='*.egg-info' \
   --exclude='__pycache__' --exclude='*.pt' --exclude='*.ckpt' \
-  --exclude='outputs' --exclude='multirun' --exclude='*.zip' --exclude='/scripts' \
+  --exclude='outputs' --exclude='multirun' --exclude='*.zip' \
+  --exclude='/scripts/make_anon_snapshot.sh' --exclude='*.log' \
   --exclude='/arxiv' --exclude='arxiv_submission.tar.gz' \
   "$ROOT"/ "$STAGE"/
 

@@ -77,10 +77,23 @@ SCALING = [("qsann", "sst2", n) for n in (4, 6, 8, 10)]
 # the gradients match), so these runs carry a chunk size while the small mc/rp runs keep
 # the untouched full-batch path. The chunk sizes differ because the per-example graph
 # does: qsann costs a few MB an example, claqs about 83 MB (q=8 with LCU and a degree-5
-# QSVT polynomial). Measured on claqs/sst2, chunk=1 is both the smallest and the fastest
+# QSVT polynomial), which is why every full-batch claqs run was killed: claqs/mc peaked at
+# 2.79-3.56 GB on only ~62 training examples. Measured on claqs/sst2, chunk=1 is the
+# smallest and the fastest
 # (0.53 GB and ~25 min, against 1.17 GB and ~42 min at chunk=4), because the per-example
 # graph is large enough that building several at once costs more than it saves.
-CHUNKED = {("qsann", "sst2"): 32, ("claqs", "sst2"): 1}
+CHUNKED = {("qsann", "sst2"): 32, ("claqs", "sst2"): 1, ("claqs", "mc"): 1}
+
+
+def _scaling_chunk(n_qubits: int) -> int:
+    """Chunk for a scaling sweep run.
+
+    The per-example graph grows with the statevector, so a chunk that is comfortable at
+    n=4 is not at n=10: measured, chunk=32 peaked at 1.18 GB for n=4 and 1.78 GB for n=8
+    but blew past 2.5 GB at n=10. Shrinking the chunk with n keeps every point of the
+    sweep at roughly the same footprint.
+    """
+    return 32 if n_qubits <= 8 else 8
 
 GB = 1024 ** 3
 
@@ -111,9 +124,8 @@ def _jobs():
             yield (model, dataset, argv, f"{model}/{dataset}/seed{seed}")
     for model, dataset, n in SCALING:
         argv = ["mode=both", f"model={model}", f"dataset={dataset}",
-                "audit=scaling", "seed=1", f"model.n_qubits={n}"]
-        if (model, dataset) in CHUNKED:
-            argv.append(f"model.train_chunk={CHUNKED[(model, dataset)]}")
+                "audit=scaling", "seed=1", f"model.n_qubits={n}",
+                f"model.train_chunk={_scaling_chunk(n)}"]
         yield (model, dataset, argv, f"{model}/{dataset}/scaling-n{n}")
 
 

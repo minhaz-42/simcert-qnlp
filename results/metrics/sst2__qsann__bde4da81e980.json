@@ -1,0 +1,319 @@
+{
+  "run_hash": "bde4da81e980",
+  "config": {
+    "seed": 1,
+    "mode": "both",
+    "model_name": "qsann",
+    "dataset_name": "sst2",
+    "audit_name": "scaling",
+    "paths": {
+      "results": "results",
+      "checkpoints": "checkpoints"
+    },
+    "model": {
+      "n_qubits": 4,
+      "d_enc": 1,
+      "d_qkv": 1,
+      "epochs": 40,
+      "lr": 0.05,
+      "lam": 0.0,
+      "gam": 0.0,
+      "published_accuracy": 1.0,
+      "baseline": "logreg_bow",
+      "train_chunk": 32,
+      "seed": 1,
+      "dataset": "sst2"
+    },
+    "dataset": {
+      "name": "sst2",
+      "n_train": 600,
+      "n_test": 200,
+      "max_tokens": 16,
+      "val_frac": 0.15,
+      "test_frac": 0.0
+    },
+    "audit": {
+      "chi_values": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        null
+      ],
+      "cutoff": 1e-12,
+      "entanglement_removal": false
+    }
+  },
+  "dataset": {
+    "name": "sst2",
+    "n_classes": 2,
+    "n_train": 510,
+    "n_val": 90,
+    "n_test": 200
+  },
+  "train_report": {
+    "train_accuracy": 1.0,
+    "val_accuracy": 0.6888888888888889,
+    "published_accuracy": 1.0,
+    "n_params": 19033,
+    "epochs": 40,
+    "extra": {}
+  },
+  "certificate": {
+    "model": "qsann",
+    "dataset": "sst2",
+    "full_accuracy": 0.66,
+    "accuracy_by_chi": {
+      "1": 0.65,
+      "2": 0.655,
+      "4": 0.66,
+      "8": 0.66,
+      "16": 0.66,
+      "32": 0.66,
+      "full": 0.66
+    },
+    "accuracy_ci_by_chi": {
+      "1": [
+        0.58,
+        0.715
+      ],
+      "2": [
+        0.585,
+        0.7201249999999999
+      ],
+      "4": [
+        0.59,
+        0.7251249999999999
+      ],
+      "8": [
+        0.59,
+        0.7251249999999999
+      ],
+      "16": [
+        0.59,
+        0.7251249999999999
+      ],
+      "32": [
+        0.59,
+        0.7251249999999999
+      ],
+      "full": [
+        0.59,
+        0.7251249999999999
+      ]
+    },
+    "mcnemar_by_chi": {
+      "1": {
+        "b": 15,
+        "c": 13,
+        "n_discordant": 28,
+        "p_value": 0.8505540192127228
+      },
+      "2": {
+        "b": 1,
+        "c": 0,
+        "n_discordant": 1,
+        "p_value": 1.0
+      },
+      "4": {
+        "b": 0,
+        "c": 0,
+        "n_discordant": 0,
+        "p_value": 1.0
+      },
+      "8": {
+        "b": 0,
+        "c": 0,
+        "n_discordant": 0,
+        "p_value": 1.0
+      },
+      "16": {
+        "b": 0,
+        "c": 0,
+        "n_discordant": 0,
+        "p_value": 1.0
+      },
+      "32": {
+        "b": 0,
+        "c": 0,
+        "n_discordant": 0,
+        "p_value": 1.0
+      }
+    },
+    "fidelity_by_chi": {
+      "1": 0.7736885569347135,
+      "2": 0.9915526883500217,
+      "4": 1.0,
+      "8": 1.0,
+      "16": 1.0,
+      "32": 1.0,
+      "full": 1.0
+    },
+    "agreement_by_chi": {
+      "1": 0.86,
+      "2": 0.995,
+      "4": 1.0,
+      "8": 1.0,
+      "16": 1.0,
+      "32": 1.0,
+      "full": 1.0
+    },
+    "chi_star": {
+      "tau_gen": 1,
+      "tau_ci": 1,
+      "tau_agree": 2
+    },
+    "scaling_slope": null,
+    "scaling_r2": null,
+    "delta_ent": null,
+    "entropy_mean": 0.4297158954600617,
+    "entropy_p99": 0.5743413204564539,
+    "gcq_ratio": null,
+    "fourier_degree": null,
+    "baseline_gap": 0.010000000000000009,
+    "mps_surrogate_repro": {},
+    "verdict": "CLASSICALLY_SIMULABLE",
+    "meta": {
+      "n_examples": 200,
+      "chi_values": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        null
+      ],
+      "tau_gen": 0.33999999999999997,
+      "tau_ci": 0.06756249999999997,
+      "train_accuracy": 1.0,
+      "run_hash": "bde4da81e980",
+      "separable_test_accuracy": null
+    }
+  },
+  "details": {
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      null
+    ],
+    "accuracy_by_chi": {
+      "1": 0.65,
+      "2": 0.655,
+      "4": 0.66,
+      "8": 0.66,
+      "16": 0.66,
+      "32": 0.66,
+      "full": 0.66
+    },
+    "accuracy_ci_by_chi": {
+      "1": [
+        0.58,
+        0.715
+      ],
+      "2": [
+        0.585,
+        0.7201249999999999
+      ],
+      "4": [
+        0.59,
+        0.7251249999999999
+      ],
+      "8": [
+        0.59,
+        0.7251249999999999
+      ],
+      "16": [
+        0.59,
+        0.7251249999999999
+      ],
+      "32": [
+        0.59,
+        0.7251249999999999
+      ],
+      "full": [
+        0.59,
+        0.7251249999999999
+      ]
+    },
+    "mcnemar_by_chi": {
+      "1": {
+        "b": 15,
+        "c": 13,
+        "n_discordant": 28,
+        "p_value": 0.8505540192127228
+      },
+      "2": {
+        "b": 1,
+        "c": 0,
+        "n_discordant": 1,
+        "p_value": 1.0
+      },
+      "4": {
+        "b": 0,
+        "c": 0,
+        "n_discordant": 0,
+        "p_value": 1.0
+      },
+      "8": {
+        "b": 0,
+        "c": 0,
+        "n_discordant": 0,
+        "p_value": 1.0
+      },
+      "16": {
+        "b": 0,
+        "c": 0,
+        "n_discordant": 0,
+        "p_value": 1.0
+      },
+      "32": {
+        "b": 0,
+        "c": 0,
+        "n_discordant": 0,
+        "p_value": 1.0
+      }
+    },
+    "fidelity_by_chi": {
+      "1": 0.7736885569347135,
+      "2": 0.9915526883500217,
+      "4": 1.0,
+      "8": 1.0,
+      "16": 1.0,
+      "32": 1.0,
+      "full": 1.0
+    },
+    "agreement_by_chi": {
+      "1": 0.86,
+      "2": 0.995,
+      "4": 1.0,
+      "8": 1.0,
+      "16": 1.0,
+      "32": 1.0,
+      "full": 1.0
+    },
+    "full_accuracy": 0.66,
+    "ci": [
+      0.59,
+      0.7251249999999999
+    ]
+  },
+  "env": {
+    "git_sha": "1e0d62d",
+    "libs": {
+      "pennylane": "0.45.1",
+      "quimb": "1.14.0",
+      "qiskit": "2.3.0",
+      "qiskit_aer": "0.17.2",
+      "numpy": "2.4.6",
+      "torch": "2.12.1",
+      "transformers": "5.13.0"
+    }
+  }
+}

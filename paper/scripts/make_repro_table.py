@@ -8,11 +8,13 @@ committed results/metrics/*.json.
 from __future__ import annotations
 
 import glob
-import json
-from collections import defaultdict
+import sys
 from pathlib import Path
 
 import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+from simcert.io_results import select_runs  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "paper" / "tables" / "reproduction.tex"
@@ -27,11 +29,10 @@ PUBLISHED = {
 
 
 def main():
-    groups = defaultdict(list)
-    for f in sorted(glob.glob(str(REPO / "results" / "metrics" / "*.json"))):
-        d = json.load(open(f))
-        c = d["certificate"]
-        groups[(c["model"], c["dataset"])].append(c["full_accuracy"])
+    # Same selection rule as the certificate table, so the two never disagree on how
+    # many seeds a row has.
+    groups = {k: [d["certificate"]["full_accuracy"] for d in v]
+              for k, v in select_runs(glob.glob(str(REPO / "results" / "metrics" / "*.json"))).items()}
 
     rows = [r"\begin{tabular}{llccc}", r"\toprule",
             r"Model & Data & seeds & ours (test) & published \\", r"\midrule"]

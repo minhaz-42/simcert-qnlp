@@ -14,6 +14,8 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+from simcert.io_results import select_runs  # noqa: E402
 from _style import PALETTE, apply_rc  # noqa: E402
 
 import matplotlib.pyplot as plt  # noqa: E402
@@ -27,16 +29,16 @@ ORDER = ["vqc_text", "qsann", "qmsan", "claqs", "discocat"]
 def main():
     apply_rc()
     ent, full, chi1 = defaultdict(list), defaultdict(list), defaultdict(list)
-    for f in sorted(METRICS.glob("mc__*.json")):
-        d = json.loads(f.read_text())
-        c = d["certificate"]
-        if c["dataset"] != "mc":
+    # Shared selection so a seed superseded by a re-audit is not counted twice.
+    for (m, dataset), runs in select_runs(METRICS.glob("*.json")).items():
+        if dataset != "mc":
             continue
-        m = c["model"]
-        if c.get("entropy_mean") is not None:
-            ent[m].append(c["entropy_mean"])
-        full[m].append(c["full_accuracy"])
-        chi1[m].append(c["accuracy_by_chi"].get("1"))
+        for d in runs:
+            c = d["certificate"]
+            if c.get("entropy_mean") is not None:
+                ent[m].append(c["entropy_mean"])
+            full[m].append(c["full_accuracy"])
+            chi1[m].append(c["accuracy_by_chi"].get("1"))
     models = [m for m in ORDER if m in full]
     x = np.arange(len(models))
     colors = [PALETTE.get(m, "#444") for m in models]

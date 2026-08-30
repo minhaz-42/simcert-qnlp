@@ -1,0 +1,104 @@
+{
+  "model": "qmsan",
+  "dataset": "mc",
+  "full_accuracy": 1.0,
+  "accuracy_by_chi": {
+    "1": 1.0,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "accuracy_ci_by_chi": {
+    "1": [
+      1.0,
+      1.0
+    ],
+    "2": [
+      1.0,
+      1.0
+    ],
+    "4": [
+      1.0,
+      1.0
+    ],
+    "8": [
+      1.0,
+      1.0
+    ],
+    "full": [
+      1.0,
+      1.0
+    ]
+  },
+  "mcnemar_by_chi": {
+    "1": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    },
+    "2": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    },
+    "4": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    },
+    "8": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    }
+  },
+  "fidelity_by_chi": {
+    "1": 0.9477088109476844,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "agreement_by_chi": {
+    "1": 1.0,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "chi_star": {
+    "tau_gen": 1,
+    "tau_ci": 1,
+    "tau_agree": 1
+  },
+  "scaling_slope": null,
+  "scaling_r2": null,
+  "delta_ent": 0.0,
+  "entropy_mean": 0.1423632408222946,
+  "entropy_p99": 0.31019902250775194,
+  "gcq_ratio": null,
+  "fourier_degree": null,
+  "baseline_gap": 0.0,
+  "mps_surrogate_repro": {},
+  "verdict": "CLASSICALLY_SIMULABLE",
+  "meta": {
+    "n_examples": 26,
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      null
+    ],
+    "tau_gen": 0.0,
+    "tau_ci": 1e-09,
+    "train_accuracy": 1.0,
+    "run_hash": "7643407f6bab",
+    "separable_test_accuracy": 1.0
+  }
+}

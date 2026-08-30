@@ -52,8 +52,11 @@ def main():
     ax1.set_xticks(x); ax1.set_xticklabels(models, rotation=15)
     ax1.set_ylabel(r"mean entanglement entropy $\bar S$ (nats)")
     ax1.set_title("(a) the trained circuits carry entanglement")
-    for xi, mu in zip(x, means):
-        ax1.text(xi, mu + 0.03, f"{mu:.2f}", ha="center", fontsize=9)
+    # clear the error bar, not just the bar: the cap sits at mu+sigma, so a fixed offset
+    # from mu draws the label straight through the whisker whenever sigma exceeds it
+    for xi, mu, sd in zip(x, means, errs):
+        ax1.text(xi, mu + sd + 0.04, f"{mu:.2f}", ha="center", fontsize=9)
+    ax1.set_ylim(0, max(m + e for m, e in zip(means, errs)) * 1.16)
 
     # (b) full accuracy vs chi=1 accuracy
     w = 0.38

@@ -1,0 +1,215 @@
+{
+  "run_hash": "76d832f81bec",
+  "config": {
+    "seed": 8,
+    "mode": "both",
+    "model_name": "vqc_text",
+    "dataset_name": "mc",
+    "audit_name": "default",
+    "paths": {
+      "results": "results",
+      "checkpoints": "checkpoints"
+    },
+    "model": {
+      "n_qubits": 6,
+      "n_layers": 2,
+      "epochs": 40,
+      "lr": 0.05,
+      "published_accuracy": null,
+      "baseline": "logreg_bow",
+      "seed": 8,
+      "dataset": "mc"
+    },
+    "dataset": {
+      "name": "mc",
+      "n_per_class": 65,
+      "val_frac": 0.2,
+      "test_frac": 0.2
+    },
+    "audit": {
+      "chi_values": [
+        1,
+        2,
+        4,
+        8,
+        null
+      ],
+      "cutoff": 1e-12,
+      "entanglement_removal": true
+    }
+  },
+  "dataset": {
+    "name": "mc",
+    "n_classes": 2,
+    "n_train": 78,
+    "n_val": 26,
+    "n_test": 26
+  },
+  "train_report": {
+    "train_accuracy": 1.0,
+    "val_accuracy": 1.0,
+    "published_accuracy": null,
+    "n_params": 204,
+    "epochs": 40,
+    "extra": {}
+  },
+  "certificate": {
+    "model": "vqc_text",
+    "dataset": "mc",
+    "full_accuracy": 1.0,
+    "accuracy_by_chi": {
+      "1": 1.0,
+      "2": 1.0,
+      "4": 1.0,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "accuracy_ci_by_chi": {
+      "1": [
+        1.0,
+        1.0
+      ],
+      "2": [
+        1.0,
+        1.0
+      ],
+      "4": [
+        1.0,
+        1.0
+      ],
+      "8": [
+        1.0,
+        1.0
+      ],
+      "full": [
+        1.0,
+        1.0
+      ]
+    },
+    "mcnemar_p_by_chi": {
+      "1": 1.0,
+      "2": 1.0,
+      "4": 1.0,
+      "8": 1.0
+    },
+    "fidelity_by_chi": {
+      "1": 0.6616767300942457,
+      "2": 0.911317664465998,
+      "4": 0.9877355627710303,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "agreement_by_chi": {
+      "1": 1.0,
+      "2": 1.0,
+      "4": 1.0,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "chi_star": {
+      "tau_gen": 1,
+      "tau_ci": 1,
+      "tau_agree": 1
+    },
+    "scaling_slope": null,
+    "scaling_r2": null,
+    "delta_ent": 0.0,
+    "entropy_mean": 0.8559509394156304,
+    "entropy_p99": 1.4362198237201573,
+    "gcq_ratio": 0.9868285461229346,
+    "fourier_degree": 1,
+    "baseline_gap": 0.0,
+    "mps_surrogate_repro": {},
+    "verdict": "CLASSICALLY_SIMULABLE",
+    "meta": {
+      "n_examples": 26,
+      "chi_values": [
+        1,
+        2,
+        4,
+        8,
+        null
+      ],
+      "tau_gen": 0.0,
+      "tau_ci": 1e-09,
+      "train_accuracy": 1.0,
+      "run_hash": "76d832f81bec",
+      "separable_test_accuracy": 1.0
+    }
+  },
+  "details": {
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      null
+    ],
+    "accuracy_by_chi": {
+      "1": 1.0,
+      "2": 1.0,
+      "4": 1.0,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "accuracy_ci_by_chi": {
+      "1": [
+        1.0,
+        1.0
+      ],
+      "2": [
+        1.0,
+        1.0
+      ],
+      "4": [
+        1.0,
+        1.0
+      ],
+      "8": [
+        1.0,
+        1.0
+      ],
+      "full": [
+        1.0,
+        1.0
+      ]
+    },
+    "mcnemar_p_by_chi": {
+      "1": 1.0,
+      "2": 1.0,
+      "4": 1.0,
+      "8": 1.0
+    },
+    "fidelity_by_chi": {
+      "1": 0.6616767300942457,
+      "2": 0.911317664465998,
+      "4": 0.9877355627710303,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "agreement_by_chi": {
+      "1": 1.0,
+      "2": 1.0,
+      "4": 1.0,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "full_accuracy": 1.0,
+    "ci": [
+      1.0,
+      1.0
+    ]
+  },
+  "env": {
+    "git_sha": "de33190",
+    "libs": {
+      "pennylane": "0.45.1",
+      "quimb": "1.14.0",
+      "qiskit": "2.3.0",
+      "qiskit_aer": "0.17.2",
+      "numpy": "2.4.6",
+      "torch": "2.12.1",
+      "transformers": "5.13.0"
+    }
+  }
+}

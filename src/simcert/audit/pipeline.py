@@ -13,7 +13,7 @@ import numpy as np
 from .certificate import SimCert, chi_star
 from .entanglement import max_bipartite_entropy
 from .fidelity import prediction_agreement
-from .metrics import accuracy, bootstrap_ci
+from .metrics import accuracy, bootstrap_ci, mcnemar
 from .mps_truncation import _chi_key, run_chi_sweep
 
 
@@ -71,13 +71,19 @@ def audit_model(
     full_accuracy = accuracy(labels, full_preds)
 
     accuracy_by_chi: dict = {}
+    accuracy_ci_by_chi: dict = {}
     agreement_by_chi: dict = {}
     fidelity_by_chi: dict = {}
+    mcnemar_p_by_chi: dict = {}
     for k in keys:
         p = np.array(preds_by_key[k])
         accuracy_by_chi[k] = accuracy(labels, p)
+        _, clo, chi_ = bootstrap_ci(labels, p, metric=accuracy, n_boot=1000, seed=seed)
+        accuracy_ci_by_chi[k] = [clo, chi_]
         agreement_by_chi[k] = prediction_agreement(full_preds, p)
         fidelity_by_chi[k] = float(np.mean(fid_by_key[k]))
+        if isinstance(k, int):  # paired McNemar of the truncated surrogate against the full model
+            mcnemar_p_by_chi[k] = mcnemar(labels, full_preds, p)["p_value"]
 
     # tolerances for chi*
     tau_gen = max(0.0, (train_accuracy - full_accuracy)) if train_accuracy is not None else 0.02
@@ -92,6 +98,8 @@ def audit_model(
         dataset=dataset_name,
         full_accuracy=full_accuracy,
         accuracy_by_chi=accuracy_by_chi,
+        accuracy_ci_by_chi=accuracy_ci_by_chi,
+        mcnemar_p_by_chi=mcnemar_p_by_chi,
         fidelity_by_chi=fidelity_by_chi,
         agreement_by_chi=agreement_by_chi,
         chi_star={
@@ -119,6 +127,8 @@ def audit_model(
     details = {
         "chi_values": list(chi_values),
         "accuracy_by_chi": accuracy_by_chi,
+        "accuracy_ci_by_chi": accuracy_ci_by_chi,
+        "mcnemar_p_by_chi": mcnemar_p_by_chi,
         "fidelity_by_chi": fidelity_by_chi,
         "agreement_by_chi": agreement_by_chi,
         "full_accuracy": full_accuracy,

@@ -280,8 +280,16 @@ configurations are in Appendix~\ref{app:configs}.
 \section{Results}
 \label{sec:results}
 We report three findings, then a subsection of effects we looked for and did not see. Unless noted,
-numbers are the mean over three seeds; the aggregate certificate is Table~\ref{tab:results} and the
-reproduction gap is Table~\ref{tab:repro}.
+numbers are the mean over seeds, with the per-row seed count in Table~\ref{tab:results}; the
+aggregate certificate is Table~\ref{tab:results} and the reproduction gap is Table~\ref{tab:repro}.
+We quantify uncertainty in two ways that do not rely on the seed count alone. For every truncated
+surrogate we compute a $95\%$ example-level bootstrap confidence interval on its retained accuracy,
+and we compare it against the full model with an exact paired McNemar test on the test predictions.
+A large McNemar p-value means the surrogate is not significantly different from the full model, which
+is the simulability signal; a small p-value flags a surrogate that is significantly worse. The
+product-state surrogate is not significantly different from the full model on any task where the
+models saturate, and it is significantly worse only for \texttt{discocat} at $\chi{=}1$, which is
+exactly the case that needs $\chi{=}2$ (Table~\ref{tab:results}).
 
 \subsection{A classical surrogate recovers the predictions at small bond dimension}
 Across models and datasets, a bond-dimension-one or bond-dimension-two surrogate recovers the
@@ -369,13 +377,18 @@ This lone exception matters more than the uniform cases, because it shows the au
 reporting $\chi{=}1$ by construction.
 
 \begin{table}[t]
-\centering\small
-\input{tables/results.tex}
+\centering
+\resizebox{\linewidth}{!}{%
+\input{tables/results.tex}}
 \caption{Simulability certificate for all models. Mean and standard deviation over seeds.
-Acc@$\chi{=}1$ is the accuracy of a product-state surrogate; \chistar\ is Eq.~\ref{eq:chistar};
-$\bar S$ is the mean bipartite entanglement entropy in nats; $\Delta A_{\mathrm{ent}}$ is the
-entanglement-removal gap, with a dash where a separable twin is not defined. Attention and mixer
-models are recovered at $\chi{=}1$, and \texttt{discocat} at $\chi{=}2$.}
+Acc@$\chi{=}1$ is the accuracy of a product-state surrogate; $p_{\mathrm{McN}}^{\chi=1}$ is the
+mean exact-McNemar p-value comparing that surrogate against the full model, where a large value
+means the two are not significantly different and a small value flags a surrogate that is
+significantly worse; \chistar\ is Eq.~\ref{eq:chistar}; $\bar S$ is the mean bipartite entanglement
+entropy in nats; $\Delta A_{\mathrm{ent}}$ is the entanglement-removal gap, with a dash where a
+separable twin is not defined. Attention and mixer models are recovered at $\chi{=}1$
+($p_{\mathrm{McN}}^{\chi=1}$ near one), and \texttt{discocat} needs $\chi{=}2$
+($p_{\mathrm{McN}}^{\chi=1}$ small).}
 \label{tab:results}
 \end{table}
 

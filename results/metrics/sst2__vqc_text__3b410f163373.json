@@ -1,0 +1,217 @@
+{
+  "run_hash": "3b410f163373",
+  "config": {
+    "seed": 1,
+    "mode": "both",
+    "model_name": "vqc_text",
+    "dataset_name": "sst2",
+    "audit_name": "default",
+    "paths": {
+      "results": "results",
+      "checkpoints": "checkpoints"
+    },
+    "model": {
+      "n_qubits": 6,
+      "n_layers": 2,
+      "epochs": 40,
+      "lr": 0.05,
+      "published_accuracy": null,
+      "baseline": "logreg_bow",
+      "seed": 1,
+      "dataset": "sst2"
+    },
+    "dataset": {
+      "name": "sst2",
+      "n_train": 600,
+      "n_test": 200,
+      "max_tokens": 16,
+      "val_frac": 0.15,
+      "test_frac": 0.0
+    },
+    "audit": {
+      "chi_values": [
+        1,
+        2,
+        4,
+        8,
+        null
+      ],
+      "cutoff": 1e-12,
+      "entanglement_removal": true
+    }
+  },
+  "dataset": {
+    "name": "sst2",
+    "n_classes": 2,
+    "n_train": 510,
+    "n_val": 90,
+    "n_test": 200
+  },
+  "train_report": {
+    "train_accuracy": 0.9980392156862745,
+    "val_accuracy": 0.6333333333333333,
+    "published_accuracy": null,
+    "n_params": 9516,
+    "epochs": 40,
+    "extra": {}
+  },
+  "certificate": {
+    "model": "vqc_text",
+    "dataset": "sst2",
+    "full_accuracy": 0.65,
+    "accuracy_by_chi": {
+      "1": 0.65,
+      "2": 0.66,
+      "4": 0.65,
+      "8": 0.65,
+      "full": 0.65
+    },
+    "accuracy_ci_by_chi": {
+      "1": [
+        0.58,
+        0.715
+      ],
+      "2": [
+        0.59,
+        0.73
+      ],
+      "4": [
+        0.58,
+        0.715
+      ],
+      "8": [
+        0.58,
+        0.715
+      ],
+      "full": [
+        0.58,
+        0.715
+      ]
+    },
+    "mcnemar_p_by_chi": {
+      "1": 1.0,
+      "2": 0.8956832138895903,
+      "4": 1.0,
+      "8": 1.0
+    },
+    "fidelity_by_chi": {
+      "1": 0.3856156471265024,
+      "2": 0.7068891493441065,
+      "4": 0.9937311278084531,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "agreement_by_chi": {
+      "1": 1.0,
+      "2": 0.71,
+      "4": 1.0,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "chi_star": {
+      "tau_gen": 1,
+      "tau_ci": 1,
+      "tau_agree": 1
+    },
+    "scaling_slope": null,
+    "scaling_r2": null,
+    "delta_ent": 0.13,
+    "entropy_mean": 1.1541937667314597,
+    "entropy_p99": 1.2807639488989453,
+    "gcq_ratio": 0.9028638707057995,
+    "fourier_degree": 1,
+    "baseline_gap": 0.0,
+    "mps_surrogate_repro": {},
+    "verdict": "AMBIGUOUS",
+    "meta": {
+      "n_examples": 200,
+      "chi_values": [
+        1,
+        2,
+        4,
+        8,
+        null
+      ],
+      "tau_gen": 0.3480392156862745,
+      "tau_ci": 0.0675,
+      "train_accuracy": 0.9980392156862745,
+      "run_hash": "3b410f163373",
+      "separable_test_accuracy": 0.52
+    }
+  },
+  "details": {
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      null
+    ],
+    "accuracy_by_chi": {
+      "1": 0.65,
+      "2": 0.66,
+      "4": 0.65,
+      "8": 0.65,
+      "full": 0.65
+    },
+    "accuracy_ci_by_chi": {
+      "1": [
+        0.58,
+        0.715
+      ],
+      "2": [
+        0.59,
+        0.73
+      ],
+      "4": [
+        0.58,
+        0.715
+      ],
+      "8": [
+        0.58,
+        0.715
+      ],
+      "full": [
+        0.58,
+        0.715
+      ]
+    },
+    "mcnemar_p_by_chi": {
+      "1": 1.0,
+      "2": 0.8956832138895903,
+      "4": 1.0,
+      "8": 1.0
+    },
+    "fidelity_by_chi": {
+      "1": 0.3856156471265024,
+      "2": 0.7068891493441065,
+      "4": 0.9937311278084531,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "agreement_by_chi": {
+      "1": 1.0,
+      "2": 0.71,
+      "4": 1.0,
+      "8": 1.0,
+      "full": 1.0
+    },
+    "full_accuracy": 0.65,
+    "ci": [
+      0.58,
+      0.715
+    ]
+  },
+  "env": {
+    "git_sha": "de33190",
+    "libs": {
+      "pennylane": "0.45.1",
+      "quimb": "1.14.0",
+      "qiskit": "2.3.0",
+      "qiskit_aer": "0.17.2",
+      "numpy": "2.4.6",
+      "torch": "2.12.1",
+      "transformers": "5.13.0"
+    }
+  }
+}

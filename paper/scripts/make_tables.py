@@ -26,6 +26,16 @@ def _fmt(vals, prec=3):
     return f"{np.mean(vals):.{prec}f}$\\pm${np.std(vals):.{prec}f}"
 
 
+def _fmt_p(vals):
+    """Mean McNemar p-value across seeds. A large value means the product-state
+    surrogate is not significantly different from the full model."""
+    vals = [v for v in vals if v is not None]
+    if not vals:
+        return "--"
+    m = float(np.mean(vals))
+    return r"$<$0.001" if m < 0.001 else f"{m:.3f}"
+
+
 def main():
     groups = defaultdict(list)
     for f in sorted(glob.glob(str(REPO / "results" / "metrics" / "*.json"))):
@@ -34,16 +44,17 @@ def main():
         groups[(c["model"], c["dataset"])].append(c)
 
     lines = [
-        r"\begin{tabular}{llcccccc}",
+        r"\begin{tabular}{llccccccc}",
         r"\toprule",
-        r"Model & Data & seeds & Full acc & Acc@$\chi{=}1$ & $\chi^\star$ & "
-        r"$\bar{S}$ (nats) & $\Delta A_{\mathrm{ent}}$ \\",
+        r"Model & Data & seeds & Full acc & Acc@$\chi{=}1$ & $p_{\mathrm{McN}}^{\chi=1}$ & "
+        r"$\chi^\star$ & $\bar{S}$ (nats) & $\Delta A_{\mathrm{ent}}$ \\",
         r"\midrule",
     ]
     for (model, dataset), certs in sorted(groups.items()):
         n = len(certs)
         full = [c["full_accuracy"] for c in certs]
         acc1 = [c["accuracy_by_chi"].get("1") for c in certs]
+        pmcn = [(c.get("mcnemar_p_by_chi") or {}).get("1") for c in certs]
         cstar = [c["chi_star"].get("tau_gen") for c in certs]
         cstar_txt = (
             "/".join(sorted({str(x) for x in cstar})) if any(x is not None for x in cstar) else "full"
@@ -52,7 +63,7 @@ def main():
         dent = [c["delta_ent"] for c in certs]
         lines.append(
             f"\\texttt{{{model.replace('_', chr(92) + '_')}}} & {dataset.replace('_', chr(92)+'_')} & {n} & "
-            f"{_fmt(full)} & {_fmt(acc1)} & {cstar_txt} & {_fmt(ent)} & {_fmt(dent)} \\\\"
+            f"{_fmt(full)} & {_fmt(acc1)} & {_fmt_p(pmcn)} & {cstar_txt} & {_fmt(ent)} & {_fmt(dent)} \\\\"
         )
     lines += [r"\bottomrule", r"\end{tabular}"]
 

@@ -7,13 +7,17 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 STAGE="$(mktemp -d)/simcert"
 mkdir -p "$STAGE"
 
-# copy code, keeping only what a reviewer needs to reproduce the audit
+# Copy code, keeping only what a reviewer needs to reproduce the audit. The two
+# excluded scripts build the paper and this snapshot; both name the author on
+# purpose (the anonymity gate greps for exactly those strings) and neither is
+# useful to a reviewer, since paper/ is excluded anyway.
 rsync -a --delete \
   --exclude='.git' --exclude='paper' --exclude='references/pdfs' \
   --exclude='data' --exclude='checkpoints' --exclude='*.egg-info' \
   --exclude='__pycache__' --exclude='*.pt' --exclude='*.ckpt' \
   --exclude='outputs' --exclude='multirun' --exclude='*.zip' \
-  --exclude='/scripts/make_anon_snapshot.sh' --exclude='*.log' \
+  --exclude='/scripts/make_anon_snapshot.sh' --exclude='/scripts/build_paper.sh' \
+  --exclude='*.log' \
   --exclude='/arxiv' --exclude='arxiv_submission.tar.gz' \
   "$ROOT"/ "$STAGE"/
 

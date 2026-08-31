@@ -315,22 +315,29 @@ bond-cheap.
 
 \subsection{$\chistar$ does not grow with system size}
 The obvious objection is that small circuits are trivially simulable, so the audit only bites at
-scale. Figure~\ref{fig:scaling} tests this directly. On a fixed task we increase the qubit count of
-the reference model from four to ten and track \chistar. It stays flat at $1$ while the exact bond
-bound grows from $4$ to $8$ to $16$ to $32$. Adding qubits neither raises the bond dimension a
-classical surrogate needs nor, on this task, improves accuracy, which drifts from $0.63$ at four
-qubits to $0.52$ at ten. \emph{The gap between what the model uses and what it could use widens with
-every qubit.}
+scale. Figure~\ref{fig:scaling} tests this directly. On a fixed task we increase the qubit count
+from four to ten and track \chistar, once for the reference model and independently for
+\texttt{qsann}, whose per-token attention circuits are structurally unlike the reference ansatz. For
+both, \chistar\ stays flat at $1$ while the exact bond bound grows from $4$ to $8$ to $16$ to $32$.
+Adding qubits does not raise the bond dimension a classical surrogate needs. What happens to
+accuracy differs between the two, and that difference is what makes the result readable. The
+reference model drifts down from $0.63$ at four qubits to $0.52$ at ten, so on its own a flat
+\chistar\ could be dismissed as an artifact of a classifier decaying toward chance. \texttt{qsann}
+holds between $0.62$ and $0.66$ across the same range and is still recovered by a product state, so
+the flat \chistar\ survives in a model that does not decay. \emph{The gap between what the model
+uses and what it could use widens with every qubit.}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.98\linewidth]{scaling.pdf}
 \caption{The required bond dimension \chistar\ does not grow with qubit count. Left, accuracy retained versus bond
 dimension for the reference model at $n\in\{4,6,8,10\}$ on \textsc{sst-2}; each curve is flat down
-to $\chi{=}1$. Right, the measured \chistar\ (orange) stays at $1$ while the exact-MPS bound
-$2^{n/2}$ (grey, dashed) grows exponentially on the log axis. A product-state surrogate recovers
-the predictions at every size tested. Accuracy here is modest and does not rise with $n$, so this
-probes recovery rather than a strong classifier.}
+to $\chi{=}1$. Right, the measured \chistar\ for the reference model and for \texttt{qsann} both
+stay at $1$ while the exact-MPS bound $2^{n/2}$ (grey, dashed) grows exponentially on the log axis.
+A product-state surrogate recovers the predictions at every size tested, for two architectures that
+share no circuit structure. Accuracy for the reference model is modest and drifts down with $n$,
+while \texttt{qsann} holds near $0.63$ throughout, so the flat \chistar\ is not an artifact of a
+classifier decaying to chance.}
 \label{fig:scaling}
 \end{figure}
 

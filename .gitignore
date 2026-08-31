@@ -53,3 +53,5 @@ paper/*.out
 grid.log
 rerun_grid.log
 grid_sequential.log
+dcprod.log
+dcaudit.log

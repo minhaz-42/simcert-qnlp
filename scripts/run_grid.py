@@ -55,7 +55,7 @@ from simcert.runner import load_config  # noqa: E402
 GRID = [
     ("discocat", "mc",      "discocat", range(1, 4)),   # cached circuits, seeds 1-3 only
     ("discocat", "mc_real", "discocat", range(1, 4)),
-    ("discocat", "rp",      "discocat", range(1, 4)),
+    ("discocat", "rp",      "discocat", range(1, 21)),  # matches the other models' seed coverage
     ("qmsan",    "mc",      "default",  range(1, 9)),
     ("qmsan",    "rp",      "default",  range(1, 21)),  # 20 seeds: reproduction-gap probe
     ("qsann",    "mc",      "default",  range(1, 9)),

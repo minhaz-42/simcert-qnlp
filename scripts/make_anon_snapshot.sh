@@ -17,6 +17,7 @@ rsync -a --delete \
   --exclude='__pycache__' --exclude='*.pt' --exclude='*.ckpt' \
   --exclude='outputs' --exclude='multirun' --exclude='*.zip' \
   --exclude='/scripts/make_anon_snapshot.sh' --exclude='/scripts/build_paper.sh' \
+  --exclude='/docs/positive-control-study.md' \
   --exclude='*.log' \
   --exclude='/arxiv' --exclude='arxiv_submission.tar.gz' \
   "$ROOT"/ "$STAGE"/

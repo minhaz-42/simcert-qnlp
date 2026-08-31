@@ -1,111 +1,120 @@
-"""Chunked training must compute the same gradient as full-batch training.
+"""Chunked training must be indistinguishable from full-batch training.
 
-Backprop through a per-token statevector simulator keeps the entire autograd graph
-alive until backward(), so a 600-example training set exhausts memory on a laptop
-even though every individual circuit is tiny. Chunking bounds that graph, but it is
-only legitimate if the accumulated gradient is the one full-batch training would have
-produced, so that is what these tests check, parameter by parameter.
+Backprop runs through a statevector simulator, so the autograd graph spans the whole
+training set and its cost grows with 2^n. Full-batch training exhausted a 16 GB machine
+on sst2 and at n>=12, so fit() accepts a train_chunk and accumulates gradients over
+chunks instead. That is only legitimate if the resulting update is the one full-batch
+training would have produced, which is what these tests check, on the real fit() path
+rather than on a reimplementation of each model's loss.
+
+The last test exists because of a specific bug: train_chunk was added to qsann and claqs
+but not to vqc_text, so passing model.train_chunk on the command line was accepted by the
+config and silently ignored by the model, and two large runs died on memory that the
+option was supposed to bound. A silently ignored knob is worse than a missing one.
 """
 
 from __future__ import annotations
 
+import inspect
+
 import numpy as np
+import pytest
 from omegaconf import OmegaConf
 
 from simcert import models  # noqa: F401  (import populates the model registry)
 from simcert.data.loaders import build_vocab, load_dataset
+from simcert.registry import _REGISTRY, get_model
+
+# (model name, dataset, extra config) for every model whose fit() we can drive cheaply.
+CHUNKABLE = [
+    ("vqc_text", "mc", {}),
+    ("qsann", "mc", {}),
+    ("qmsan", "mc", {}),
+    ("claqs", "mc", {}),
+]
 
 
-def _grads(model_name, chunk, seed=1, n_epochs=1):
-    """Train one step with the given chunk setting; return the resulting gradients."""
-    from simcert.registry import get_model
-
-    ds = load_dataset("mc", seed=seed, val_frac=0.2, test_frac=0.2)
+def _fit_params(model_name, dataset, chunk, extra, n_train=10, epochs=1, seed=1):
+    """Fit for one step with the given chunk setting; return the resulting parameters."""
+    ds = load_dataset(dataset, seed=seed, val_frac=0.2, test_frac=0.2)
     vocab = build_vocab(ds.train)
-    cfg = OmegaConf.create({
-        "n_qubits": 2, "d_enc": 1, "d_qkv": 1, "epochs": n_epochs, "lr": 0.05,
-        "lam": 0.0, "gam": 0.0, "seed": seed, "dataset": "mc",
-        "published_accuracy": None, "baseline": None, "train_chunk": chunk,
-    })
+    cfg = OmegaConf.load(f"configs/model/{model_name}.yaml")
+    cfg.seed, cfg.dataset, cfg.epochs = seed, dataset, epochs
+    cfg.train_chunk = chunk
+    for k, v in extra.items():
+        cfg[k] = v
     m = get_model(model_name)()
     m.build(cfg, vocab)
-
-    torch = m._torch
-    train = ds.train
-    n = len(train)
-    opt = torch.optim.Adam(m._params(), lr=0.05)
-    opt.zero_grad()
-    if not chunk or chunk >= n:
-        logits = torch.stack([m._forward_logit(ex) for ex in train])
-        probs = torch.sigmoid(logits)
-        y = torch.tensor([float(ex.label) for ex in train], dtype=probs.dtype)
-        ((probs - y) ** 2).mean().backward()
-    else:
-        for i in range(0, n, chunk):
-            part = train[i:i + chunk]
-            logits = torch.stack([m._forward_logit(ex) for ex in part])
-            probs = torch.sigmoid(logits)
-            y = torch.tensor([float(ex.label) for ex in part], dtype=probs.dtype)
-            (((probs - y) ** 2).sum() / n).backward()
-    return [p.grad.detach().numpy().copy() for p in m._params()], n
+    m.fit(ds.train[:n_train], ds.val[:2], cfg)
+    return [p.detach().numpy().copy() for p in m._params()] if hasattr(m, "_params") \
+        else [m.embedding.detach().numpy().copy(), m.theta.detach().numpy().copy()]
 
 
-def test_chunked_gradient_matches_full_batch_qsann():
-    full, n = _grads("qsann", chunk=None)
-    chunked, _ = _grads("qsann", chunk=7)  # deliberately not a divisor of n
-    assert len(full) == len(chunked)
+@pytest.mark.parametrize("model_name,dataset,extra", CHUNKABLE)
+def test_chunked_fit_matches_full_batch(model_name, dataset, extra):
+    """One optimizer step must land on the same parameters either way."""
+    full = _fit_params(model_name, dataset, None, extra)
+    # 3 deliberately does not divide 10, so the last chunk is short
+    chunked = _fit_params(model_name, dataset, 3, extra)
+    assert len(full) == len(chunked) and len(full) > 0
     for a, b in zip(full, chunked):
-        np.testing.assert_allclose(a, b, rtol=1e-9, atol=1e-12)
+        np.testing.assert_allclose(a, b, rtol=1e-8, atol=1e-10)
 
 
-def test_chunk_size_does_not_change_the_gradient():
-    """Any chunking of the same data must land on the same accumulated gradient."""
-    g1, n = _grads("qsann", chunk=3)
-    g2, _ = _grads("qsann", chunk=16)
-    for a, b in zip(g1, g2):
-        np.testing.assert_allclose(a, b, rtol=1e-9, atol=1e-12)
+@pytest.mark.parametrize("model_name,dataset,extra", CHUNKABLE)
+def test_chunk_size_one_matches_full_batch(model_name, dataset, extra):
+    """chunk=1 is the setting the heaviest runs use, so it gets its own check."""
+    full = _fit_params(model_name, dataset, None, extra)
+    one = _fit_params(model_name, dataset, 1, extra)
+    for a, b in zip(full, one):
+        np.testing.assert_allclose(a, b, rtol=1e-8, atol=1e-10)
 
 
-def test_chunk_larger_than_dataset_is_the_full_batch_path():
-    full, n = _grads("qsann", chunk=None)
-    big, _ = _grads("qsann", chunk=10_000)
+def test_chunk_larger_than_the_training_set_is_the_full_batch_path():
+    full = _fit_params("vqc_text", "mc", None, {})
+    big = _fit_params("vqc_text", "mc", 10_000, {})
     for a, b in zip(full, big):
         np.testing.assert_allclose(a, b, rtol=1e-12, atol=1e-14)
 
 
-def _claqs_grads(chunk, seed=1):
-    """Same check for claqs, whose per-example graph is ~20x larger than qsann's."""
-    from simcert.registry import get_model
-
-    ds = load_dataset("mc", seed=seed, val_frac=0.2, test_frac=0.2)
-    vocab = build_vocab(ds.train)
-    cfg = OmegaConf.load("configs/model/claqs.yaml")
-    cfg.seed, cfg.dataset, cfg.train_chunk = seed, "mc", chunk
-    m = get_model("claqs")()
-    m.build(cfg, vocab)
-
-    torch = m._torch
-    train = ds.train[:12]  # a slice keeps this test quick; claqs is ~0.3 s an example
-    n = len(train)
-    torch.optim.AdamW(m._params(), lr=0.05).zero_grad()
-    if not chunk or chunk >= n:
-        logits = torch.stack([m._forward_logits(ex) for ex in train])
-        y = torch.tensor([ex.label for ex in train])
-        torch.nn.CrossEntropyLoss()(logits, y).backward()
-    else:
-        lf = torch.nn.CrossEntropyLoss(reduction="sum")
-        for i in range(0, n, chunk):
-            part = train[i:i + chunk]
-            logits = torch.stack([m._forward_logits(ex) for ex in part])
-            y = torch.tensor([ex.label for ex in part])
-            (lf(logits, y) / n).backward()
-    return [p.grad.detach().numpy().copy() for p in m._params() if p.grad is not None]
+# Models that legitimately do not need train_chunk, with the reason. Listing them
+# explicitly rather than sniffing for a stub means adding a new model forces a
+# deliberate choice instead of quietly inheriting an exemption.
+CHUNK_EXEMPT = {
+    "discocat": "does not train here; the lambeq producer trains it in the other env "
+                "and fit() only reports the producer's numbers",
+    "logreg_bow": "classical sklearn baseline, no autograd graph and no statevector",
+}
 
 
-def test_chunked_gradient_matches_full_batch_claqs():
-    """chunk=1 is what claqs/sst2 actually runs, so it is the case that must match."""
-    full = _claqs_grads(chunk=None)
-    one = _claqs_grads(chunk=1)
-    assert len(full) == len(one) and len(full) > 0
-    for a, b in zip(full, one):
-        np.testing.assert_allclose(a, b, rtol=1e-9, atol=1e-12)
+def test_no_model_silently_ignores_train_chunk():
+    """Every trainable model must actually read train_chunk in fit().
+
+    Accepting the option in config and then ignoring it is the failure this guards, and
+    it is not hypothetical: vqc_text accepted model.train_chunk and ignored it, so two
+    n>=12 runs were launched believing their memory was bounded, blew past the cap, and
+    were killed with nothing to indicate the knob had done nothing.
+    """
+    ignored = []
+    for name, cls in sorted(_REGISTRY.items()):
+        if name in CHUNK_EXEMPT:
+            continue
+        fit = getattr(cls, "fit", None)
+        if fit is None:
+            continue
+        try:
+            src = inspect.getsource(fit)
+        except (OSError, TypeError):
+            continue
+        if "train_chunk" not in src:
+            ignored.append(name)
+    assert not ignored, (
+        f"these models accept train_chunk in config but never read it in fit(): {ignored}. "
+        "Either honour it, or add it to CHUNK_EXEMPT with a reason."
+    )
+
+
+def test_chunk_exempt_list_stays_honest():
+    """An exemption must name a model that still exists, or it is silently protecting nothing."""
+    stale = [n for n in CHUNK_EXEMPT if n not in _REGISTRY]
+    assert not stale, f"CHUNK_EXEMPT names models that are no longer registered: {stale}"

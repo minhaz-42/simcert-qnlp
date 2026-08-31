@@ -137,13 +137,23 @@ class QMSAN(QNLPModel):
         torch = self._torch
         opt = torch.optim.Adam(self._params(), lr=float(getattr(cfg, "lr", 0.05)))
         epochs = int(getattr(cfg, "epochs", 40))
+        # Same bounded-memory path as qsann and vqc_text; see the note in qsann.fit. Every
+        # model accepts train_chunk so the option is never silently ignored.
+        chunk = getattr(cfg, "train_chunk", None)
+        n = len(train)
         for _ in range(epochs):
             opt.zero_grad()
-            logits = torch.stack([self._forward_logit(ex) for ex in train])
-            probs = torch.sigmoid(logits)
-            y = torch.tensor([float(ex.label) for ex in train], dtype=probs.dtype)
-            loss = ((probs - y) ** 2).mean()
-            loss.backward()
+            if not chunk or chunk >= n:
+                logits = torch.stack([self._forward_logit(ex) for ex in train])
+                probs = torch.sigmoid(logits)
+                y = torch.tensor([float(ex.label) for ex in train], dtype=probs.dtype)
+                ((probs - y) ** 2).mean().backward()
+            else:
+                for i in range(0, n, int(chunk)):
+                    part = train[i:i + int(chunk)]
+                    probs = torch.sigmoid(torch.stack([self._forward_logit(ex) for ex in part]))
+                    y = torch.tensor([float(ex.label) for ex in part], dtype=probs.dtype)
+                    (((probs - y) ** 2).sum() / n).backward()
             opt.step()
         return TrainReport(
             train_accuracy=self._accuracy(train),

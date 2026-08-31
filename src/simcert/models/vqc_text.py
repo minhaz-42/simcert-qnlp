@@ -99,17 +99,29 @@ class VQCTextModel(QNLPModel):
         opt = torch.optim.Adam([self.embedding, self.theta], lr=float(getattr(cfg, "lr", 0.05)))
         epochs = int(getattr(cfg, "epochs", 30))
         eps = 1e-6
+        # See the note in qsann.fit. Backprop runs through a statevector simulator, so the
+        # graph spans the training set and its cost grows with 2^n; at n=12 and beyond the
+        # full-batch path exhausts a 16 GB machine. Summing chunk losses divided by the full
+        # n reproduces the mean-reduced objective exactly, so the update is unchanged.
+        chunk = getattr(cfg, "train_chunk", None)
+        n = len(train)
+
+        def _probs(batch):
+            return torch.stack([(1 - circuit(self._features(ex), self.theta)) / 2
+                                for ex in batch]).clamp(eps, 1 - eps)
+
         for _ in range(epochs):
             opt.zero_grad()
-            probs, ys = [], []
-            for ex in train:
-                z = circuit(self._features(ex), self.theta)
-                probs.append((1 - z) / 2)  # P(class 1)
-                ys.append(float(ex.label))
-            p = torch.stack(probs).clamp(eps, 1 - eps)
-            y = torch.tensor(ys, dtype=p.dtype)
-            loss = torch.nn.functional.binary_cross_entropy(p, y)
-            loss.backward()
+            if not chunk or chunk >= n:
+                p = _probs(train)
+                y = torch.tensor([float(ex.label) for ex in train], dtype=p.dtype)
+                torch.nn.functional.binary_cross_entropy(p, y).backward()
+            else:
+                for i in range(0, n, int(chunk)):
+                    part = train[i:i + int(chunk)]
+                    p = _probs(part)
+                    y = torch.tensor([float(ex.label) for ex in part], dtype=p.dtype)
+                    (torch.nn.functional.binary_cross_entropy(p, y, reduction="sum") / n).backward()
             opt.step()
         return TrainReport(
             train_accuracy=self._accuracy(train),

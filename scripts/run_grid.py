@@ -57,18 +57,21 @@ GRID = [
     ("discocat", "mc_real", "discocat", range(1, 4)),
     ("discocat", "rp",      "discocat", range(1, 4)),
     ("qmsan",    "mc",      "default",  range(1, 9)),
-    ("qmsan",    "rp",      "default",  range(1, 9)),
+    ("qmsan",    "rp",      "default",  range(1, 21)),  # 20 seeds: reproduction-gap probe
     ("qsann",    "mc",      "default",  range(1, 9)),
-    ("qsann",    "rp",      "default",  range(1, 9)),
+    ("qsann",    "rp",      "default",  range(1, 21)),
     ("vqc_text", "mc",      "default",  range(1, 9)),
-    ("vqc_text", "rp",      "default",  range(1, 9)),
+    ("vqc_text", "rp",      "default",  range(1, 21)),
     ("claqs",    "mc",      "claqs",    range(1, 4)),   # 8 qubits, minutes per seed
     ("vqc_text", "sst2",    "default",  range(1, 9)),
     ("claqs",    "sst2",    "claqs",    range(1, 2)),
 ]
 
 # chi*-vs-n scaling sweep: a second model so the headline figure is not single-model.
-SCALING = [("qsann", "sst2", n) for n in (4, 6, 8, 10)]
+SCALING = ([("qsann", "sst2", n) for n in (4, 6, 8, 10)]
+           # vqc_text past n=10: at n=16 the exact MPS bound is 256, so a flat chi*=1
+           # stops being explainable as "the circuit was too small to truncate".
+           + [("vqc_text", "sst2", n) for n in (12, 14, 16)])
 
 # Per-token models backprop through a statevector simulator, so the autograd graph spans
 # the whole training set and it is that graph, not the 2^n statevector, that exhausts
@@ -91,9 +94,19 @@ def _scaling_chunk(n_qubits: int) -> int:
     The per-example graph grows with the statevector, so a chunk that is comfortable at
     n=4 is not at n=10: measured, chunk=32 peaked at 1.18 GB for n=4 and 1.78 GB for n=8
     but blew past 2.5 GB at n=10. Shrinking the chunk with n keeps every point of the
-    sweep at roughly the same footprint.
+    sweep at roughly the same footprint. Past n=10 the statevector itself starts to
+    dominate (n=16 is 1 MB an example before any autograd bookkeeping), so the chunk
+    keeps halving; the watchdog records the real peak if these need tuning further.
     """
-    return 32 if n_qubits <= 8 else 8
+    if n_qubits <= 8:
+        return 32
+    if n_qubits <= 10:
+        return 8
+    if n_qubits <= 12:
+        return 4
+    if n_qubits <= 14:
+        return 2
+    return 1
 
 GB = 1024 ** 3
 

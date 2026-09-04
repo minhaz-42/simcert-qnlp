@@ -52,7 +52,7 @@ demo:
 # Every figure and table is derived from results/, so a partial regeneration silently
 # ships a stale one: repro/scaling/witnesses all move when a model gains seeds, and
 # regenerating only chi_curves is how a paper ends up disagreeing with its own data.
-FIG_SCRIPTS := fig_chi_curves fig_repro fig_scaling fig_witnesses
+FIG_SCRIPTS := fig_chi_curves fig_control fig_repro fig_scaling fig_witnesses
 TABLE_SCRIPTS := make_tables make_repro_table
 
 figures:

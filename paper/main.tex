@@ -1,7 +1,8 @@
 % SimCert -- TMLR submission (official tmlr.sty; anonymous/double-blind by default).
 % For camera-ready: \usepackage[accepted]{tmlr}. For a de-anonymised preprint: [preprint].
 % A non-archival QTML 2026 abstract is in abstract_qtml.tex.
-% Style constraints honored: no bullet lists, no em dashes.
+% Style constraints honored: no bullet lists, no em dashes, no en dashes.
+% Table placeholders read n/a rather than a bare rule.
 \documentclass[10pt]{article}
 \usepackage{tmlr}
 \usepackage{amsmath,amssymb,amsthm}
@@ -16,6 +17,10 @@
 \usepackage{hyperref}
 \usepackage{url}
 \graphicspath{{../figures/}}
+
+% Last-resort stretch so no line is left badly loose and none can overrun the
+% text block. Measured before and after: zero overfull hboxes either way.
+\emergencystretch=1.2em
 
 \newtheorem*{result}{Result (informal)}
 \newcommand{\chistar}{\ensuremath{\chi^\star}}
@@ -41,7 +46,8 @@ tested. We introduce \textsc{SimCert}, an open and model-agnostic protocol that 
 directly. It re-simulates each trained circuit as a bond-dimension-$\chi$ matrix product state,
 sweeps $\chi$, and records the smallest value (written \chistar) at which a classical surrogate
 recovers the model's own predictions, together with an entanglement-removal ablation and two
-dequantization witnesses. Auditing five published QNLP architectures across four datasets and up
+dequantization witnesses. We calibrate the criterion against a positive control whose required
+bond dimension is known in advance, and it recovers that number. Auditing five published QNLP architectures across four datasets and up
 to sixteen qubits, we find that a classical surrogate recovers the predictions at small and
 non-growing bond dimension. Attention-style models are recovered at $\chi{=}1$, that is by a
 product state, and a compositional model at $\chi{=}2$; \chistar\ stays flat at $1$ as the qubit
@@ -306,7 +312,8 @@ Across models and datasets, a bond-dimension-one or bond-dimension-two surrogate
 trained model's predictions (Figure~\ref{fig:curves}). On the canonical \textsc{mc} task the
 attention and mixer models \texttt{qsann}, \texttt{qmsan}, and \texttt{claqs}, together with the
 reference classifier, all reach full accuracy at $\chi{=}1$, a product state, with no accuracy lost;
-their curves in Figure~\ref{fig:curves} are flat down to the smallest bond dimension. The
+their curves in Figure~\ref{fig:curves} are flat down to the smallest bond dimension, a product
+state. The
 compositional \texttt{discocat} is the exception and needs $\chi{=}2$, but no more. The pattern
 holds on real data. Our DisCoCat run reproduces the published \textsc{mc} accuracy to within $0.02$,
 at $0.778$ against $0.798$ (Table~\ref{tab:repro}), and is recovered at $\chi{=}2$. The scales are
@@ -319,7 +326,11 @@ scale. Figure~\ref{fig:scaling} tests this directly. On a fixed task we increase
 and track \chistar, for the reference model from four to sixteen qubits and independently for
 \texttt{qsann}, whose per-token attention circuits are structurally unlike the reference ansatz,
 from four to ten. For both, \chistar\ stays flat at $1$ while the exact bond bound grows from $4$
-to $256$. Adding qubits does not raise the bond dimension a classical surrogate needs, and at
+to $256$. What is exactly true at every $n$, and what the $\chi^\star{=}1$ verdict rests on, is that
+the product-state surrogate reproduces the untruncated accuracy; the retained-accuracy curves are
+not monotone in $\chi$, and dip by one or two test examples at intermediate bond dimension before
+returning. Truncation error and decision error are different quantities, and only the second defines
+\chistar. Adding qubits does not raise the bond dimension a classical surrogate needs, and at
 sixteen qubits a product state still reproduces the predictions that an exact matrix product state
 would need bond dimension $256$ to represent. A flat \chistar\ would be uninteresting if it simply
 tracked a classifier decaying toward chance, but neither model decays: the reference model
@@ -331,8 +342,9 @@ uses and what it could use widens with every qubit.}
 \centering
 \includegraphics[width=0.98\linewidth]{scaling.pdf}
 \caption{The required bond dimension \chistar\ does not grow with qubit count. Left, accuracy retained versus bond
-dimension for the reference model at $n\in\{4,\dots,16\}$ on \textsc{sst-2}; each curve is flat down
-to $\chi{=}1$. Right, the measured \chistar\ for the reference model and for \texttt{qsann} both
+dimension for the reference model at $n\in\{4,\dots,16\}$ on \textsc{sst-2}; at every $n$ the
+$\chi{=}1$ point equals the untruncated accuracy, with small non-monotone excursions in between.
+Colour runs light to dark with $n$, since $n$ is an ordered quantity. Right, the measured \chistar\ for the reference model and for \texttt{qsann} both
 stay at $1$ while the exact-MPS bound $2^{n/2}$ (grey, dashed) grows exponentially on the log axis,
 reaching $256$ at sixteen qubits. A product-state surrogate recovers the predictions at every size
 tested, for two architectures that share no circuit structure. Accuracy is modest throughout but
@@ -383,6 +395,57 @@ its grammar cups is load-bearing.}
 \label{fig:witnesses}
 \end{figure}
 
+\subsection{A positive control: \chistar\ tracks a dialled entanglement resource}
+\label{sec:control}
+A reader is entitled to ask whether the audit is capable of reporting anything other than
+$\chi^\star{=}1$. A uniform verdict is only informative if the instrument would have said
+otherwise had the circuits been different. We therefore calibrate it against a family of
+states whose required bond dimension is known in advance, and audit them with the same
+code path, tolerance rule and grid used for every model above.
+
+The family has one integer knob. On $n{=}2m$ qubits, pair $j$ joins wire $j$ and wire
+$j{+}m$; the first $k$ pairs are entangled and the remaining $m{-}k$ are product states.
+The half-way cut is straddled by exactly the $k$ entangled pairs, so the Schmidt rank
+there is $2^k$ and no matrix product state of bond dimension below $2^k$ can represent the
+state. Turning $k$ moves physical resource and nothing else: the qubit count, the wire
+order, the readout, its weight, and the distribution of the full model's own readout
+values are all held fixed. The decision reads the $m$ straddling-pair correlators
+$\langle X_j X_{j+m}\rangle$ and returns their parity. Parity makes every pair
+load-bearing, because a single destroyed correlator collapses the product; and an
+$X$-correlator is the right probe, since a diagonal $\langle Z_j Z_{j+m}\rangle$ is
+reproduced exactly by a single retained branch and is therefore blind to entanglement.
+Both branches of the construction give the same correlator value, so at every $k$ the
+full model computes the same function of the same readout, and only the entanglement
+behind it changes.
+
+Figure~\ref{fig:control} reports the result. \chistar\ rises from $1$ at $k{=}0$ to $16$ at
+$k{=}4$, spanning the whole grid, and the measured value never exceeds the exact bound
+$2^k$, meeting it at four of the five points. Accuracy sits exactly at chance below
+threshold and exactly at $1.0$ at and above it, so each point is a sharp step rather than a
+statistical estimate. Two checks fix the endpoints: a separable member ($k{=}0$, entropy
+$0$) is certified at $\chi^\star{=}1$, and a maximally entangled member ($k{=}m$, entropy
+$m\ln 2$, product-state fidelity $2^{-m}$) is not. The one point below the bound is
+$k{=}3$, where $\chi^\star{=}4$ against a bound of $8$: there the truncated correlators are
+attenuated but still sign-correct, so the parity survives at half fidelity. That is the
+same decision-versus-state distinction that runs through this paper, visible here against
+a known ground truth.
+
+The control therefore does two things. It shows the criterion is sensitive, and it places
+the audited models on the curve: they sit at the $k{=}0$ end, where a product state
+suffices, and not merely at a point where the instrument is blind.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.98\linewidth]{control.pdf}
+\caption{The audit discriminates. Left, measured \chistar\ against the number of entangled
+pairs $k$ carrying the decision, with the exact bond bound $2^k$ dashed; the two coincide
+except at $k{=}3$. Right, retained accuracy against $\chi$ for each $k$: the decision sits
+at chance until $\chi$ reaches \chistar, then snaps to $1.0$. Qubit count, wire order,
+readout and readout weight are identical at every $k$, so the only thing varying along
+these curves is the entanglement the decision depends on.}
+\label{fig:control}
+\end{figure}
+
 \subsection{Effects we did \emph{not} observe}
 \label{sec:results-none}
 We looked for, and did not find, three things. We did not see \chistar\ grow with qubit count on a
@@ -394,8 +457,9 @@ This lone exception matters more than the uniform cases, because it shows the au
 reporting $\chi{=}1$ by construction. The two verdict classes also separate quantitatively, and in
 the direction they should: over every audited run, the product surrogate's mean state fidelity is
 $0.66$ where the certificate reports $\chi^\star{=}1$ and $0.22$ where it reports $\chi^\star{=}2$.
-The criterion fires where a product state is genuinely far from the trained one, so a reader need not
-take the uniform $\chi^\star{=}1$ verdicts on trust that the instrument can report anything else.
+The criterion fires where a product state is genuinely far from the trained one. The positive control
+of Section~\ref{sec:control} makes the same point against a known ground truth, by dialling the
+entangled resource and recovering the bond dimension it implies.
 
 \begin{table}[t]
 \centering
@@ -409,8 +473,8 @@ significantly worse; $d^{\chi=1}$ is the mean number of test examples on which t
 the full model disagree, which is what separates a p-value of one obtained because the two models
 predict identically ($d{=}0$) from one obtained because their disagreements happen to be balanced;
 \chistar\ is Eq.~\ref{eq:chistar}; $\bar S$ is the mean bipartite entanglement entropy in nats;
-$\Delta A_{\mathrm{ent}}$ is the entanglement-removal gap, with a dash where a separable twin is
-not defined. Attention and mixer models are recovered at $\chi{=}1$ with no disagreements at all,
+$\Delta A_{\mathrm{ent}}$ is the entanglement-removal gap, marked \texttt{n/a} where a separable
+twin is not defined. Attention and mixer models are recovered at $\chi{=}1$ with no disagreements at all,
 and \texttt{discocat} needs $\chi{=}2$.}
 \label{tab:results}
 \end{table}
@@ -450,11 +514,15 @@ training-quality artefact would produce.
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.66\linewidth]{repro.pdf}
-\caption{Reproduction gap: our audited accuracy against the published number for the pairs
-with a published value; the annotation is ours minus published. \textsc{mc\_real} reproduces
-closely, whereas \textsc{rp}, a fragile task of only $74$ training items reimplemented with our own
-embeddings and an offline reader, runs below. The simulability verdict concerns our own trained
-circuits and does not depend on closing this gap.}
+\caption{Reproduction gap, with the seed distribution behind each mean. Bars are our seed mean
+against the published number; the bold annotation is ours minus published, and each open circle is
+one seed. \textsc{mc-real} reproduces to within $0.02$. On \textsc{rp}, a fragile task of only $74$
+training items reimplemented with our own embeddings and an offline reader, the mean runs below
+published, but the seed spread is wide enough that the published value falls inside our range for
+\texttt{discocat} and \texttt{qsann}, and $0.014$ above our best seed for \texttt{qmsan}. Seed means
+and counts here are produced by the same selection rule as Table~\ref{tab:repro}, so the figure and
+the table report the same quantity. The simulability verdict concerns our own trained circuits and
+does not depend on closing this gap.}
 \label{fig:repro}
 \end{figure}
 

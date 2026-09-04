@@ -11,7 +11,7 @@ from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _style import apply_rc  # noqa: E402
+from _style import MODELS, REFERENCE, apply_rc, seq  # noqa: E402
 
 import matplotlib.pyplot as plt  # noqa: E402
 
@@ -19,13 +19,17 @@ REPO = Path(__file__).resolve().parents[2]
 METRICS = REPO / "results" / "metrics"
 OUT = REPO / "figures"
 
-# Okabe-Ito, one per qubit count (panel a)
-NCOLORS = {4: "#0072B2", 6: "#009E73", 8: "#E69F00", 10: "#D55E00"}
-NMARKERS = {4: "o", 6: "s", 8: "^", 10: "D"}
-# panel (b): one style per model
+# Panel (a) colours a QUBIT COUNT, which is an ORDERED quantity, so it takes the
+# sequential ramp and not a categorical slot. The previous version hard-coded four
+# categorical colours and let every larger n fall through to the same dark grey, which
+# silently rendered n=12, n=14 and n=16 as three indistinguishable curves.
+NMARKERS = {4: "o", 6: "s", 8: "^", 10: "D", 12: "v", 14: "P", 16: "X"}
+# Panel (b) colours a MODEL, which is identity, so it takes the shared categorical slots.
 MODEL_STYLE = {
-    "vqc_text": dict(color="#D55E00", marker="o", label=r"measured $\chi^\star$, $\mathtt{vqc\_text}$"),
-    "qsann": dict(color="#0072B2", marker="^", label=r"measured $\chi^\star$, $\mathtt{qsann}$"),
+    "vqc_text": dict(color=MODELS["vqc_text"], marker="o",
+                     label=r"measured $\chi^\star$, $\mathtt{vqc\_text}$"),
+    "qsann": dict(color=MODELS["qsann"], marker="^",
+                  label=r"measured $\chi^\star$, $\mathtt{qsann}$"),
 }
 
 
@@ -58,24 +62,31 @@ def main():
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11.5, 4.4))
 
     # (a) accuracy vs chi, one line per n, for the reference model
-    for n in ns_ref:
+    for i, n in enumerate(ns_ref):
         acc = ref[n]["details"]["accuracy_by_chi"]
         chis = sorted(int(k) for k in acc if k != "full")
         ys = [acc[str(c)] for c in chis]
-        ax1.plot(chis, ys, color=NCOLORS.get(n, "0.2"), marker=NMARKERS.get(n, "o"),
-                 linewidth=2.2, markersize=7, markeredgecolor="white",
+        ax1.plot(chis, ys, color=seq(i, len(ns_ref)), marker=NMARKERS.get(n, "o"),
+                 linewidth=2.0, markersize=7, markeredgecolor="white", markeredgewidth=0.9,
                  label=fr"$n={n}$ (exact $\chi={_exact(n)}$)")
+    ax1.axvline(1, color="#dcdbd4", lw=6, zorder=0)
+    ax1.annotate("product\nstate", (1, ax1.get_ylim()[0]), xytext=(3, 3),
+                 textcoords="offset points", fontsize=8, color="#52514e", va="bottom")
     ax1.set_xscale("log", base=2)
     ax1.set_xlabel(r"bond dimension $\chi$  (log$_2$)")
     ax1.set_ylabel("SST-2 test accuracy retained")
-    ax1.set_title(r"(a) $\mathtt{vqc\_text}$: accuracy flat in $\chi$ at every $n$")
-    ax1.legend(loc="center right", framealpha=0.92)
+    # "Flat" would be wrong and a referee would see it: the curves are NON-MONOTONE in
+    # chi. What is exactly true, and what chi*=1 rests on, is that accuracy at chi=1
+    # equals the untruncated accuracy at every n; the excursions sit at intermediate chi.
+    ax1.set_title(r"(a) $\mathtt{vqc\_text}$: $\chi{=}1$ matches the full model at every $n$")
+    ax1.legend(loc="lower center", ncol=3, fontsize=7.5, framealpha=0.95,
+               bbox_to_anchor=(0.5, -0.02))
 
     # (b) chi* vs n against the exact bound, for every model with a scaling sweep
     all_ns = sorted({n for r in scaling.values() for n in r})
     exact = [_exact(n) for n in all_ns]
-    ax2.plot(all_ns, exact, color="0.45", marker="s", ls="--", linewidth=2.0, markersize=8,
-             label=r"exact-MPS bound $2^{n/2}$")
+    ax2.plot(all_ns, exact, color=REFERENCE, marker="s", ls="--", linewidth=1.8,
+             markersize=7, label=r"exact-MPS bound $2^{n/2}$")
     for model, runs in scaling.items():
         st = MODEL_STYLE.get(model, dict(color="0.2", marker="o", label=model))
         ns = sorted(runs)

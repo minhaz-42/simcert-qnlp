@@ -19,7 +19,11 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
-from _style import MARKER, PALETTE, apply_rc  # noqa: E402
+from _style import (  # noqa: E402
+    LINESTYLE, MARKER, MODELS, PALETTE, apply_rc,
+)
+
+_DS_LABEL = {"mc": "MC", "mc_real": "MC-real", "rp": "RP", "sst2": "SST-2"}
 from simcert.io_results import select_runs  # noqa: E402
 
 import matplotlib.pyplot as plt  # noqa: E402
@@ -96,17 +100,30 @@ def main():
     axB.set_title(r"(b) state fidelity climbs with $\chi$", fontsize=11.5)
     axB.axhline(1.0, color="0.6", lw=0.8, ls=(0, (1, 2)), zorder=1)
 
-    # one shared legend beneath both panels
-    handles, labels = axA.get_legend_handles_labels()
+    # One shared legend beneath both panels, split by ENCODING rather than by series.
+    # Twelve (model, dataset) pairs cannot be listed legibly, and they do not need to be:
+    # colour carries the model and marker/dash carries the dataset, so the reader composes
+    # the two halves. Listing all twelve is what made the previous legend unreadable.
+    from matplotlib.lines import Line2D
+
+    seen_models = [m for m in MODELS if any(k[0] == m for k in groups)]
+    seen_data = [d for d in ("mc", "mc_real", "rp", "sst2")
+                 if any(k[1] == d for k in groups)]
+    handles = [Line2D([], [], color=MODELS[m], lw=3.2, label=m) for m in seen_models]
+    handles += [Line2D([], [], color="#52514e", lw=1.6, marker=MARKER[d],
+                       linestyle=LINESTYLE[d], markersize=7, markeredgecolor="white",
+                       label=_DS_LABEL.get(d, d)) for d in seen_data]
     leg = fig.legend(
-        handles, labels, loc="lower center", ncol=6, fontsize=8.4,
-        frameon=True, handlelength=1.9, columnspacing=1.3, labelspacing=0.4,
+        handles=handles, loc="lower center", ncol=len(handles), fontsize=8.6,
+        frameon=True, handlelength=2.1, columnspacing=1.3, labelspacing=0.4,
         borderpad=0.6, bbox_to_anchor=(0.5, -0.01),
+        title="colour = model          shape = dataset",
     )
-    leg.get_frame().set_edgecolor("0.7")
+    leg.get_title().set_fontsize(8.2)
+    leg.get_frame().set_edgecolor("#dcdbd4")
     leg.get_frame().set_linewidth(0.6)
 
-    fig.subplots_adjust(left=0.07, right=0.985, top=0.92, bottom=0.28, wspace=0.17)
+    fig.subplots_adjust(left=0.07, right=0.985, top=0.92, bottom=0.24, wspace=0.17)
     OUT.mkdir(parents=True, exist_ok=True)
     for ext in ("pdf", "png"):
         fig.savefig(OUT / f"chi_curves.{ext}")

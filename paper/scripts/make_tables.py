@@ -31,7 +31,7 @@ OUT = REPO / "paper" / "tables" / "results.tex"
 def _fmt(vals, prec=3):
     vals = [v for v in vals if v is not None]
     if not vals:
-        return "--"
+        return "n/a"
     if len(vals) == 1:
         return f"{vals[0]:.{prec}f}"
     return f"{np.mean(vals):.{prec}f}$\\pm${np.std(vals):.{prec}f}"
@@ -42,7 +42,7 @@ def _fmt_p(vals):
     surrogate is not significantly different from the full model."""
     vals = [v for v in vals if v is not None]
     if not vals:
-        return "--"
+        return "n/a"
     m = float(np.mean(vals))
     return r"$<$0.001" if m < 0.001 else f"{m:.3f}"
 
@@ -53,7 +53,7 @@ def _fmt_d(vals):
     statement than a large p-value obtained from a balanced discordant split."""
     vals = [v for v in vals if v is not None]
     if not vals:
-        return "--"
+        return "n/a"
     m = float(np.mean(vals))
     return "0" if m == 0 else f"{m:.1f}"
 

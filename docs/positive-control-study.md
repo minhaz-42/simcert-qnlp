@@ -1,5 +1,12 @@
 # Positive-control design study (PARTIAL, paused 2026-08-31)
 
+> **Status 2026-09-05:** the chi*-vs-entanglement anti-correlation that this study turned
+> up has been checked against the shipped models and does **not** reach them; see
+> [RESOLVED](#resolved-2026-09-05-the-anti-correlation-does-not-reach-the-audited-models)
+> below. The control *design* work is still paused, and both adversarial lenses rejected
+> the candidate design. Regenerate the faithfulness numbers with
+> `python scripts/check_chistar_faithfulness.py`.
+
 Why this exists: every SimCert verdict is CLASSICALLY_SIMULABLE (the only exception is
 discocat at chi*=2), so a referee can fairly object that the instrument may simply always
 report chi*=1. A positive control is a task plus model where entanglement genuinely is
@@ -12,11 +19,80 @@ literature-grounded, implementation-pragmatic, adversarial-referee), each judged
 adversarial lenses (soundness, integration, feasibility, referee), with a final synthesis
 step. It was PAUSED before the synthesis completed, so what follows is the raw grounding
 briefing plus whichever designs and verdicts finished. Resume by re-running the workflow
-script and reading the synthesis, or by picking a design from below.
+script and reading the synthesis, or by picking a design from below -- but read the
+RESOLVED section first, since it changes what a control still needs to prove.
 
 Design target agreed beforehand: strongly prefer a design with a CONTINUOUS KNOB that moves
 one model family from chi*=1 to chi*>1, because a calibration curve is much harder to
 dismiss as engineered-to-succeed than a binary special case.
+
+---
+
+## RESOLVED (2026-09-05): the anti-correlation does not reach the audited models
+
+The previous commit flagged the soundness lens's finding as the first thing to check on
+resume, because if chi* were anti-correlated with entanglement on the *shipped* models it
+would be a question about the paper's headline instrument rather than about this control.
+It is not. Checked three ways.
+
+**1. The mechanism needs a high-weight readout, and no shipped model has one.** The
+control read out the maximal-weight Pauli. A weight-n Pauli maps every computational-basis
+branch onto a different branch, so on a state supported on a subset of branches -- exactly
+what a low-chi truncation produces -- each term pairs a retained amplitude with a
+discarded one and the readout cancels to *exactly* zero, whatever the fidelity. Measured
+max Pauli weight over every audited model, by calling `audit_units` on a real example:
+
+    vqc_text  n=6  1 unit   1 obs   weight 1
+    qsann     n=2  9 units 24 obs   weight 1
+    qmsan     n=2  9 units  6 obs   weight 1
+    claqs     n=8  1 unit  24 obs   weight 1
+    discocat  n=9  1 unit   0 obs   no Pauli readout (post-selected Born rule)
+
+Worst weight across the whole zoo is 1. This is now pinned by
+`tests/test_readout_weight.py`, which also reproduces the cancellation on GHZ so the
+failure mode stays documented rather than rediscovered.
+
+**2. Empirically, chi* is positively correlated with infidelity, not anti-correlated.**
+Scanning all 188 stored runs that record a chi=1 fidelity:
+
+    mean F@chi=1 for runs certified chi*=1 : 0.655  (n=162)
+    mean F@chi=1 for runs certified chi*=2 : 0.223  (n=26)
+
+The instrument fires (chi*>1) precisely where the product surrogate is *far* from the true
+state, which is the correct direction. The control's signature -- chi*=1 certified at
+near-zero fidelity while a near-product state escapes the grid -- does not appear.
+
+**3. The `2 sqrt(1-F)` bound is real but weak, and is not what carries the argument.**
+With ||O||=1 it gives |<O>_psi - <O>_phi| <= 2 sqrt(1-F), but at F=0.016 that permits a
+full swing, so it does *not* on its own forbid a weight-1 readout from agreeing at low
+fidelity. What rules the pathology out for this paper is (1) plus (2), not the bound.
+
+### The finding that survives, and it is a feature
+
+Many runs do certify chi*=1 at low state fidelity -- most sharply `vqc_text/sst2` at n=16,
+where F@chi=1 = 0.122 while the product surrogate reproduces **100%** of the test
+predictions. That is not the pathology; it is the paper's thesis stated at its strongest:
+the trained state is genuinely far from a product state, and the decisions still do not
+need the difference. chi* is a decision-level metric by construction (the abstract defines
+it as recovering "the model's own predictions"), and Figure 2's two panels already make
+the fidelity-vs-agreement split explicit.
+
+**Available strengthening, not yet written into the paper:** the n=16 pair (F=0.122,
+agreement=1.000) and the chi*=1 vs chi*=2 fidelity split above together answer the
+referee objection this whole study was chartered to answer -- "the instrument may simply
+always report chi*=1" -- from *shipped data*, without a synthetic control. The instrument
+reports chi*=2 on 26 of 188 runs, and does so exactly where fidelity is low.
+
+### What remains for a positive control
+
+The k-of-m dial proposed by the referee lens below is still the right design if a
+synthetic control is wanted: fix n, architecture, wire order and readout weight, entangle
+only k of m pairs, and check that measured chi* tracks 2^k for k=0..4. Note that both
+adversarial lenses independently rejected the candidate design, for different reasons
+(soundness: the mechanism is not entanglement; referee: the three-point ladder varies wire
+labelling, not physical resource). Any resumed work should start from the k-of-m dial and
+the two-point acceptance test in Result 11's `fix` field, not from the design as written.
+
 
 
 

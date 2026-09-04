@@ -120,6 +120,33 @@ invite. Our two auxiliary witnesses come from the same program: the geometric di
 quantum and classical kernels \citep{huang2021} and the Fourier spectrum accessible to a
 data-reuploading encoding \citep{schuld2021}.
 
+This program has a longer arc. \citet{tang2019} showed that a claimed exponential quantum speedup
+for recommendation systems dissolved once the classical algorithm was given comparable sampling
+access, establishing dequantization as a routine obligation rather than an exotic outcome.
+\citet{schreiber2023} make that obligation concrete for learning models by constructing classical
+surrogates that reproduce a trained quantum model's input-output behaviour, and \citet{huang2020}
+show that few measurements suffice to build a classical description adequate for predicting many
+properties of a state. Our surrogate is of the same species, specialised to a
+bond-dimension-limited MPS so that the knob controlling classical power is explicit and sweepable.
+
+The trainability literature supplies the other half of the motivation. Barren plateaus make deep
+random circuits untrainable \citep{mcclean2018}, which is why practical variational models
+\citep{peruzzo2014,cerezo2021} adopt shallow, structured ansatze. But the structures that avoid
+plateaus, such as quantum convolutional networks \citep{cong2019,pesah2021}, are precisely those
+\citet{cerezo2025} identify as classically simulable, and even plateau-free shallow models are
+beset by poor local minima \citep{anschuetz2022}. \citet{larocca2025} survey where this leaves the
+field. The tension is structural rather than incidental, and our audit measures which side of it a
+trained QNLP circuit falls on.
+
+The QNLP models we audit inherit a specific lineage. Compositional distributional semantics
+assigns a sentence a meaning built from its pregroup parse \citep{coecke2010}; \citet{zeng2016}
+observed that this structure maps onto quantum circuits, \citet{meichanetzidis2021} built the
+near-term pipeline, and \citet{kartsaklis2021} packaged it as \texttt{lambeq}, which our
+compositional producer uses. The line continues onto hardware \citep{duneau2024}, and
+\citet{nausheen2025} survey the wider field. The attention-based models instead import the
+classical transformer's mechanism \citep{vaswani2017}, whose pretrained descendants
+\citep{devlin2019} are the baselines QNLP accuracy claims are implicitly measured against.
+
 On the QNLP side, the models we audit are the compositional DisCoCat framework \citep{lorenz2021},
 the Gaussian-projected and mixed-state quantum self-attention networks \citep{li2022,chen2024}, and
 the all-quantum token mixer \citep{claqs2025}. Each reports an accuracy comparison against a
@@ -178,6 +205,15 @@ fidelity $F(\chi)$. The certificate's headline scalar is
 \label{eq:chistar}
 \end{equation}
 the smallest bond dimension whose accuracy is within a tolerance $\tau$ of the untruncated model.
+The choice of bond dimension as the knob is not arbitrary. Matrix product states arose as the
+variational class behind the density-matrix renormalization group \citep{white1992,schollwock2011,
+orus2014} and provably represent gapped one-dimensional ground states at a bond dimension that does
+not grow with system size \citep{verstraete2006}. \citet{vidal2003} turned this into the statement
+we rely on: a quantum computation whose entanglement stays bounded can be simulated classically at
+a cost polynomial in the system size and exponential only in the entanglement, so bond dimension is
+the natural currency in which to price a circuit's classical difficulty. The same class is a
+capable learner in its own right \citep{stoudenmire2016}, which is why a low-$\chi$ surrogate that
+matches a quantum model is evidence about the model rather than about the surrogate's weakness.
 We set $\tau$ to the model's own generalization gap, since differences smaller than the gap the
 model already exhibits are not meaningfully quantum resource, and we report robustness to two other
 tolerances in Appendix~\ref{app:configs}. A model whose \chistar\ is small and does not grow with
@@ -197,7 +233,11 @@ of the model and reports $\Delta A_{\mathrm{ent}}=A_{\mathrm{full}}-A_{\mathrm{s
 states, which lower-bounds the $\chi$ an exact representation needs. The third pairs two
 dequantization probes where they apply, the geometric difference $g_{CQ}$ between the trained
 quantum kernel and a classical kernel \citep{huang2021} and the effective data-reuploading Fourier
-degree \citep{schuld2021}. We report the full vector rather than collapsing to a single verdict,
+degree \citep{schuld2021}. Both probes come from the kernel reading of quantum models, under which
+a data encoding is a feature map \citep{havlicek2019,schuld2019} and a trained variational model is
+equivalent to a kernel machine \citep{schuld2021kernel}; on that reading the encoding, not the
+ansatz, is where a separation would have to live, and provable separations are known only for
+carefully constructed problems \citep{liu2021}. We report the full vector rather than collapsing to a single verdict,
 because, as Section~\ref{sec:results} shows, the witnesses can legitimately disagree.
 
 \section{Models and datasets audited}
@@ -209,7 +249,13 @@ compact set spanning the two dominant paradigms, compositional and attention-bas
 all-quantum mixer, and we add one plain variational classifier as a reference point.
 Table~\ref{tab:models} compares them at a glance and stands in for a wall of per-model circuit
 diagrams; representative ansätze appear in Figure~\ref{fig:circuit} and Appendix~\ref{app:circuits}.
-None of the attention or mixer models ship official code, so we reimplement from the equations and
+All four use parameterised circuits of the kind now standard in quantum machine learning
+\citep{biamonte2017,mitarai2018,benedetti2019}. Such circuits are usually characterised by
+ansatz-level descriptors, expressibility and entangling capability \citep{sim2019}, effective
+dimension \citep{abbas2021}, or generalization bounds in the number of trainable gates
+\citep{caro2022}. Those quantities describe what an ansatz could represent. We deliberately measure
+something else, what a trained instance turns out to need, because the two can differ and it is the
+second that decides whether a reported accuracy rests on quantum structure. None of the attention or mixer models ship official code, so we reimplement from the equations and
 report the reproduction gap openly in Section~\ref{sec:results}, while the compositional model uses
 the official \texttt{lambeq} pipeline.
 
@@ -238,7 +284,8 @@ density matrices. Full circuits, gate sets, and parameter counts are in Appendix
 classification of cooking versus computing, and \textsc{rp}, a relative-pronoun task, are the
 canonical DisCoCat benchmarks of \citet{lorenz2021}. \textsc{mc} is small and near-separable,
 whereas \textsc{rp} is the harder, low-data task where published accuracies actually differ across
-models. We add a balanced subset of \textsc{sst-2} as a genuinely non-separable sentiment task, and
+models. We add a balanced subset of \textsc{sst-2}, the sentence-level binary split of the Stanford
+Sentiment Treebank \citep{socher2013}, as a genuinely non-separable sentiment task, and
 a synthetic \textsc{mc}-style set for controlled scaling. Sizes and preprocessing are in
 Appendix~\ref{app:data}. Two limitations are worth stating here rather than burying. Our \textsc{rp}
 reimplementations use our own token embeddings, and our DisCoCat pipeline uses an offline reader in
@@ -249,7 +296,10 @@ place of the trained grammar parser whose model host is no longer reachable. Bot
 \label{sec:protocol}
 We do not conjecture simulability, we realise it. Each trained model exports its per-example circuit
 to a common representation, OpenQASM for gate circuits, or, for the token mixer whose state is a
-matrix polynomial rather than a gate sequence, the trained statevector directly. A single audit
+matrix polynomial rather than a gate sequence, the trained statevector directly. Statevector
+simulation and gradients go through PennyLane \citep{bergholm2018}, and every model is small enough
+that the whole audit runs on a laptop CPU, which is the regime these architectures are published in
+\citep{preskill2018}. A single audit
 consumer then re-simulates every model identically (Algorithm~\ref{alg:audit}), so the audit never
 depends on which framework produced a circuit. The MPS truncation itself is an exact sequential-SVD
 computation, cross-checked against an independent tensor-network simulator. On circuits with known
@@ -290,7 +340,10 @@ numbers are the mean over seeds, with the per-row seed count in Table~\ref{tab:r
 aggregate certificate is Table~\ref{tab:results} and the reproduction gap is Table~\ref{tab:repro}.
 We quantify uncertainty in two ways that do not rely on the seed count alone. For every truncated
 surrogate we compute a $95\%$ example-level bootstrap confidence interval on its retained accuracy,
-and we compare it against the full model with an exact paired McNemar test on the test predictions.
+and we compare it against the full model with an exact paired McNemar test \citep{mcnemar1947} on
+the test predictions, the paired form being the appropriate one when two models are scored on the
+same examples \citep{dietterich1998}; the intervals are percentile bootstrap intervals
+\citep{efron1979}.
 A large McNemar p-value means the surrogate is not significantly different from the full model, which
 is the simulability signal; a small p-value flags a surrogate that is significantly worse. Wherever
 the attention and mixer models saturate, the product-state surrogate does not merely fail to differ
@@ -569,27 +622,136 @@ training, which we control by seed.
 
 \begin{thebibliography}{99}
 \small
-\bibitem[Bowles et al.(2024)]{bowles2024} J.~Bowles, S.~Ahmed, and M.~Schuld. Better than classical?
-The subtle art of benchmarking quantum machine learning models. \emph{arXiv:2403.07059}, 2024.
+\bibitem[Abbas et al.(2021)]{abbas2021} A.~Abbas, D.~Sutter, C.~Zoufal, A.~Lucchi, A.~Figalli, and
+S.~Woerner. The power of quantum neural networks. \emph{Nature Computational Science} 1:403-409,
+2021.
+\bibitem[Anschuetz and Kiani(2022)]{anschuetz2022} E.~R.~Anschuetz and B.~T.~Kiani. Quantum
+variational algorithms are swamped with traps. \emph{Nature Communications} 13:7760, 2022.
+arXiv:2205.05786.
+\bibitem[Benedetti et al.(2019)]{benedetti2019} M.~Benedetti, E.~Lloyd, S.~Sack, and M.~Fiorentini.
+Parameterized quantum circuits as machine learning models. \emph{Quantum Science and Technology}
+4:043001, 2019. arXiv:1906.07682.
+\bibitem[Bergholm et al.(2018)]{bergholm2018} V.~Bergholm, J.~Izaac, M.~Schuld, C.~Gogolin, and
+N.~Killoran. PennyLane: automatic differentiation of hybrid quantum-classical computations.
+\emph{arXiv:1811.04968}, 2018.
 \bibitem[Bermejo et al.(2024)]{bermejo2024} P.~Bermejo et al. Quantum convolutional neural networks
 are (effectively) classically simulable. \emph{arXiv:2408.12739}, 2024.
+\bibitem[Biamonte et al.(2017)]{biamonte2017} J.~Biamonte, P.~Wittek, N.~Pancotti, P.~Rebentrost,
+N.~Wiebe, and S.~Lloyd. Quantum machine learning. \emph{Nature} 549:195-202, 2017.
+arXiv:1611.09347.
+\bibitem[Bowles et al.(2024)]{bowles2024} J.~Bowles, S.~Ahmed, and M.~Schuld. Better than classical?
+The subtle art of benchmarking quantum machine learning models. \emph{arXiv:2403.07059}, 2024.
+\bibitem[Caro et al.(2022)]{caro2022} M.~C.~Caro, H.-Y.~Huang, M.~Cerezo, K.~Sharma, A.~Sornborger,
+L.~Cincio, and P.~J.~Coles. Generalization in quantum machine learning from few training data.
+\emph{Nature Communications} 13:4919, 2022. arXiv:2111.05292.
+\bibitem[Cerezo et al.(2021)]{cerezo2021} M.~Cerezo, A.~Arrasmith, R.~Babbush, S.~C.~Benjamin,
+S.~Endo, K.~Fujii, J.~R.~McClean, K.~Mitarai, X.~Yuan, L.~Cincio, and P.~J.~Coles. Variational
+quantum algorithms. \emph{Nature Reviews Physics} 3:625-644, 2021.
 \bibitem[Cerezo et al.(2025)]{cerezo2025} M.~Cerezo et al. Does provable absence of barren plateaus
 imply classical simulability? \emph{Nature Communications}, 2025. arXiv:2312.09121.
-\bibitem[Shin et al.(2024)]{shin2024} S.~Shin, Y.~S.~Teo, and H.~Jeong. Dequantizing quantum machine
-learning models using tensor networks. \emph{Phys. Rev. Research} 6:023218, 2024.
-\bibitem[Huang et al.(2021)]{huang2021} H.-Y.~Huang et al. Power of data in quantum machine learning.
-\emph{Nature Communications} 12:2631, 2021. arXiv:2011.01938.
-\bibitem[Schuld et al.(2021)]{schuld2021} M.~Schuld, R.~Sweke, and J.~J.~Meyer. Effect of data
-encoding on the expressive power of variational quantum machine learning models. \emph{Phys. Rev. A}
-103:032430, 2021.
-\bibitem[Lorenz et al.(2021)]{lorenz2021} R.~Lorenz et al. QNLP in practice: running compositional
-models of meaning on a quantum computer. \emph{arXiv:2102.12846}, 2021.
-\bibitem[Li et al.(2022)]{li2022} G.~Li, X.~Zhao, and X.~Wang. Quantum self-attention neural networks
-for text classification. \emph{arXiv:2205.05625}, 2022.
 \bibitem[Chen et al.(2024)]{chen2024} F.~Chen et al. Quantum mixed-state self-attention network.
 \emph{arXiv:2403.02871}, 2024.
 \bibitem[Chen et al.(2025)]{claqs2025} J.~Chen et al. CLAQS: compact learnable all-quantum token mixer
 for text classification. \emph{arXiv:2510.06532}, 2025.
+\bibitem[Coecke et al.(2010)]{coecke2010} B.~Coecke, M.~Sadrzadeh, and S.~Clark. Mathematical
+foundations for a compositional distributional model of meaning. \emph{Linguistic Analysis}
+36:345-384, 2010. arXiv:1003.4394.
+\bibitem[Cong et al.(2019)]{cong2019} I.~Cong, S.~Choi, and M.~D.~Lukin. Quantum convolutional
+neural networks. \emph{Nature Physics} 15:1273-1278, 2019. arXiv:1810.03787.
+\bibitem[Devlin et al.(2019)]{devlin2019} J.~Devlin, M.-W.~Chang, K.~Lee, and K.~Toutanova. BERT:
+pre-training of deep bidirectional transformers for language understanding. In \emph{Proceedings of
+NAACL-HLT}, pages 4171-4186, 2019.
+\bibitem[Dietterich(1998)]{dietterich1998} T.~G.~Dietterich. Approximate statistical tests for
+comparing supervised classification learning algorithms. \emph{Neural Computation} 10(7):1895-1923,
+1998.
+\bibitem[Duneau et al.(2024)]{duneau2024} T.~Duneau, S.~Bruhn, G.~Matos, T.~Laakkonen, K.~Saiti,
+A.~Pearson, K.~Meichanetzidis, and B.~Coecke. Scalable and interpretable quantum natural language
+processing: an implementation on trapped ions. \emph{arXiv:2409.08777}, 2024.
+\bibitem[Efron(1979)]{efron1979} B.~Efron. Bootstrap methods: another look at the jackknife.
+\emph{The Annals of Statistics} 7(1):1-26, 1979.
+\bibitem[Havl\'i\v{c}ek et al.(2019)]{havlicek2019} V.~Havl\'i\v{c}ek, A.~D.~C\'orcoles, K.~Temme,
+A.~W.~Harrow, A.~Kandala, J.~M.~Chow, and J.~M.~Gambetta. Supervised learning with quantum-enhanced
+feature spaces. \emph{Nature} 567:209-212, 2019.
+\bibitem[Huang et al.(2020)]{huang2020} H.-Y.~Huang, R.~Kueng, and J.~Preskill. Predicting many
+properties of a quantum system from very few measurements. \emph{Nature Physics} 16:1050-1057, 2020.
+\bibitem[Huang et al.(2021)]{huang2021} H.-Y.~Huang et al. Power of data in quantum machine learning.
+\emph{Nature Communications} 12:2631, 2021. arXiv:2011.01938.
+\bibitem[Kartsaklis et al.(2021)]{kartsaklis2021} D.~Kartsaklis, I.~Fan, R.~Yeung, A.~Pearson,
+R.~Lorenz, A.~Toumi, G.~de~Felice, K.~Meichanetzidis, S.~Clark, and B.~Coecke. lambeq: an efficient
+high-level Python library for quantum NLP. \emph{arXiv:2110.04236}, 2021.
+\bibitem[Larocca et al.(2025)]{larocca2025} M.~Larocca et al. Barren plateaus in variational quantum
+computing. \emph{Nature Reviews Physics}, 2025. doi:10.1038/s42254-025-00813-9.
+\bibitem[Li et al.(2022)]{li2022} G.~Li, X.~Zhao, and X.~Wang. Quantum self-attention neural networks
+for text classification. \emph{arXiv:2205.05625}, 2022.
+\bibitem[Liu et al.(2021)]{liu2021} Y.~Liu, S.~Arunachalam, and K.~Temme. A rigorous and robust
+quantum speed-up in supervised machine learning. \emph{Nature Physics} 17:1013-1017, 2021.
+\bibitem[Lorenz et al.(2021)]{lorenz2021} R.~Lorenz et al. QNLP in practice: running compositional
+models of meaning on a quantum computer. \emph{arXiv:2102.12846}, 2021.
+\bibitem[McClean et al.(2018)]{mcclean2018} J.~R.~McClean, S.~Boixo, V.~N.~Smelyanskiy, R.~Babbush,
+and H.~Neven. Barren plateaus in quantum neural network training landscapes. \emph{Nature
+Communications} 9:4812, 2018.
+\bibitem[McNemar(1947)]{mcnemar1947} Q.~McNemar. Note on the sampling error of the difference between
+correlated proportions or percentages. \emph{Psychometrika} 12:153-157, 1947.
+\bibitem[Meichanetzidis et al.(2021)]{meichanetzidis2021} K.~Meichanetzidis, S.~Gogioso,
+G.~de~Felice, N.~Chiappori, A.~Toumi, and B.~Coecke. Quantum natural language processing on
+near-term quantum computers. \emph{Electronic Proceedings in Theoretical Computer Science}
+340:213-229, 2021. arXiv:2005.04147.
+\bibitem[Mitarai et al.(2018)]{mitarai2018} K.~Mitarai, M.~Negoro, M.~Kitagawa, and K.~Fujii.
+Quantum circuit learning. \emph{Physical Review A} 98:032309, 2018.
+\bibitem[Nausheen et al.(2025)]{nausheen2025} F.~Nausheen, K.~Ahmed, M.~I.~Khan, and F.~Riaz.
+Quantum natural language processing: a comprehensive review of models, methods, and applications.
+\emph{arXiv:2504.09909}, 2025.
+\bibitem[Or\'us(2014)]{orus2014} R.~Or\'us. A practical introduction to tensor networks: matrix
+product states and projected entangled pair states. \emph{Annals of Physics} 349:117-158, 2014.
+arXiv:1306.2164.
+\bibitem[Peruzzo et al.(2014)]{peruzzo2014} A.~Peruzzo, J.~McClean, P.~Shadbolt, M.-H.~Yung,
+X.-Q.~Zhou, P.~J.~Love, A.~Aspuru-Guzik, and J.~L.~O'Brien. A variational eigenvalue solver on a
+photonic quantum processor. \emph{Nature Communications} 5:4213, 2014.
+\bibitem[Pesah et al.(2021)]{pesah2021} A.~Pesah, M.~Cerezo, S.~Wang, T.~Volkoff, A.~T.~Sornborger,
+and P.~J.~Coles. Absence of barren plateaus in quantum convolutional neural networks. \emph{Physical
+Review X} 11:041011, 2021.
+\bibitem[Preskill(2018)]{preskill2018} J.~Preskill. Quantum computing in the NISQ era and beyond.
+\emph{Quantum} 2:79, 2018.
+\bibitem[Schollw\"ock(2011)]{schollwock2011} U.~Schollw\"ock. The density-matrix renormalization
+group in the age of matrix product states. \emph{Annals of Physics} 326(1):96-192, 2011.
+arXiv:1008.3477.
+\bibitem[Schreiber et al.(2023)]{schreiber2023} F.~J.~Schreiber, J.~Eisert, and J.~J.~Meyer.
+Classical surrogates for quantum learning models. \emph{Physical Review Letters} 131:100803, 2023.
+arXiv:2206.11740.
+\bibitem[Schuld and Killoran(2019)]{schuld2019} M.~Schuld and N.~Killoran. Quantum machine learning
+in feature Hilbert spaces. \emph{Physical Review Letters} 122:040504, 2019. arXiv:1803.07128.
+\bibitem[Schuld et al.(2021)]{schuld2021} M.~Schuld, R.~Sweke, and J.~J.~Meyer. Effect of data
+encoding on the expressive power of variational quantum machine learning models. \emph{Physical
+Review A} 103:032430, 2021.
+\bibitem[Schuld(2021)]{schuld2021kernel} M.~Schuld. Supervised quantum machine learning models are
+kernel methods. \emph{arXiv:2101.11020}, 2021.
+\bibitem[Shin et al.(2024)]{shin2024} S.~Shin, Y.~S.~Teo, and H.~Jeong. Dequantizing quantum machine
+learning models using tensor networks. \emph{Physical Review Research} 6:023218, 2024.
+\bibitem[Sim et al.(2019)]{sim2019} S.~Sim, P.~D.~Johnson, and A.~Aspuru-Guzik. Expressibility and
+entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms.
+\emph{Advanced Quantum Technologies} 2:1900070, 2019. arXiv:1905.10876.
+\bibitem[Socher et al.(2013)]{socher2013} R.~Socher, A.~Perelygin, J.~Wu, J.~Chuang, C.~D.~Manning,
+A.~Ng, and C.~Potts. Recursive deep models for semantic compositionality over a sentiment treebank.
+In \emph{Proceedings of EMNLP}, pages 1631-1642, 2013.
+\bibitem[Stoudenmire and Schwab(2016)]{stoudenmire2016} E.~M.~Stoudenmire and D.~J.~Schwab.
+Supervised learning with tensor networks. In \emph{Advances in Neural Information Processing Systems
+29}, 2016. arXiv:1605.05775.
+\bibitem[Tang(2019)]{tang2019} E.~Tang. A quantum-inspired classical algorithm for recommendation
+systems. In \emph{Proceedings of the 51st Annual ACM SIGACT Symposium on Theory of Computing
+(STOC)}, pages 217-228, 2019. arXiv:1807.04271.
+\bibitem[Vaswani et al.(2017)]{vaswani2017} A.~Vaswani, N.~Shazeer, N.~Parmar, J.~Uszkoreit,
+L.~Jones, A.~N.~Gomez, L.~Kaiser, and I.~Polosukhin. Attention is all you need. In \emph{Advances in
+Neural Information Processing Systems 30}, pages 5998-6008, 2017.
+\bibitem[Verstraete and Cirac(2006)]{verstraete2006} F.~Verstraete and J.~I.~Cirac. Matrix product
+states represent ground states faithfully. \emph{Physical Review B} 73:094423, 2006.
+arXiv:cond-mat/0505140.
+\bibitem[Vidal(2003)]{vidal2003} G.~Vidal. Efficient classical simulation of slightly entangled
+quantum computations. \emph{Physical Review Letters} 91:147902, 2003. arXiv:quant-ph/0301063.
+\bibitem[White(1992)]{white1992} S.~R.~White. Density matrix formulation for quantum renormalization
+groups. \emph{Physical Review Letters} 69(19):2863-2866, 1992.
+\bibitem[Zeng and Coecke(2016)]{zeng2016} W.~Zeng and B.~Coecke. Quantum algorithms for compositional
+natural language processing. \emph{Electronic Proceedings in Theoretical Computer Science}
+221:67-75, 2016. arXiv:1608.01406.
 \end{thebibliography}
 
 \appendix

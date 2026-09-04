@@ -1,40 +1,62 @@
-% Fig 1: two-track schematic. Top = trained quantum model; bottom = classical MPS surrogate that
-% replaces the quantum core; linked by an equivalence. Minimal, paper-friendly palette.
+% Fig 1: two-track schematic, instantiated on a REAL audited example rather than on an
+% abstract x. Every number below is measured, not illustrative: the sentence is
+% test-set item 3 of MC, the model is the reference classifier at seed 1, and the
+% expectation values, fidelities and labels come from that run. Regenerate with
+%   python scripts/trace_example.py
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[
   font=\small, >=Latex,
-  n/.style={draw=black!40, rounded corners=2pt, minimum height=8.5mm, minimum width=13mm, inner sep=2pt, fill=black!4, align=center},
-  q/.style={draw=blue!55!black, line width=0.7pt, rounded corners=3pt, minimum height=10mm, minimum width=34mm, inner sep=2pt, fill=blue!9, align=center},
-  c/.style={draw=teal!60!black, line width=0.7pt, rounded corners=3pt, minimum height=10mm, minimum width=34mm, inner sep=2pt, fill=teal!12, align=center},
+  n/.style={draw=black!40, rounded corners=2pt, minimum height=8.5mm, minimum width=12mm,
+            inner sep=2pt, fill=black!4, align=center},
+  q/.style={draw=blue!55!black, line width=0.7pt, rounded corners=3pt, minimum height=11mm,
+            minimum width=36mm, inner sep=2pt, fill=blue!9, align=center},
+  c/.style={draw=teal!60!black, line width=0.7pt, rounded corners=3pt, minimum height=11mm,
+            minimum width=36mm, inner sep=2pt, fill=teal!12, align=center},
+  s/.style={draw=black!25, rounded corners=2pt, minimum height=8.5mm, inner sep=3pt,
+            fill=yellow!10, align=center, font=\footnotesize\ttfamily},
+  rdo/.style={align=center, font=\footnotesize},
   lbl/.style={black!55, font=\itshape\footnotesize, align=right},
 ]
-% ---- top track: trained quantum model ----
-\node (x1) {$x$};
-\node[n, right=4mm of x1] (e1) {embed};
-\node[q, right=5mm of e1] (qc) {quantum core\\[-1pt]$U_{\mathrm enc}(x)\,U(\theta)\to\langle P\rangle$};
-\node[n, right=5mm of qc] (h1) {head};
-\node[right=4mm of h1] (y1) {$\hat y$};
-\foreach \a/\b in {x1/e1,e1/qc,qc/h1,h1/y1} \draw[->] (\a)--(\b);
-\node[lbl, left=3mm of x1] {trained\\quantum\\model};
-% ---- bottom track: classical surrogate ----
-\node[below=16mm of x1] (x2) {$x$};
-\node[n, right=4mm of x2] (e2) {embed};
-\node[c, right=5mm of e2] (mp) {classical MPS surrogate\\[-1pt]bond dimension $\chi$};
-\node[n, right=5mm of mp] (h2) {head};
-\node[right=4mm of h2] (y2) {$\hat y^{(\chi)}$};
-\foreach \a/\b in {x2/e2,e2/mp,mp/h2,h2/y2} \draw[->] (\a)--(\b);
-\node[lbl, left=3mm of x2] {\textsc{SimCert}\\surrogate};
-% ---- equivalence between the two cores ----
+% ---- the real input sentence, shared by both tracks ----
+\node[s] (x) {engineer writes program};
+\node[below=0.5mm of x, font=\scriptsize, black!55] (xl) {\textsc{mc} test item, true label $1$};
+
+% ---- top track: the trained quantum model ----
+\node[n, right=6mm of x] (e1) {embed};
+\node[q, right=5mm of e1] (qc) {quantum core, $n{=}4$\\[-1pt]$U_{\mathrm{enc}}(x)\,U(\theta)$};
+\node[rdo, right=5mm of qc] (r1) {$\langle Z_0\rangle$\\$=-0.843$};
+\node[n, right=5mm of r1] (h1) {head};
+\node[right=4mm of h1] (y1) {$\hat y=1$};
+\foreach \a/\b in {e1/qc,qc/r1,r1/h1,h1/y1} \draw[->] (\a)--(\b);
+\draw[->] (x) -- (e1);
+\node[lbl, above=1mm of qc, black!60] {trained quantum model};
+
+% ---- bottom track: the classical surrogate at chi = 1 ----
+\node[n, below=17mm of e1] (e2) {embed};
+\node[c, right=5mm of e2] (mp) {MPS surrogate, $\chi{=}1$\\[-1pt]product state, $F{=}0.52$};
+\node[rdo, right=5mm of mp] (r2) {$\langle Z_0\rangle$\\$=-0.996$};
+\node[n, right=5mm of r2] (h2) {head};
+\node[right=4mm of h2] (y2) {$\hat y^{(1)}=1$};
+\foreach \a/\b in {e2/mp,mp/r2,r2/h2,h2/y2} \draw[->] (\a)--(\b);
+\draw[->] (x.south) |- (e2.west);
+\node[lbl, below=1mm of mp, black!60] {\textsc{SimCert} surrogate};
+
+% ---- the equivalence that the audit tests ----
 \draw[<->, thick, dashed, black!55] (qc) -- (mp);
-\node[right=1.5mm, align=left, font=\scriptsize, black!70] at ($(qc)!0.5!(mp)$)
-  {truncate to bond $\chi$,\\ then $\hat y^{(\chi)}\!=\hat y$ for $\chi^\star\!\le 2$};
+\draw[<->, thick, dashed, black!35] (y1) -- (y2);
+\node[right=2mm, align=left, font=\scriptsize, black!70] at ($(y1)!0.5!(y2)$) {same\\label};
 \end{tikzpicture}
-\caption{\textsc{SimCert} at a glance. A trained quantum-NLP classifier (top) embeds a sentence
-$x$, runs a quantum core that prepares $|\psi_\theta(x)\rangle$ and reads out Pauli expectations,
-and applies a classical head to obtain a label $\hat y$. \textsc{SimCert} replaces the quantum core
-with a classical matrix-product-state surrogate of bond dimension $\chi$ (bottom) and asks how small
-$\chi$ can be before the recovered label $\hat y^{(\chi)}$ changes. For every audited model the two
-tracks agree already at $\chi^\star\le 2$.}
+\caption{\textsc{SimCert} at a glance, on a real audited example. A trained quantum-NLP
+classifier (top) embeds a sentence, runs a quantum core that prepares
+$|\psi_\theta(x)\rangle$ and reads out Pauli expectations, and applies a classical head to
+obtain a label. \textsc{SimCert} replaces the quantum core with a classical
+matrix-product-state surrogate of bond dimension $\chi$ (bottom) and asks how small $\chi$
+can be before the recovered label changes. The sentence, the expectation values, the
+fidelity and both labels are measured values from the reference classifier on \textsc{mc}
+at seed $1$, not illustrations. They show the case the paper is about: at $\chi{=}1$ the
+surrogate is a product state that overlaps the trained state by only $F{=}0.52$, yet it
+returns the same label. The trained state carries entanglement, $\bar S = 0.82$ nats here,
+and the decision does not use it.}
 \label{fig:pipeline}
 \end{figure}

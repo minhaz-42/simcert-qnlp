@@ -1,26 +1,53 @@
-% Fig 2: simulability hierarchy as a clean set-inclusion chain (CSIM subset QESIM subset QSIM).
+% Fig 2: the four audited datasets shown by real example, then the simulability hierarchy
+% those datasets land in. Every count, label and chi* below is measured; regenerate with
+%   python scripts/trace_example.py
+% Sentences are quoted verbatim from the test splits, including SST-2's clipped phrasing
+% and its pre-tokenised spacing, so the reader sees the data as the models receive it.
 \begin{figure}[t]
 \centering
+{\footnotesize
+\begin{tabular}{@{}llrrrl@{}}
+\toprule
+Data & A test example, verbatim & train & test & vocab & $\chi^\star$ \\
+\midrule
+\textsc{mc} & \texttt{baker cooks bread} & 78 & 26 & 29 & 1, 2 \\
+\textsc{mc-real} & \texttt{woman prepares tasty dinner} & 70 & 30 & 17 & 2 \\
+\textsc{rp} & \texttt{organization that fleet destroy} & 59 & 31 & 115 & 1, 2 \\
+\textsc{sst-2} & \texttt{puts a human face on a land most} & 480 & 200 & 2511 & 1 \\
+ & \texttt{westerners are unfamiliar with .} & & & & \\
+\bottomrule
+\end{tabular}}
+
+\vspace{2.5mm}
+
 \begin{tikzpicture}[
   font=\small,
-  box/.style={rounded corners=3pt, minimum height=15mm, minimum width=30mm, align=center, line width=0.8pt},
+  box/.style={rounded corners=3pt, minimum height=14mm, minimum width=29mm, align=center,
+              line width=0.8pt},
 ]
 \node[box, draw=teal!55!black, fill=teal!12] (csim)
   {\textbf{CSIM}\\[3pt]\footnotesize classically\\[-1pt]\footnotesize simulable};
-\node[box, draw=blue!50, fill=blue!7, right=12mm of csim] (qesim)
+\node[box, draw=blue!50, fill=blue!7, right=11mm of csim] (qesim)
   {\textbf{QESIM}\\[3pt]\footnotesize classical up\\[-1pt]\footnotesize to data loading};
-\node[box, draw=black!45, fill=black!4, right=12mm of qesim] (qsim)
+\node[box, draw=black!45, fill=black!4, right=11mm of qesim] (qsim)
   {\textbf{QSIM}\\[3pt]\footnotesize quantum-\\[-1pt]\footnotesize simulable};
 \node at ($(csim.east)!0.5!(qesim.west)$) {\large$\subseteq$};
 \node at ($(qesim.east)!0.5!(qsim.west)$) {\large$\subseteq$};
-\node[below=7mm of csim, align=center, font=\footnotesize, black!70] (note)
-  {$\bigstar$~\textsc{SimCert} certifies membership here\\ when the required bond dimension is small};
+\node[below=6mm of csim, align=center, font=\footnotesize, black!75] (note)
+  {all five audited models, on all four datasets above\\[-1pt]
+   $\chi^\star\!\le 2$ in every one of the 129 runs};
 \draw[->, black!55] (note) -- (csim);
 \end{tikzpicture}
-\caption{The nested hierarchy of classical simulability. A classically simulable model (CSIM) is a
-special case of one that is simulable up to a data-loading step (QESIM), which is a special case of
-quantum-simulable (QSIM) \citep{cerezo2025,shin2024}. \textsc{SimCert} certifies membership in CSIM
-whenever the trained state truncates to a small bond dimension, and we make no claim outside that
-innermost class.}
+\caption{What is audited, and the class the audit certifies. Top, the four datasets, each
+with one test-set sentence quoted verbatim; \textsc{sst-2} rows are clipped phrases and
+arrive pre-tokenised, which is why its example reads as a fragment and carries spaced
+punctuation. The $\chi^\star$ column lists the values actually observed on that dataset
+across every model and seed. \textsc{mc} and \textsc{rp} show both $1$ and $2$ because the
+compositional model needs $\chi{=}2$ there while the attention and mixer models need
+$\chi{=}1$. Bottom, the nested hierarchy: a classically simulable model (CSIM) is a special
+case of one simulable up to a data-loading step (QESIM), which is a special case of
+quantum-simulable (QSIM) \citep{cerezo2025,shin2024}. \textsc{SimCert} certifies membership
+in CSIM whenever the trained state truncates to a small bond dimension, and we make no
+claim outside that innermost class.}
 \label{fig:venn}
 \end{figure}

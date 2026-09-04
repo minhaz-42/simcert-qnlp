@@ -1,0 +1,104 @@
+{
+  "model": "discocat",
+  "dataset": "rp",
+  "full_accuracy": 0.4838709677419355,
+  "accuracy_by_chi": {
+    "1": 0.3870967741935484,
+    "2": 0.4838709677419355,
+    "4": 0.4838709677419355,
+    "8": 0.4838709677419355,
+    "full": 0.4838709677419355
+  },
+  "accuracy_ci_by_chi": {
+    "1": [
+      0.25725806451612976,
+      0.5806451612903226
+    ],
+    "2": [
+      0.2903225806451613,
+      0.6451612903225806
+    ],
+    "4": [
+      0.2903225806451613,
+      0.6451612903225806
+    ],
+    "8": [
+      0.2903225806451613,
+      0.6451612903225806
+    ],
+    "full": [
+      0.2903225806451613,
+      0.6451612903225806
+    ]
+  },
+  "mcnemar_by_chi": {
+    "1": {
+      "b": 10,
+      "c": 7,
+      "n_discordant": 17,
+      "p_value": 0.629058837890625
+    },
+    "2": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    },
+    "4": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    },
+    "8": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    }
+  },
+  "fidelity_by_chi": {
+    "1": 0.16520385546176358,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "agreement_by_chi": {
+    "1": 0.45161290322580644,
+    "2": 1.0,
+    "4": 1.0,
+    "8": 1.0,
+    "full": 1.0
+  },
+  "chi_star": {
+    "tau_gen": 1,
+    "tau_ci": 1,
+    "tau_agree": 2
+  },
+  "scaling_slope": null,
+  "scaling_r2": null,
+  "delta_ent": null,
+  "entropy_mean": 0.6899226518781856,
+  "entropy_p99": 0.6931471239469101,
+  "gcq_ratio": null,
+  "fourier_degree": null,
+  "baseline_gap": -0.12903225806451613,
+  "mps_surrogate_repro": {},
+  "verdict": "CLASSICALLY_SIMULABLE",
+  "meta": {
+    "n_examples": 31,
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      null
+    ],
+    "tau_gen": 0.27884089666484413,
+    "tau_ci": 0.17741935483870966,
+    "train_accuracy": 0.7627118644067796,
+    "run_hash": "97a3e7b20f90",
+    "separable_test_accuracy": null
+  }
+}

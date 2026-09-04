@@ -54,4 +54,6 @@ grid.log
 rerun_grid.log
 grid_sequential.log
 dcprod.log
+dcprod_rest.log
 dcaudit.log
+grid_pass2.log

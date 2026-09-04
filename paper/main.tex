@@ -290,13 +290,13 @@ is the simulability signal; a small p-value flags a surrogate that is significan
 the attention and mixer models saturate, the product-state surrogate does not merely fail to differ
 significantly from the full model, it reproduces every test prediction, so the contingency table is
 empty and the comparison is decided by $d^{\chi=1}{=}0$ rather than by a p-value. On the harder
-real-data tasks the surrogate does flip a few decisions, on average between $0.4$ and $5$ test
-examples, but never significantly, with p-values from $0.375$ to $0.953$. The reference model
+real-data tasks the surrogate does flip a few decisions, on average between $0.5$ and $5$ test
+examples, but never significantly, with p-values from $0.375$ to $0.981$. The reference model
 \texttt{vqc\_text} reaches $d^{\chi=1}{=}0$ on all three of its datasets. The one model whose
 decisions truncation to $\chi{=}1$ does change is \texttt{discocat}, where the surrogate is
 significantly worse on \textsc{mc} ($p{=}0.014$) and sits at the conventional boundary on
 \textsc{mc-real} ($p{=}0.050$), which is exactly the pair of tasks whose certificate reports
-$\chi^\star{=}2$. On \textsc{rp} that same comparison is not significant ($p{=}0.52$), which is a
+$\chi^\star{=}2$. On \textsc{rp} that same comparison is not significant ($p{=}0.318$), which is a
 statement about the task rather than about the model: \texttt{discocat} sits close to chance on
 \textsc{rp} (Table~\ref{tab:repro}), so there is little decision content left for truncation to
 destroy (Table~\ref{tab:results}).
@@ -425,7 +425,7 @@ circuits and is independent of this gap.}
 \paragraph{Reproduction, honestly.} Table~\ref{tab:repro} and Figure~\ref{fig:repro} place our
 reimplementations against the published numbers. On \textsc{mc} the compositional model reproduces to within $0.02$. On
 \textsc{rp}, a task of only $74$ training items that the original papers themselves flag as fragile,
-our numbers run about $0.17$ to $0.22$ below published, which we attribute to our own token
+our numbers run about $0.14$ to $0.18$ below published, which we attribute to our own token
 embeddings and, for DisCoCat, the offline reader standing in for the unavailable grammar parser. We
 flag this plainly, because it matters for one thing and not another. It weakens any claim about
 matching \textsc{rp} accuracy, but the simulability verdict is about our own trained circuits and is

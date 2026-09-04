@@ -2,7 +2,7 @@ CONDA ?= conda
 AUDIT_ENV ?= qnlp
 LAMBEQ_ENV ?= qnlp-lambeq
 
-.PHONY: help env-audit env-lambeq lock install-dev test lint train audit figures paper reproduce clean
+.PHONY: help env-audit env-lambeq lock install-dev test lint train audit demo figures tables paper reproduce clean
 
 help:
 	@echo "SimCert make targets:"
@@ -49,13 +49,28 @@ audit:
 demo:
 	$(CONDA) run -n $(AUDIT_ENV) python -m simcert.runner mode=both model=$(MODEL) dataset=$(DATASET) seed=$(SEED)
 
+# Every figure and table is derived from results/, so a partial regeneration silently
+# ships a stale one: repro/scaling/witnesses all move when a model gains seeds, and
+# regenerating only chi_curves is how a paper ends up disagreeing with its own data.
+FIG_SCRIPTS := fig_chi_curves fig_repro fig_scaling fig_witnesses
+TABLE_SCRIPTS := make_tables make_repro_table
+
 figures:
-	$(CONDA) run -n $(AUDIT_ENV) python figures/scripts/fig_chi_curves.py
+	@for f in $(FIG_SCRIPTS); do \
+		echo "--> $$f"; \
+		$(CONDA) run -n $(AUDIT_ENV) python figures/scripts/$$f.py || exit 1; \
+	done
 
 tables:
-	$(CONDA) run -n $(AUDIT_ENV) python paper/scripts/make_tables.py
+	@for t in $(TABLE_SCRIPTS); do \
+		echo "--> $$t"; \
+		$(CONDA) run -n $(AUDIT_ENV) python paper/scripts/$$t.py || exit 1; \
+	done
 
+# build_paper.sh, not a bare tectonic call: it builds the anonymous submission and the
+# de-anonymised preprint from one source and fails if the blind PDF carries the author
+# name. A plain `tectonic main.tex` skips that gate.
 paper: figures tables
-	cd paper && tectonic main.tex
+	scripts/build_paper.sh
 
-reproduce: figures tables paper   # regenerate figure + table + PDF from committed results/
+reproduce: figures tables paper   # regenerate every figure + table + both PDFs from results/

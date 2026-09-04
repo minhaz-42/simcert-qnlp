@@ -1,0 +1,1 @@
+{"seed": 19, "dataset": "rp", "n_layers": 1, "epochs": 120, "n_params": 118, "reader": "cups", "ansatz": "IQP", "train_acc": 0.7457627118644068, "val_acc": 0.6, "test_acc": 0.5806451612903226, "published_accuracy": 0.798}

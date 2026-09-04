@@ -1,62 +1,61 @@
-% Fig 1: two-track schematic, instantiated on a REAL audited example rather than on an
-% abstract x. Every number below is measured, not illustrative: the sentence is
-% test-set item 3 of MC, the model is the reference classifier at seed 1, and the
-% expectation values, fidelities and labels come from that run. Regenerate with
-%   python scripts/trace_example.py
+% Fig 1: the audit on one real example, with the trained state shown rather than described.
+% Two rows so the amplitude plot is legible: the pipeline on top, the state it prepares
+% underneath at full width. Input is a verbatim MC test sentence drawn as the DisCoCat
+% string diagram lambeq builds for it. Every number is measured on the AUDITED
+% configuration (reference classifier, n=6, seed 1) and the trace reproduces that run's
+% stored certificate exactly. Regenerate with
+%   python scripts/trace_example.py          (the numbers)
+%   python figures/scripts/fig_objects.py    (the images)
 \begin{figure}[t]
 \centering
+% ---- row 1: the pipeline, starting from the dataset's own object ----
 \begin{tikzpicture}[
   font=\small, >=Latex,
-  n/.style={draw=black!40, rounded corners=2pt, minimum height=8.5mm, minimum width=12mm,
+  n/.style={draw=black!40, rounded corners=2pt, minimum height=8mm, minimum width=13mm,
             inner sep=2pt, fill=black!4, align=center},
-  q/.style={draw=blue!55!black, line width=0.7pt, rounded corners=3pt, minimum height=11mm,
-            minimum width=36mm, inner sep=2pt, fill=blue!9, align=center},
-  c/.style={draw=teal!60!black, line width=0.7pt, rounded corners=3pt, minimum height=11mm,
-            minimum width=36mm, inner sep=2pt, fill=teal!12, align=center},
-  s/.style={draw=black!25, rounded corners=2pt, minimum height=8.5mm, inner sep=3pt,
-            fill=yellow!10, align=center, font=\footnotesize\ttfamily},
-  rdo/.style={align=center, font=\footnotesize},
-  lbl/.style={black!55, font=\itshape\footnotesize, align=right},
+  q/.style={draw=blue!55!black, line width=0.7pt, rounded corners=3pt, minimum height=9mm,
+            inner sep=3pt, fill=blue!9, align=center},
+  c/.style={draw=teal!60!black, line width=0.7pt, rounded corners=3pt, minimum height=9mm,
+            inner sep=3pt, fill=teal!12, align=center},
+  lbl/.style={black!60, font=\itshape\scriptsize, align=center},
 ]
-% ---- the real input sentence, shared by both tracks ----
-\node[s] (x) {engineer writes program};
-\node[below=0.5mm of x, font=\scriptsize, black!55] (xl) {\textsc{mc} test item, true label $1$};
+\node[inner sep=1pt, draw=black!20, rounded corners=2pt] (obj)
+  {\includegraphics[width=0.26\linewidth]{objects/diagram_mc.png}};
+\node[lbl, below=0.5mm of obj, text width=0.26\linewidth]
+  {a verbatim \textsc{mc} test sentence, as \texttt{lambeq} parses it};
 
-% ---- top track: the trained quantum model ----
-\node[n, right=6mm of x] (e1) {embed};
-\node[q, right=5mm of e1] (qc) {quantum core, $n{=}4$\\[-1pt]$U_{\mathrm{enc}}(x)\,U(\theta)$};
-\node[rdo, right=5mm of qc] (r1) {$\langle Z_0\rangle$\\$=-0.843$};
-\node[n, right=5mm of r1] (h1) {head};
-\node[right=4mm of h1] (y1) {$\hat y=1$};
-\foreach \a/\b in {e1/qc,qc/r1,r1/h1,h1/y1} \draw[->] (\a)--(\b);
-\draw[->] (x) -- (e1);
-\node[lbl, above=1mm of qc, black!60] {trained quantum model};
+\node[n, right=4mm of obj] (emb) {embed};
+\node[q, above right=1mm and 4mm of emb] (qc)
+  {trained state, $n{=}6$\\[-1pt]$\bar S = 1.32$ nats};
+\node[c, below right=1mm and 4mm of emb] (mp)
+  {$\chi{=}1$ surrogate\\[-1pt]product state, $F{=}0.35$};
+\draw[->] (obj) -- (emb);
+\draw[->] (emb.east) -- (qc.west);
+\draw[->] (emb.east) -- (mp.west);
 
-% ---- bottom track: the classical surrogate at chi = 1 ----
-\node[n, below=17mm of e1] (e2) {embed};
-\node[c, right=5mm of e2] (mp) {MPS surrogate, $\chi{=}1$\\[-1pt]product state, $F{=}0.52$};
-\node[rdo, right=5mm of mp] (r2) {$\langle Z_0\rangle$\\$=-0.996$};
-\node[n, right=5mm of r2] (h2) {head};
-\node[right=4mm of h2] (y2) {$\hat y^{(1)}=1$};
-\foreach \a/\b in {e2/mp,mp/r2,r2/h2,h2/y2} \draw[->] (\a)--(\b);
-\draw[->] (x.south) |- (e2.west);
-\node[lbl, below=1mm of mp, black!60] {\textsc{SimCert} surrogate};
-
-% ---- the equivalence that the audit tests ----
-\draw[<->, thick, dashed, black!55] (qc) -- (mp);
-\draw[<->, thick, dashed, black!35] (y1) -- (y2);
-\node[right=2mm, align=left, font=\scriptsize, black!70] at ($(y1)!0.5!(y2)$) {same\\label};
+\node[right=4mm of qc, font=\footnotesize] (r1) {$\langle Z_0\rangle = -0.507 \Rightarrow \hat y = 1$};
+\node[right=4mm of mp, font=\footnotesize] (r2) {$\langle Z_0\rangle = -0.959 \Rightarrow \hat y^{(1)} = 1$};
+\draw[->] (qc) -- (r1);
+\draw[->] (mp) -- (r2);
+\draw[<->, dashed, black!45] (r1) -- (r2);
+\node[right=1mm, font=\scriptsize, black!70, align=left] at ($(r1)!0.5!(r2)$) {same\\label};
 \end{tikzpicture}
-\caption{\textsc{SimCert} at a glance, on a real audited example. A trained quantum-NLP
-classifier (top) embeds a sentence, runs a quantum core that prepares
-$|\psi_\theta(x)\rangle$ and reads out Pauli expectations, and applies a classical head to
-obtain a label. \textsc{SimCert} replaces the quantum core with a classical
-matrix-product-state surrogate of bond dimension $\chi$ (bottom) and asks how small $\chi$
-can be before the recovered label changes. The sentence, the expectation values, the
-fidelity and both labels are measured values from the reference classifier on \textsc{mc}
-at seed $1$, not illustrations. They show the case the paper is about: at $\chi{=}1$ the
-surrogate is a product state that overlaps the trained state by only $F{=}0.52$, yet it
-returns the same label. The trained state carries entanglement, $\bar S = 0.82$ nats here,
-and the decision does not use it.}
+
+\vspace{1mm}
+% ---- row 2: the two states themselves ----
+\includegraphics[width=0.95\linewidth]{objects/amplitudes_mc.pdf}
+
+\caption{The audit on one real example, showing the object it operates on. Top, the
+sentence \texttt{engineer writes program}, a verbatim \textsc{mc} test item, drawn as the
+compositional parse \texttt{lambeq} builds for it; the curved wires are the grammar cups
+that make the sentence's meaning a contraction rather than a product. The trained reference
+classifier prepares a six-qubit state from it, and \textsc{SimCert} prepares the best
+bond-dimension-one approximation of that state. Bottom, the two states themselves. They are
+plainly different, overlapping by only $F=0.35$, and the surrogate is a product state
+carrying no entanglement where the trained state carries $1.32$ nats. They nonetheless
+return the same label, because the readout $\langle Z_0\rangle$ stays on the same side of
+the decision boundary. That gap, between a state that is visibly not reproduced and a
+decision that is, is what this paper measures. All values are measured on the audited
+configuration at seed $1$, and the trace reproduces that run's stored certificate exactly.}
 \label{fig:pipeline}
 \end{figure}

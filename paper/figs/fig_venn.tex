@@ -1,28 +1,16 @@
-% Fig 2: the four audited datasets shown by real example, then the simulability hierarchy
-% those datasets land in. Every count, label and chi* below is measured; regenerate with
-%   python scripts/trace_example.py
-% Sentences are quoted verbatim from the test splits, including SST-2's clipped phrasing
-% and its pre-tokenised spacing, so the reader sees the data as the models receive it.
+% Fig 2: the trained states themselves, one per audited case, as the objects that decide
+% the verdict; then the class the audit certifies. The Schmidt spectra are measured on the
+% audited configurations, not illustrative. Regenerate with
+%   python figures/scripts/fig_objects.py
 \begin{figure}[t]
 \centering
-{\footnotesize
-\begin{tabular}{@{}llrrrl@{}}
-\toprule
-Data & A test example, verbatim & train & test & vocab & $\chi^\star$ \\
-\midrule
-\textsc{mc} & \texttt{baker cooks bread} & 78 & 26 & 29 & 1, 2 \\
-\textsc{mc-real} & \texttt{woman prepares tasty dinner} & 70 & 30 & 17 & 2 \\
-\textsc{rp} & \texttt{organization that fleet destroy} & 59 & 31 & 115 & 1, 2 \\
-\textsc{sst-2} & \texttt{puts a human face on a land most} & 480 & 200 & 2511 & 1 \\
- & \texttt{westerners are unfamiliar with .} & & & & \\
-\bottomrule
-\end{tabular}}
+\includegraphics[width=\linewidth]{objects/schmidt_all.pdf}
 
-\vspace{2.5mm}
+\vspace{1.5mm}
 
 \begin{tikzpicture}[
   font=\small,
-  box/.style={rounded corners=3pt, minimum height=14mm, minimum width=29mm, align=center,
+  box/.style={rounded corners=3pt, minimum height=13mm, minimum width=28mm, align=center,
               line width=0.8pt},
 ]
 \node[box, draw=teal!55!black, fill=teal!12] (csim)
@@ -34,20 +22,25 @@ Data & A test example, verbatim & train & test & vocab & $\chi^\star$ \\
 \node at ($(csim.east)!0.5!(qesim.west)$) {\large$\subseteq$};
 \node at ($(qesim.east)!0.5!(qsim.west)$) {\large$\subseteq$};
 \node[below=6mm of csim, align=center, font=\footnotesize, black!75] (note)
-  {all five audited models, on all four datasets above\\[-1pt]
-   $\chi^\star\!\le 2$ in every one of the 129 runs};
+  {all five models, all four datasets\\[-1pt]$\chi^\star\!\le 2$ in every one of the 129 runs};
 \draw[->, black!55] (note) -- (csim);
 \end{tikzpicture}
-\caption{What is audited, and the class the audit certifies. Top, the four datasets, each
-with one test-set sentence quoted verbatim; \textsc{sst-2} rows are clipped phrases and
-arrive pre-tokenised, which is why its example reads as a fragment and carries spaced
-punctuation. The $\chi^\star$ column lists the values actually observed on that dataset
-across every model and seed. \textsc{mc} and \textsc{rp} show both $1$ and $2$ because the
-compositional model needs $\chi{=}2$ there while the attention and mixer models need
-$\chi{=}1$. Bottom, the nested hierarchy: a classically simulable model (CSIM) is a special
-case of one simulable up to a data-loading step (QESIM), which is a special case of
-quantum-simulable (QSIM) \citep{cerezo2025,shin2024}. \textsc{SimCert} certifies membership
-in CSIM whenever the trained state truncates to a small bond dimension, and we make no
-claim outside that innermost class.}
+\caption{The states that decide the verdict, and the class the verdict names. Top, the
+Schmidt spectrum at the central cut of one trained state per audited case, measured on the
+audited configurations. The solid rule marks where a $\chi{=}1$ surrogate truncates and the
+dotted rule where $\chi{=}2$ does, so each panel shows directly how much of the state is
+being discarded. The compositional \texttt{discocat} is the informative one: its spectrum
+carries two weights and then falls off a cliff, so it is almost exactly rank two, which is
+why it is the one model in the paper that needs $\chi{=}2$ and cannot be recovered by a
+product state. The attention model is near rank one already. The reference classifier keeps
+only $0.44$ of its weight in the leading Schmidt value on \textsc{mc} and $0.61$ on
+\textsc{sst-2}, so its state is genuinely spread, and yet its decisions survive truncation
+to a product state, which is the dissociation this paper reports. Weights below $10^{-7}$
+are clipped so the \texttt{discocat} cliff does not flatten the other panels. Bottom, the
+nested hierarchy: a classically simulable model (CSIM) is a special case of one simulable
+up to a data-loading step (QESIM), itself a special case of quantum-simulable (QSIM)
+\citep{cerezo2025,shin2024}. \textsc{SimCert} certifies membership in CSIM whenever the
+trained state truncates to a small bond dimension, and we make no claim outside that
+innermost class.}
 \label{fig:venn}
 \end{figure}

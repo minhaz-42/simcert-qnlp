@@ -26,6 +26,8 @@ from simcert.audit.observables import pauli_expval  # noqa: E402
 from simcert.data.loaders import build_vocab, load_dataset  # noqa: E402
 from simcert.io_results import select_runs  # noqa: E402
 from simcert.registry import get_model  # noqa: E402
+from simcert.runner import load_config  # noqa: E402
+from simcert.seed import seed_everything  # noqa: E402
 
 MODEL = "vqc_text"
 DATASET = "mc"
@@ -33,19 +35,57 @@ SEED = 1
 TEST_INDEX = 2  # 'engineer writes program', the sentence quoted in Figure 1
 
 
-def trace():
-    ds = load_dataset(DATASET, seed=SEED, val_frac=0.2, test_frac=0.2)
-    cfg = OmegaConf.create({"name": MODEL})
-    m = get_model(MODEL)()
-    m.build(cfg, build_vocab(ds.train))
-    rep = m.fit(ds.train, ds.val, cfg)
+def trained_state(model_name=MODEL, dataset=DATASET, seed=SEED, text=None,
+                  audit="default", extra=None):
+    """Build and train the model the AUDIT actually ran, then return one example's state.
 
-    ex = ds.test[TEST_INDEX]
+    Two things here are load-bearing and both were got wrong first time round.
+
+    The config comes from ``load_config``, the same Hydra composition ``run_grid.py``
+    uses, not from a hand-built OmegaConf dict. Building the dict by hand silently
+    produced a 4-qubit reference classifier when every audited run of it is 6 qubits, so
+    the traced numbers described a model the paper never audited.
+
+    And ``seed_everything`` runs before build and fit, exactly as ``runner.main`` does.
+    Without it the parameter initialisation depends on ambient RNG state and the same
+    nominal example yields a different fidelity on each invocation.
+    """
+    argv = ["mode=both", f"model={model_name}", f"dataset={dataset}",
+            f"audit={audit}", f"seed={seed}"]
+    for k, v in (extra or {}).items():
+        argv.append(f"model.{k}={v}")
+    cfg = load_config(argv)
+
+    seed_everything(int(cfg.seed))
+    ds_kwargs = {k: v for k, v in OmegaConf.to_container(cfg.dataset, resolve=True).items()
+                 if k not in ("name", "val_frac", "test_frac")}
+    ds = load_dataset(cfg.dataset_name, seed=int(cfg.seed),
+                      val_frac=float(cfg.dataset.val_frac),
+                      test_frac=float(cfg.dataset.get("test_frac", 0.2)), **ds_kwargs)
+
+    m = get_model(cfg.model_name)()
+    m.build(cfg.model, build_vocab(ds.train))
+    rep = m.fit(ds.train, ds.val, cfg.model)
+
+    pool = [e for e in ds.test if getattr(m, "records", None) is None or e.text in m.records]
+    pool = pool or list(ds.test)
+    ex = next((e for e in pool if e.text == text), None)
+    if ex is None:
+        ex = pool[TEST_INDEX] if (text is None and len(pool) > TEST_INDEX) else pool[0]
+
     unit = m.audit_units(ex)[0]
     n = unit.n_qubits
-    psi = exact_statevector(unit.qfunc(), n)
-    obs = unit.observables[0]
+    psi = unit.state if unit.state is not None else exact_statevector(unit.qfunc(), n)
+    psi = np.asarray(psi, dtype=complex).reshape(-1)
+    psi = psi / np.linalg.norm(psi)
+    obs = unit.observables[0] if unit.observables else None
+    return dict(psi=psi, n=n, obs=obs, example=ex, report=rep, model=cfg.model_name,
+                dataset=cfg.dataset_name, cfg=cfg)
 
+
+def trace():
+    got = trained_state()
+    rep, ex, n, psi, obs = (got["report"], got["example"], got["n"], got["psi"], got["obs"])
     print("FIGURE 1, the traced example")
     print(f"  model={MODEL} dataset={DATASET} seed={SEED} "
           f"train_acc={rep.train_accuracy:.3f} val_acc={rep.val_accuracy:.3f}")

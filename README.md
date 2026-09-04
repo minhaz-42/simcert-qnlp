@@ -62,8 +62,22 @@ paper/                  # TMLR LaTeX sources (tmlr.sty) + QTML abstract
 
 ## Status
 
-Bootstrapping (milestone **M0**): audit harness + test suite first, then the model zoo.
-See the full plan for the certificate spec, experiment matrix, statistics, and milestones.
+**Grid complete.** All five models are built and audited: 129/129 certificate runs on disk,
+20 seeds on the RP reproduction probe for `discocat`/`qsann`/`qmsan`/`vqc_text`, and a
+chi*-vs-n scaling sweep to 16 qubits for two architectures. `make reproduce` regenerates
+every figure, both tables, and both PDFs from committed `results/`.
+
+```bash
+python scripts/run_grid.py --dry-run   # should report "0 to run"
+make reproduce                         # figures + tables + main.pdf and main_preprint.pdf
+```
+
+Open, and not compute-bound: the positive-control design study is paused
+(`docs/positive-control-study.md`). The chi*-vs-entanglement anti-correlation it turned up
+has been checked and does **not** affect the audited models -- both adversarial lenses
+rejected the candidate control design, so any resumption should start from the k-of-m
+entanglement dial described there. See the full plan for the certificate spec, experiment
+matrix, statistics, and milestones.
 
 ## Compute note
 

@@ -391,7 +391,11 @@ on the tasks where the models saturate. And we did not see the compositional mod
 attention models. \texttt{discocat} alone needs $\chi{=}2$, and truncating it to $\chi{=}1$ collapses
 its accuracy toward chance, so its grammar cups create entanglement that is, minimally, load-bearing.
 This lone exception matters more than the uniform cases, because it shows the audit is not simply
-reporting $\chi{=}1$ by construction.
+reporting $\chi{=}1$ by construction. The two verdict classes also separate quantitatively, and in
+the direction they should: over every audited run, the product surrogate's mean state fidelity is
+$0.66$ where the certificate reports $\chi^\star{=}1$ and $0.22$ where it reports $\chi^\star{=}2$.
+The criterion fires where a product state is genuinely far from the trained one, so a reader need not
+take the uniform $\chi^\star{=}1$ verdicts on trust that the instrument can report anything else.
 
 \begin{table}[t]
 \centering
@@ -426,8 +430,14 @@ circuits and is independent of this gap.}
 reimplementations against the published numbers. On \textsc{mc} the compositional model reproduces to within $0.02$. On
 \textsc{rp}, a task of only $74$ training items that the original papers themselves flag as fragile,
 our numbers run about $0.14$ to $0.18$ below published, which we attribute to our own token
-embeddings and, for DisCoCat, the offline reader standing in for the unavailable grammar parser. We
-flag this plainly, because it matters for one thing and not another. It weakens any claim about
+embeddings and, for DisCoCat, the offline reader standing in for the unavailable grammar parser.
+That shortfall is the mean of a wide distribution rather than an unreachable target. Over $20$ seeds
+each model's \textsc{rp} accuracy spans roughly $0.36$ to $0.74$, and the published value lies inside
+that spread for the compositional model and for \texttt{qsann}, and $0.014$ above our best seed for
+\texttt{qmsan}. On a $31$-example test set one example is $3.2$ accuracy points, so \textsc{rp}
+cannot resolve differences of that size; we therefore report the seed mean throughout, since a
+best-of-seeds figure compared against a published point estimate would not be a like-for-like
+comparison. We flag this plainly, because it matters for one thing and not another. It weakens any claim about
 matching \textsc{rp} accuracy, but the simulability verdict is about our own trained circuits and is
 unaffected by whether they hit the published accuracy. The certificate audits the model in hand. One
 might still object that better-trained models would demand more bond dimension, so that our gap,

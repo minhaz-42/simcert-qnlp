@@ -25,6 +25,21 @@
 \newtheorem*{result}{Result (informal)}
 \newcommand{\chistar}{\ensuremath{\chi^\star}}
 
+% The repository URL names the author's account, so it may appear only in the
+% de-anonymised build. tmlr.sty sets \if@preprint from the [preprint] class option, which
+% scripts/build_paper.sh passes for the arXiv PDF and withholds for the TMLR PDF. The
+% anonymity gate in that script fails the build if this ever leaks the wrong way.
+\makeatletter
+\newcommand{\repoavailability}{%
+  \if@preprint
+    Code, configurations and all stored results:
+    \url{https://github.com/minhaz-42/simcert-qnlp}.%
+  \else
+    The harness, with every stored result needed to regenerate the figures and tables, is
+    attached as anonymous supplementary material with this submission.%
+  \fi}
+\makeatother
+
 \title{\textsc{SimCert}: A Classical-Simulability Audit of\\ Trained Quantum-NLP Text Classifiers}
 
 \author{\name Tanvir Ahmed \email tanvir.ahmed32@northsouth.edu \\
@@ -95,8 +110,7 @@ self-attention models \texttt{QSANN} and \texttt{QMSAN}, the all-quantum token m
 known by construction, so the uniform verdicts can be read as a measurement rather than as an
 instrument that only ever reports one value. Fourth, we release an open, model-agnostic harness
 that consumes any trained circuit through a common intermediate representation, so the certificate
-can be recomputed and extended by others.\footnote{Anonymized for review:
-\url{https://anonymous.4open.science/r/simcert}.}
+can be recomputed and extended by others.\footnote{\repoavailability}
 
 The paper front-loads its epistemics. Section~\ref{sec:related} places the work among the audits
 it extends. Section~\ref{sec:epistemics} sets out what a simulability audit can and cannot
@@ -617,8 +631,9 @@ benefit sits with the model, not with the skeptic.}
 
 \subsubsection*{Reproducibility statement}
 The harness, all model reimplementations, exact configurations, seeds, dataset indices, and the
-scripts that regenerate every figure and table from stored results are released at the anonymized
-repository above. The audit is deterministic given a trained model, and the only stochasticity is in
+scripts that regenerate every figure and table from stored results are released in full.
+\repoavailability{} A single command, \texttt{make reproduce}, rebuilds
+every figure, both tables and the paper from the stored results, with no retraining required. The audit is deterministic given a trained model, and the only stochasticity is in
 training, which we control by seed.
 
 \begin{thebibliography}{99}

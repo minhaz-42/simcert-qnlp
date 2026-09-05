@@ -6,9 +6,9 @@ on: the trained state itself. This script renders three kinds, all measured from
 trained models on real dataset sentences, and saves them as image files that the LaTeX
 figures include.
 
-  amplitudes_mc.pdf   the 16 amplitudes of one trained state, full against chi=1, so the
-                      "same label at 52 percent fidelity" claim is visible rather than
-                      asserted
+  amplitudes_mc.pdf   the 64 amplitudes of one trained state (the audited reference model
+                      is 6 qubits), full against chi=1, so the "same label at 35 percent
+                      fidelity" claim is visible rather than asserted
   schmidt_all.pdf     the Schmidt spectrum at the middle cut for one trained state per
                       dataset, with the chi=1 and chi=2 truncation points marked; this is
                       the picture of why chi*=1 holds for the attention models and why

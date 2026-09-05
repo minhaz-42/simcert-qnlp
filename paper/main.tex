@@ -32,7 +32,6 @@
 
 \def\month{07}
 \def\year{2026}
-\def\openreview{\url{https://openreview.net/forum?id=XXXX}}
 
 \begin{document}
 \maketitle
@@ -47,7 +46,7 @@ directly. It re-simulates each trained circuit as a bond-dimension-$\chi$ matrix
 sweeps $\chi$, and records the smallest value (written \chistar) at which a classical surrogate
 recovers the model's own predictions, together with an entanglement-removal ablation and two
 dequantization witnesses. We calibrate the criterion against a positive control whose required
-bond dimension is known in advance, and it recovers that number. Auditing five published QNLP architectures across four datasets and up
+bond dimension is known in advance, and it recovers that number. Auditing four published QNLP architectures, plus a variational-classifier reference, across four datasets and up
 to sixteen qubits, we find that a classical surrogate recovers the predictions at small and
 non-growing bond dimension. Attention-style models are recovered at $\chi{=}1$, that is by a
 product state, and a compositional model at $\chi{=}2$; \chistar\ stays flat at $1$ as the qubit
@@ -84,17 +83,19 @@ that trainable variational models are constrained matrix product states \citep{s
 the absence of barren plateaus tends to imply classical simulability \citep{cerezo2025}. So which
 QNLP results survive a classical surrogate of the trained circuit? That is the question we take up.
 
-This paper makes three contributions, each an audit rather than a new model. First, we define a
+This paper makes four contributions, each an audit rather than a new model. First, we define a
 scoped simulability criterion for trained QNLP circuits, namely the smallest MPS bond dimension
 \chistar\ at which a classical surrogate recovers the model's predictions, and we package it with
 an entanglement-removal ablation, the entanglement entropy, a geometric-difference kernel test,
 and a data-reuploading spectral test into a per-model simulability certificate. Second, we audit
-five published QNLP architectures, namely DisCoCat as realised in \texttt{lambeq}, the quantum
+four published QNLP architectures, namely DisCoCat as realised in \texttt{lambeq}, the quantum
 self-attention models \texttt{QSANN} and \texttt{QMSAN}, the all-quantum token mixer
 \texttt{CLAQS}, and a variational-classifier reference, across four datasets, and we report how
-\chistar\ scales with system size. Third, we release an open, model-agnostic harness that consumes
-any trained circuit through a common intermediate representation, so the certificate can be
-recomputed and extended by others.\footnote{Anonymized for review:
+\chistar\ scales with system size. Third, we calibrate the criterion against a positive control whose required bond dimension is
+known by construction, so the uniform verdicts can be read as a measurement rather than as an
+instrument that only ever reports one value. Fourth, we release an open, model-agnostic harness
+that consumes any trained circuit through a common intermediate representation, so the certificate
+can be recomputed and extended by others.\footnote{Anonymized for review:
 \url{https://anonymous.4open.science/r/simcert}.}
 
 The paper front-loads its epistemics. Section~\ref{sec:related} places the work among the audits

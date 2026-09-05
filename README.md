@@ -81,6 +81,6 @@ matrix, statistics, and milestones.
 
 ## Compute note
 
-Developed on an Apple M1 (8 GB, no CUDA). Statevector simulation is CPU-only and small
+Developed on Apple Silicon laptops with no CUDA, an M1 with 8 GB and an M5 with 16 GB. Statevector simulation is CPU-only and small
 (≤16-qubit state ≈ 1 MB). Heavy training (hybrid quantum-BERT, CLAQS) runs on remote GPU and
 syncs exported circuits + result stubs back for local auditing.

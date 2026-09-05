@@ -3,9 +3,15 @@
 > **Status 2026-09-05:** the chi*-vs-entanglement anti-correlation that this study turned
 > up has been checked against the shipped models and does **not** reach them; see
 > [RESOLVED](#resolved-2026-09-05-the-anti-correlation-does-not-reach-the-audited-models)
-> below. The control *design* work is still paused, and both adversarial lenses rejected
-> the candidate design. Regenerate the faithfulness numbers with
+> below. Regenerate the faithfulness numbers with
 > `python scripts/check_chistar_faithfulness.py`.
+>
+> **Status 2026-09-05, control built:** the candidate design in this study was rejected by
+> both adversarial lenses, so it was NOT used. A different control was built instead, the
+> k-of-m entanglement dial in `scripts/positive_control_kofm.py`, which passes both
+> acceptance tests and is Section 7.4 and Figure 8 of the paper. Its acceptance tests live
+> in `tests/test_positive_control.py`. This document is kept for the reasoning that led
+> there, not as a live design proposal.
 
 Why this exists: every SimCert verdict is CLASSICALLY_SIMULABLE (the only exception is
 discocat at chi*=2), so a referee can fairly object that the instrument may simply always
@@ -85,8 +91,8 @@ reports chi*=2 on 26 of 188 runs, and does so exactly where fidelity is low.
 
 ### What remains for a positive control
 
-The k-of-m dial proposed by the referee lens below is still the right design if a
-synthetic control is wanted: fix n, architecture, wire order and readout weight, entangle
+The k-of-m dial proposed by the referee lens below was the design adopted, and it is now
+built and passing; what follows is the specification it was built from: fix n, architecture, wire order and readout weight, entangle
 only k of m pairs, and check that measured chi* tracks 2^k for k=0..4. Note that both
 adversarial lenses independently rejected the candidate design, for different reasons
 (soundness: the mechanism is not entanglement; referee: the three-point ladder varies wire

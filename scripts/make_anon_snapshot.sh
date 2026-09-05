@@ -19,6 +19,7 @@ rsync -a --delete \
   --exclude='/scripts/make_anon_snapshot.sh' --exclude='/scripts/build_paper.sh' \
   --exclude='/docs/positive-control-study.md' \
   --exclude='*.log' \
+  --exclude='.DS_Store' --exclude='.pytest_cache' --exclude='.ruff_cache' \
   --exclude='/arxiv' --exclude='arxiv_submission.tar.gz' \
   "$ROOT"/ "$STAGE"/
 

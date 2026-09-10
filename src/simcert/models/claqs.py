@@ -178,7 +178,7 @@ class CLAQS(QNLPModel):
         chunk = getattr(cfg, "train_chunk", None)
         n = len(train)
         lossf_sum = torch.nn.CrossEntropyLoss(reduction="sum")
-        for _ in range(epochs):
+        for _ep in range(epochs):
             opt.zero_grad()
             if not chunk or chunk >= n:
                 logits = torch.stack([self._forward_logits(ex) for ex in train])
@@ -192,6 +192,9 @@ class CLAQS(QNLPModel):
                     y = torch.tensor([ex.label for ex in part])
                     (lossf_sum(logits, y) / n).backward()
             opt.step()
+            self._snapshot_hook(_ep + 1, cfg)
+            self._best_val_hook(_ep + 1, cfg, val)
+        self._restore_best_val(cfg)
         return TrainReport(
             train_accuracy=self._accuracy(train), val_accuracy=self._accuracy(val),
             published_accuracy=self._published_accuracy,

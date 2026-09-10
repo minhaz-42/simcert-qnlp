@@ -93,10 +93,13 @@ class VQCTextModel(QNLPModel):
         return self.embedding[torch.tensor(idx)].mean(dim=0)
 
     # ---- training -----------------------------------------------------------
+    def _params(self):
+        return [self.embedding, self.theta]
+
     def fit(self, train, val, cfg) -> TrainReport:
         torch = self._torch
         circuit = self._qnode()
-        opt = torch.optim.Adam([self.embedding, self.theta], lr=float(getattr(cfg, "lr", 0.05)))
+        opt = torch.optim.Adam(self._params(), lr=float(getattr(cfg, "lr", 0.05)))
         epochs = int(getattr(cfg, "epochs", 30))
         eps = 1e-6
         # See the note in qsann.fit. Backprop runs through a statevector simulator, so the
@@ -110,7 +113,7 @@ class VQCTextModel(QNLPModel):
             return torch.stack([(1 - circuit(self._features(ex), self.theta)) / 2
                                 for ex in batch]).clamp(eps, 1 - eps)
 
-        for _ in range(epochs):
+        for _ep in range(epochs):
             opt.zero_grad()
             if not chunk or chunk >= n:
                 p = _probs(train)
@@ -123,6 +126,9 @@ class VQCTextModel(QNLPModel):
                     y = torch.tensor([float(ex.label) for ex in part], dtype=p.dtype)
                     (torch.nn.functional.binary_cross_entropy(p, y, reduction="sum") / n).backward()
             opt.step()
+            self._snapshot_hook(_ep + 1, cfg)
+            self._best_val_hook(_ep + 1, cfg, val)
+        self._restore_best_val(cfg)
         return TrainReport(
             train_accuracy=self._accuracy(train),
             val_accuracy=self._accuracy(val),

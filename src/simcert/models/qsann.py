@@ -169,7 +169,7 @@ class QSANN(QNLPModel):
         # this bounds peak memory without changing the update.
         chunk = getattr(cfg, "train_chunk", None)
         n = len(train)
-        for _ in range(epochs):
+        for _ep in range(epochs):
             opt.zero_grad()
             if not chunk or chunk >= n:
                 logits = torch.stack([self._forward_logit(ex) for ex in train])
@@ -189,6 +189,9 @@ class QSANN(QNLPModel):
                 if lam:  # batch-independent, so it enters the gradient exactly once
                     (lam / self.d * (self.w @ self.w)).backward()
             opt.step()
+            self._snapshot_hook(_ep + 1, cfg)
+            self._best_val_hook(_ep + 1, cfg, val)
+        self._restore_best_val(cfg)
         return TrainReport(
             train_accuracy=self._accuracy(train),
             val_accuracy=self._accuracy(val),

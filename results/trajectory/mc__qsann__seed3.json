@@ -1,0 +1,529 @@
+{
+  "model": "qsann",
+  "dataset": "mc",
+  "seed": 3,
+  "epochs": 40,
+  "snapshot_every": 2,
+  "n_test_audited": 26,
+  "n_test_full": 26,
+  "chi_values": [
+    1,
+    2,
+    4,
+    8,
+    "full"
+  ],
+  "final_train_accuracy": 1.0,
+  "final_val_accuracy": 1.0,
+  "accuracy_first": 0.34615384615384615,
+  "accuracy_last": 1.0,
+  "accuracy_min": 0.34615384615384615,
+  "accuracy_max": 1.0,
+  "accuracy_declined": false,
+  "best_val_epoch": 10,
+  "best_val_accuracy": 1.0,
+  "test_accuracy_at_best_val": 1.0,
+  "chi_star_at_best_val": 1,
+  "chi_star_set": [
+    "1",
+    "2"
+  ],
+  "chi_star_constant": false,
+  "points": [
+    {
+      "epoch": 2,
+      "test_accuracy": 0.34615384615384615,
+      "val_accuracy": 0.46153846153846156,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.34615384615384615,
+        "2": 0.34615384615384615,
+        "4": 0.34615384615384615,
+        "8": 0.34615384615384615,
+        "full": 0.34615384615384615
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.014223057081853492
+    },
+    {
+      "epoch": 4,
+      "test_accuracy": 0.34615384615384615,
+      "val_accuracy": 0.46153846153846156,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.34615384615384615,
+        "2": 0.34615384615384615,
+        "4": 0.34615384615384615,
+        "8": 0.34615384615384615,
+        "full": 0.34615384615384615
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.04977787095539375
+    },
+    {
+      "epoch": 6,
+      "test_accuracy": 0.34615384615384615,
+      "val_accuracy": 0.46153846153846156,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.34615384615384615,
+        "2": 0.34615384615384615,
+        "4": 0.34615384615384615,
+        "8": 0.34615384615384615,
+        "full": 0.34615384615384615
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.09447470878904797
+    },
+    {
+      "epoch": 8,
+      "test_accuracy": 0.9615384615384616,
+      "val_accuracy": 0.8846153846153846,
+      "chi_star": 2,
+      "chi_star_agree": 2,
+      "accuracy_by_chi": {
+        "1": 0.4230769230769231,
+        "2": 0.9615384615384616,
+        "4": 0.9615384615384616,
+        "8": 0.9615384615384616,
+        "full": 0.9615384615384616
+      },
+      "agreement_by_chi": {
+        "1": 0.46153846153846156,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.1384762113382066
+    },
+    {
+      "epoch": 10,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.16938617282399196
+    },
+    {
+      "epoch": 12,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.17344549495515327
+    },
+    {
+      "epoch": 14,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.15230592514048316
+    },
+    {
+      "epoch": 16,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.12565972770188572
+    },
+    {
+      "epoch": 18,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.11339277625866788
+    },
+    {
+      "epoch": 20,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.12890603754569363
+    },
+    {
+      "epoch": 22,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.15415195701871484
+    },
+    {
+      "epoch": 24,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.18178362496353995
+    },
+    {
+      "epoch": 26,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.20863805769370256
+    },
+    {
+      "epoch": 28,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.23261830372555137
+    },
+    {
+      "epoch": 30,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.25277240345290514
+    },
+    {
+      "epoch": 32,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.26904766966361093
+    },
+    {
+      "epoch": 34,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.2818441274993636
+    },
+    {
+      "epoch": 36,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.2917114856618669
+    },
+    {
+      "epoch": 38,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.29919917441730504
+    },
+    {
+      "epoch": 40,
+      "test_accuracy": 1.0,
+      "val_accuracy": 1.0,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.3047949141269725
+    }
+  ],
+  "config": {
+    "seed": 3,
+    "mode": "both",
+    "model_name": "qsann",
+    "dataset_name": "mc",
+    "audit_name": "default",
+    "paths": {
+      "results": "results",
+      "checkpoints": "checkpoints"
+    },
+    "model": {
+      "n_qubits": 2,
+      "d_enc": 1,
+      "d_qkv": 1,
+      "epochs": 40,
+      "lr": 0.05,
+      "lam": 0.0,
+      "gam": 0.0,
+      "published_accuracy": 1.0,
+      "baseline": "logreg_bow",
+      "seed": 3,
+      "dataset": "mc",
+      "snapshot_dir": "/Users/tanvir/Desktop/Submitted/simcert-qnlp/checkpoints/trajectory/mc__qsann__seed3",
+      "snapshot_every": 2
+    },
+    "dataset": {
+      "name": "mc",
+      "n_per_class": 65,
+      "val_frac": 0.2,
+      "test_frac": 0.2
+    },
+    "audit": {
+      "chi_values": [
+        1,
+        2,
+        4,
+        8,
+        null
+      ],
+      "cutoff": 1e-12,
+      "entanglement_removal": false
+    }
+  },
+  "env": {
+    "git_sha": "9ff1f3d",
+    "libs": {
+      "pennylane": "0.45.1",
+      "quimb": "1.14.0",
+      "qiskit": "2.3.0",
+      "qiskit_aer": "0.17.2",
+      "numpy": "2.4.6",
+      "torch": "2.12.1",
+      "transformers": "5.13.0"
+    }
+  }
+}

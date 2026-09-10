@@ -28,3 +28,18 @@ its gate angles, trained via the \texttt{lambeq} pipeline with the offline \text
 (the trained Bobcat grammar parser's model host is no longer reachable, an acknowledged fidelity
 cost on RP). Splits are seed-stable; the exact indices and the synthetic generator are released
 with the harness so every split is reproducible.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.66\linewidth]{repro.pdf}
+\caption{Reproduction gap, with the seed distribution behind each mean. Bars are our seed mean
+against the published number; the bold annotation is ours minus published, and each open circle is
+one seed. \textsc{mc-real} reproduces to within $0.02$. On \textsc{rp}, a fragile task of only $74$
+training items reimplemented with our own embeddings and an offline reader, the mean runs below
+published, but the seed spread is wide enough that the published value falls inside our range for
+\texttt{discocat} and \texttt{qsann}, and $0.014$ above our best seed for \texttt{qmsan}. Seed means
+and counts here are produced by the same selection rule as Table~\ref{tab:repro}, so the figure and
+the table report the same quantity. The simulability verdict concerns our own trained circuits and
+does not depend on closing this gap.}
+\label{fig:repro}
+\end{figure}

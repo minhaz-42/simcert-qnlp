@@ -60,17 +60,23 @@ def _fmt_d(vals):
 
 def main():
     runs = select_runs(glob.glob(str(REPO / "results" / "metrics" / "*.json")))
-    groups = {k: [d["certificate"] for d in v] for k, v in runs.items()}
+    groups = {k: v for k, v in runs.items()}
 
     lines = [
-        r"\begin{tabular}{llcccccccc}",
+        r"\begin{tabular}{llcccccccccc}",
         r"\toprule",
-        r"Model & Data & seeds & Full acc & Acc@$\chi{=}1$ & $p_{\mathrm{McN}}^{\chi=1}$ & "
-        r"$d^{\chi=1}$ & $\chi^\star$ & $\bar{S}$ (nats) & $\Delta A_{\mathrm{ent}}$ \\",
+        # n_test is stated because several of these datasets are tiny: an accuracy on
+        # 29 sentences should not be read like an accuracy on 200.
+        r"Model & Data & seeds & $n_{\mathrm{test}}$ & Full acc & Acc@$\chi{=}1$ & "
+        r"$p_{\mathrm{McN}}^{\chi=1}$ & $d^{\chi=1}$ & $\chi^\star$ & $\bar{S}$ (nats) & "
+        r"$\Delta A_{\mathrm{ent}}$ \\",
         r"\midrule",
     ]
-    for (model, dataset), certs in sorted(groups.items()):
+    for (model, dataset), rundicts in sorted(groups.items()):
+        certs = [d["certificate"] for d in rundicts]
         n = len(certs)
+        ntest = sorted({d["dataset"]["n_test"] for d in rundicts})
+        ntest_txt = "/".join(str(x) for x in ntest)
         full = [c["full_accuracy"] for c in certs]
         acc1 = [c["accuracy_by_chi"].get("1") for c in certs]
         mcn = [(c.get("mcnemar_by_chi") or {}).get("1") or {} for c in certs]
@@ -84,7 +90,7 @@ def main():
         dent = [c["delta_ent"] for c in certs]
         lines.append(
             f"\\texttt{{{model.replace('_', chr(92) + '_')}}} & {dataset.replace('_', chr(92)+'_')} & {n} & "
-            f"{_fmt(full)} & {_fmt(acc1)} & {_fmt_p(pmcn)} & {_fmt_d(dmcn)} & {cstar_txt} & "
+            f"{ntest_txt} & {_fmt(full)} & {_fmt(acc1)} & {_fmt_p(pmcn)} & {_fmt_d(dmcn)} & {cstar_txt} & "
             f"{_fmt(ent)} & {_fmt(dent)} \\\\"
         )
     lines += [r"\bottomrule", r"\end{tabular}"]

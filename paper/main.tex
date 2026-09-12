@@ -380,12 +380,13 @@ trained model's predictions (Figure~\ref{fig:curves}). The weight of this sits o
 the one corpus here whose test set is large enough to resolve a few accuracy points: all four
 trainable architectures are recovered at $\chi{=}1$, a product state, over $200$ test items.
 \texttt{qsann} reaches $0.634\pm0.029$ and its product-state surrogate $0.635\pm0.032$;
-\texttt{qmsan} reaches $0.604\pm0.014$ against $0.604\pm0.026$; the reference classifier and
-\texttt{claqs} likewise (Table~\ref{tab:results}). On \textsc{mc} the same four reach full accuracy at $\chi{=}1$ with nothing
+\texttt{qmsan} reaches $0.604\pm0.014$ against $0.604\pm0.026$, and the reference classifier
+likewise (Table~\ref{tab:results}). \texttt{claqs} is recovered at $\chi{=}1$ too, but at
+$0.554\pm0.032$ it sits near chance at the reduced scale we can run, so we draw no verdict from it. On \textsc{mc} the same four reach full accuracy at $\chi{=}1$ with nothing
 lost at all, though every model saturates that task. The compositional
 \texttt{discocat} is the exception and needs $\chi{=}2$, but no more, reproducing the published
-\textsc{mc} accuracy to within $0.02$, at $0.778$ against $0.798$ (Table~\ref{tab:repro}). In the
-operational sense of Section~\ref{sec:framework} these trained models are bond-cheap.
+\textsc{mc} accuracy to within $0.02$, at $0.778$ against $0.798$ (Table~\ref{tab:repro}). These
+models are bond-cheap in the sense of Section~\ref{sec:framework}.
 
 \subsection{$\chistar$ does not grow with system size}
 The obvious objection is that small circuits are trivially simulable, so the audit only bites at
@@ -548,12 +549,11 @@ on the tasks where the models saturate. And we did not see the compositional mod
 attention models. \texttt{discocat} alone needs $\chi{=}2$, and truncating it to $\chi{=}1$ collapses
 its accuracy toward chance, so its grammar cups create entanglement that is, minimally, load-bearing.
 This lone exception matters more than the uniform cases, because it shows the audit is not simply
-reporting $\chi{=}1$ by construction. The two verdict classes also separate quantitatively, and in
-the direction they should: over every audited run, the product surrogate's mean state fidelity is
-$0.66$ where the certificate reports $\chi^\star{=}1$ and $0.22$ where it reports $\chi^\star{=}2$.
-The criterion fires where a product state is genuinely far from the trained one. The positive control
-of Section~\ref{sec:control} makes the same point against a known ground truth, by dialling the
-entangled resource and recovering the bond dimension it implies.
+reporting $\chi{=}1$ by construction. The verdict classes also separate quantitatively: over every
+audited run the product surrogate's mean state fidelity is $0.66$ where the certificate reports
+$\chi^\star{=}1$ and $0.22$ where it reports $\chi^\star{=}2$, so the criterion fires where a
+product state is genuinely far from the trained one. The positive control of
+Section~\ref{sec:control} makes the same point against a known ground truth.
 
 \begin{table}[t]
 \centering
@@ -618,17 +618,15 @@ Several caveats bound the reading. The audit is average-case over a test set, no
 every input; \chistar\ is defined against a tolerance; and our simulability notion is the
 practical one, up to data loading, not a hardness result. The scales are small, and a determined optimum at larger $n$ remains out of
 simulation's reach. Our \textsc{rp} reimplementations do not clear a majority-class predictor, so
-we draw no verdict from them, and \textsc{mc} is saturated by every model. Finally, the all-quantum mixer runs at reduced scale
-on a CPU, where its accuracy is near chance, so we treat it as a demonstration that the audit works
-at eight qubits rather than as an audit of the published model.\footnote{This is the only place
+we draw no verdict from them, and \textsc{mc} is saturated by every model. Finally, the all-quantum mixer runs at reduced scale on a CPU, so it demonstrates that the
+audit works at eight qubits rather than auditing the published model.\footnote{This is the only place
 additional compute would change what we can measure; the rest of the audit is CPU-bound by design.}
 
 There is a constructive reading. A quantum implementation earns its overhead only where a classical
 MPS cannot follow, that is where \chistar\ grows with system size, and none of the audited models
-show it growing. The audit therefore names a target rather than cataloguing a shortfall, and poses
-the next questions: which architectural choices make \chistar\ grow with $n$, and should QNLP
-benchmarks report a simulability certificate alongside accuracy, as tabular and vision audits now
-do? \emph{Until a QNLP model shows its bond dimension
+show it growing. The audit therefore names a target rather than cataloguing a shortfall: which
+architectural choices make \chistar\ grow with $n$, and should QNLP benchmarks report a
+simulability certificate alongside accuracy? \emph{Until a QNLP model shows its bond dimension
 growing, the burden of proof sits with the model, not the skeptic.}
 
 \subsubsection*{Reproducibility statement}

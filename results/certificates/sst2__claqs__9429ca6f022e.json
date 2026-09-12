@@ -1,0 +1,118 @@
+{
+  "model": "claqs",
+  "dataset": "sst2",
+  "full_accuracy": 0.55,
+  "accuracy_by_chi": {
+    "1": 0.55,
+    "2": 0.555,
+    "4": 0.545,
+    "8": 0.55,
+    "16": 0.55,
+    "full": 0.55
+  },
+  "accuracy_ci_by_chi": {
+    "1": [
+      0.485,
+      0.6201249999999999
+    ],
+    "2": [
+      0.485,
+      0.63
+    ],
+    "4": [
+      0.475,
+      0.62
+    ],
+    "8": [
+      0.48,
+      0.625
+    ],
+    "16": [
+      0.48,
+      0.625
+    ],
+    "full": [
+      0.48,
+      0.625
+    ]
+  },
+  "mcnemar_by_chi": {
+    "1": {
+      "b": 3,
+      "c": 3,
+      "n_discordant": 6,
+      "p_value": 1.0
+    },
+    "2": {
+      "b": 0,
+      "c": 1,
+      "n_discordant": 1,
+      "p_value": 1.0
+    },
+    "4": {
+      "b": 1,
+      "c": 0,
+      "n_discordant": 1,
+      "p_value": 1.0
+    },
+    "8": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    },
+    "16": {
+      "b": 0,
+      "c": 0,
+      "n_discordant": 0,
+      "p_value": 1.0
+    }
+  },
+  "fidelity_by_chi": {
+    "1": 0.6545037130070065,
+    "2": 0.8859345499673378,
+    "4": 0.974463388271414,
+    "8": 0.9985155968774657,
+    "16": 1.0,
+    "full": 1.0
+  },
+  "agreement_by_chi": {
+    "1": 0.97,
+    "2": 0.995,
+    "4": 0.995,
+    "8": 1.0,
+    "16": 1.0,
+    "full": 1.0
+  },
+  "chi_star": {
+    "tau_gen": 1,
+    "tau_ci": 1,
+    "tau_agree": 1
+  },
+  "scaling_slope": null,
+  "scaling_r2": null,
+  "delta_ent": null,
+  "entropy_mean": 0.6714366625259339,
+  "entropy_p99": 1.2432710901034556,
+  "gcq_ratio": null,
+  "fourier_degree": null,
+  "baseline_gap": -0.09499999999999997,
+  "mps_surrogate_repro": {},
+  "verdict": "CLASSICALLY_SIMULABLE",
+  "meta": {
+    "n_examples": 200,
+    "chi_values": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      null
+    ],
+    "tau_gen": 0.44999999999999996,
+    "tau_ci": 0.07250000000000001,
+    "train_accuracy": 1.0,
+    "run_hash": "9429ca6f022e",
+    "separable_test_accuracy": null
+  }
+}

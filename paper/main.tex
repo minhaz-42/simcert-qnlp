@@ -511,28 +511,29 @@ We snapshot each model every two epochs and re-run the whole audit at every snap
 can be read against the accuracy the model had reached at that point rather than only at the end
 of training (Figure~\ref{fig:trajectory}).
 
-Across 18 runs, three models and three seeds on both \texttt{mc} and \texttt{rp}, the 360 audited
-snapshots span test accuracies from $0.346$ to $1.000$, and 349 of them ($96.9\%$) certify
-$\chistar{=}1$. The cleanest case is \texttt{mc}, where every run climbs from at or below chance to
-$1.000$ within forty epochs: \chistar\ is $1$ at 179 of those 180 snapshots. Restricting to the 138
-snapshots at which a model is perfectly accurate, a product state reproduces its predictions at
-every single one. The excursions to $\chistar{=}2$ sit at low accuracy rather than high; on
-\texttt{rp}, where no run rises meaningfully above chance, \chistar\ fluctuates between $1$ and $2$.
-The bond dimension needed to recover a model's predictions therefore does not rise as the model
-gets better, which is the confound this control was built to rule out.
+Across 22 runs spanning \texttt{mc}, \texttt{rp} and \textsc{sst2}, the 392 audited snapshots
+cover test accuracies from $0.346$ to $1.000$, and 378 of them ($96.4\%$) certify $\chistar{=}1$.
+On \texttt{mc} every run climbs from at or below chance to $1.000$ within forty epochs, with
+\chistar{=}1 at 179 of those 180 snapshots, and at all 138 snapshots where a model is perfectly
+accurate a product state reproduces its predictions. On \textsc{sst2}, the corpus carrying our
+conclusions, runs climb from chance to $0.68$ on $200$ real test items with \chistar{=}1 at 29 of
+32. The excursions to $\chistar{=}2$ sit at low accuracy rather than high; on \texttt{rp}, where no
+run rises above chance, \chistar\ fluctuates between $1$ and $2$. The bond dimension needed to
+recover a model's predictions therefore does not rise as the model gets better, which is the
+confound this control was built to rule out.
 
 Two things this does not establish. It does not close the reproduction gap of
-Table~\ref{tab:repro}: our \texttt{rp} models remain weaker than the published ones, and the
-\chistar\ fluctuation there is what a 31-sentence test set produces, not evidence of structure. And
-it speaks only to the accuracy range these runs actually reach. A model that attained the published
-$0.72$ on \texttt{rp} might behave differently, and nothing here rules that out.
+Table~\ref{tab:repro}, and the \chistar\ fluctuation on \texttt{rp} is what a 31-sentence test set
+produces rather than evidence of structure. And it speaks only to the accuracy range these runs
+reach: a model attaining the published $0.72$ on \texttt{rp} might behave differently.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.98\linewidth]{trajectory.pdf}
 \caption{The verdict does not depend on the model having failed to learn. Left, test accuracy
-against training epoch, mean over three seeds with the seed range shaded; \texttt{mc} runs (solid,
-circles) go from chance to $1.000$, while \texttt{rp} runs (dash-dot, triangles) never leave chance.
+against training epoch, mean over seeds with the seed range shaded; \texttt{mc} runs (solid,
+circles) go from chance to $1.000$ and \textsc{sst2} runs (dotted, diamonds) from chance to $0.68$,
+while \texttt{rp} runs (dash-dot, triangles) never leave chance.
 Right, \chistar\ at every one of those snapshots against the accuracy reached there. If the audit
 were merely detecting undertrained models, \chistar\ would rise to the right; it does not, and every
 snapshot at accuracy $1.000$ certifies $\chistar{=}1$.}

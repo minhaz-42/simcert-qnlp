@@ -77,7 +77,7 @@ def main():
     ax1.set_ylabel("test accuracy")
     # Not "the models learn": on RP they do not, and a referee would see it in the panel.
     # What the panel shows is a wide accuracy range to audit against, which is what (b) needs.
-    ax1.set_title("(a) MC runs reach 1.000; RP runs never leave chance")
+    ax1.set_title("(a) MC saturates, SST-2 climbs from chance, RP never leaves it")
     composite_legend(
         ax1,
         sorted({m for m, _ in runs}),

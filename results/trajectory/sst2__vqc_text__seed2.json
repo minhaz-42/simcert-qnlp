@@ -1,0 +1,264 @@
+{
+  "model": "vqc_text",
+  "dataset": "sst2",
+  "seed": 2,
+  "epochs": 40,
+  "snapshot_every": 5,
+  "n_test_audited": 100,
+  "n_test_full": 200,
+  "chi_values": [
+    1,
+    2,
+    4,
+    8,
+    "full"
+  ],
+  "final_train_accuracy": 0.9980392156862745,
+  "final_val_accuracy": 0.6333333333333333,
+  "accuracy_first": 0.51,
+  "accuracy_last": 0.65,
+  "accuracy_min": 0.51,
+  "accuracy_max": 0.68,
+  "accuracy_declined": false,
+  "best_val_epoch": 10,
+  "best_val_accuracy": 0.6444444444444445,
+  "test_accuracy_at_best_val": 0.55,
+  "chi_star_at_best_val": 1,
+  "chi_star_set": [
+    "1"
+  ],
+  "chi_star_constant": true,
+  "points": [
+    {
+      "epoch": 5,
+      "test_accuracy": 0.51,
+      "val_accuracy": 0.4888888888888889,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.51,
+        "2": 0.51,
+        "4": 0.51,
+        "8": 0.51,
+        "full": 0.51
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.7918628895573705
+    },
+    {
+      "epoch": 10,
+      "test_accuracy": 0.55,
+      "val_accuracy": 0.6444444444444445,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.55,
+        "2": 0.56,
+        "4": 0.55,
+        "8": 0.55,
+        "full": 0.55
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 0.97,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.9276362273271337
+    },
+    {
+      "epoch": 15,
+      "test_accuracy": 0.51,
+      "val_accuracy": 0.5777777777777777,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.51,
+        "2": 0.51,
+        "4": 0.51,
+        "8": 0.51,
+        "full": 0.51
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.9061494636294847
+    },
+    {
+      "epoch": 20,
+      "test_accuracy": 0.51,
+      "val_accuracy": 0.5888888888888889,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.51,
+        "2": 0.54,
+        "4": 0.51,
+        "8": 0.51,
+        "full": 0.51
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 0.97,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.923297181469957
+    },
+    {
+      "epoch": 25,
+      "test_accuracy": 0.64,
+      "val_accuracy": 0.6333333333333333,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.64,
+        "2": 0.62,
+        "4": 0.64,
+        "8": 0.64,
+        "full": 0.64
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 0.98,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.9529390965915385
+    },
+    {
+      "epoch": 30,
+      "test_accuracy": 0.67,
+      "val_accuracy": 0.6444444444444445,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.67,
+        "2": 0.68,
+        "4": 0.67,
+        "8": 0.67,
+        "full": 0.67
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 0.99,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 0.9772921498272382
+    },
+    {
+      "epoch": 35,
+      "test_accuracy": 0.68,
+      "val_accuracy": 0.6333333333333333,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.68,
+        "2": 0.7,
+        "4": 0.68,
+        "8": 0.68,
+        "full": 0.68
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 0.96,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 1.0001289253680148
+    },
+    {
+      "epoch": 40,
+      "test_accuracy": 0.65,
+      "val_accuracy": 0.6333333333333333,
+      "chi_star": 1,
+      "chi_star_agree": 1,
+      "accuracy_by_chi": {
+        "1": 0.65,
+        "2": 0.68,
+        "4": 0.65,
+        "8": 0.65,
+        "full": 0.65
+      },
+      "agreement_by_chi": {
+        "1": 1.0,
+        "2": 0.97,
+        "4": 1.0,
+        "8": 1.0,
+        "full": 1.0
+      },
+      "entropy_mean": 1.018143929401075
+    }
+  ],
+  "config": {
+    "seed": 2,
+    "mode": "both",
+    "model_name": "vqc_text",
+    "dataset_name": "sst2",
+    "audit_name": "default",
+    "paths": {
+      "results": "results",
+      "checkpoints": "checkpoints"
+    },
+    "model": {
+      "n_qubits": 4,
+      "n_layers": 2,
+      "epochs": 40,
+      "lr": 0.05,
+      "published_accuracy": null,
+      "baseline": "logreg_bow",
+      "train_chunk": 32,
+      "seed": 2,
+      "dataset": "sst2",
+      "snapshot_dir": "/Users/tanvir/Desktop/Submitted/simcert-qnlp/checkpoints/trajectory/sst2__vqc_text__seed2",
+      "snapshot_every": 5
+    },
+    "dataset": {
+      "name": "sst2",
+      "n_train": 600,
+      "n_test": 200,
+      "max_tokens": 16,
+      "val_frac": 0.15,
+      "test_frac": 0.0
+    },
+    "audit": {
+      "chi_values": [
+        1,
+        2,
+        4,
+        8,
+        null
+      ],
+      "cutoff": 1e-12,
+      "entanglement_removal": false
+    }
+  },
+  "env": {
+    "git_sha": "e156264",
+    "libs": {
+      "pennylane": "0.45.1",
+      "quimb": "1.14.0",
+      "qiskit": "2.3.0",
+      "qiskit_aer": "0.17.2",
+      "numpy": "2.4.6",
+      "torch": "2.12.1",
+      "transformers": "5.13.0"
+    }
+  }
+}

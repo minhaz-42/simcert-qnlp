@@ -65,7 +65,8 @@ architectures plus a variational-classifier reference, we find that a product st
 \textsc{sst2}, the only corpus here whose test set can resolve a few accuracy points, three
 architectures keep their full accuracy under a $\chi{=}1$ surrogate over $200$ test items, and
 \chistar\ stays at $1$ as the qubit count grows to sixteen, for two architectures independently,
-while the bond dimension an exact representation needs grows to $256$. The exception is
+while the bond dimension an exact representation needs grows to $256$. On that same corpus a
+bag-of-words logistic regression matches or beats every audited model. The exception is
 instructive: the compositional model needs $\chi{=}2$, so the criterion is not reporting $1$ by
 construction. Auditing along the training path rather than only at its end, \chistar\ is $1$ at
 $378$ of $392$ snapshots spanning accuracies from chance to perfect, so the verdict does not rest
@@ -377,7 +378,10 @@ trainable architectures are recovered at $\chi{=}1$, a product state, over $200$
 \texttt{qmsan} reaches $0.604\pm0.014$ against $0.604\pm0.026$, and the reference classifier
 likewise (Table~\ref{tab:results}). \texttt{claqs} is recovered at $\chi{=}1$ too, but at
 $0.554\pm0.032$, against a published $0.916$, it sits near chance at the reduced scale a CPU
-allows, so we report its audit and draw no verdict from it. On \textsc{mc} the same four reach full accuracy at $\chi{=}1$ with nothing
+allows, so we report its audit and draw no verdict from it. The bond dimension is not the only
+thing that turns out to be unnecessary here: on the same subset a bag-of-words logistic regression
+reaches $0.638$, matching or beating every audited model, so on this corpus the quantum apparatus
+buys nothing over a linear classical baseline either. On \textsc{mc} the same four reach full accuracy at $\chi{=}1$ with nothing
 lost at all, though every model saturates that task. The compositional
 \texttt{discocat} is the exception and needs $\chi{=}2$, but no more, reproducing the published
 \textsc{mc} accuracy to within $0.02$, at $0.778$ against $0.798$ (Table~\ref{tab:repro}). These

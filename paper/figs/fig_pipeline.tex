@@ -43,19 +43,16 @@
 
 \vspace{1mm}
 % ---- row 2: the two states themselves ----
-\includegraphics[width=0.95\linewidth]{objects/amplitudes_mc.pdf}
+\includegraphics[width=0.86\linewidth]{objects/amplitudes_mc.pdf}
 
-\caption{The audit on one real example, showing the object it operates on. Top, the
-sentence \texttt{engineer writes program}, a verbatim \textsc{mc} test item, drawn as the
-compositional parse \texttt{lambeq} builds for it; the curved wires are the grammar cups
-that make the sentence's meaning a contraction rather than a product. The trained reference
-classifier prepares a six-qubit state from it, and \textsc{SimCert} prepares the best
-bond-dimension-one approximation of that state. Bottom, the two states themselves. They are
-plainly different, overlapping by only $F=0.35$, and the surrogate is a product state
-carrying no entanglement where the trained state carries $1.32$ nats. They nonetheless
-return the same label, because the readout $\langle Z_0\rangle$ stays on the same side of
-the decision boundary. That gap, between a state that is visibly not reproduced and a
-decision that is, is what this paper measures. All values are measured on the audited
-configuration at seed $1$, and the trace reproduces that run's stored certificate exactly.}
+\caption{The audit on one real example. Top, the sentence \texttt{engineer writes program},
+a verbatim \textsc{mc} test item: the trained reference classifier prepares a six-qubit state
+from it, and \textsc{SimCert} prepares the best bond-dimension-one approximation of that state.
+Bottom, the two states themselves. They are plainly different, overlapping by only $F=0.35$,
+and the surrogate is a product state carrying no entanglement where the trained state carries
+$1.32$ nats. They nonetheless return the same label, because the readout $\langle Z_0\rangle$
+stays on the same side of the decision boundary. That gap, between a state that is visibly not
+reproduced and a decision that is, is what this paper measures. All values are measured on the
+audited configuration at seed $1$ and reproduce that run's stored certificate exactly.}
 \label{fig:pipeline}
 \end{figure}

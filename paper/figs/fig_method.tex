@@ -1,0 +1,78 @@
+% Method figure: the protocol at a glance, from a real corpus sentence to a certificate.
+% Input is a verbatim RP test item drawn as the pregroup parse lambeq builds for it, so the
+% object entering the pipeline is one the corpus actually contains. Regenerate the image with
+%   conda run -n qnlp-lambeq python scripts/render_diagram_objects.py
+%
+% Laid out on explicit millimetre coordinates rather than relative placement: the two rows
+% have to line up as a snake (left to right, drop, left to right again), and chained
+% "right=of" placement drifts once nodes have different heights.
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\small, >=Latex, x=1mm, y=1mm,
+  stage/.style={draw=black!35, rounded corners=2.5pt, align=center, inner sep=3pt,
+                fill=black!3, minimum height=9mm},
+  qbox/.style={draw=blue!55!black, line width=0.7pt, rounded corners=3pt, align=center,
+               inner sep=3pt, fill=blue!9, minimum height=9mm},
+  vbox/.style={draw=black!55, line width=0.8pt, rounded corners=3pt, align=center,
+               inner sep=3.5pt, fill=black!6, minimum height=9mm},
+  lbl/.style={black!60, font=\scriptsize\itshape, align=center},
+  steplbl/.style={font=\scriptsize, black!65, align=center},
+  ten/.style={draw=teal!65!black, fill=teal!16, rounded corners=1pt, minimum size=4mm,
+              inner sep=0pt},
+  grp/.style={draw=teal!65!black, dashed, rounded corners=3pt},
+]
+
+% ================= row 1: corpus object, model zoo, bound circuit =================
+\node[inner sep=1.5pt, anchor=west] (obj) at (0,0)
+  {\includegraphics[width=0.40\linewidth]{objects/diagram_rp.png}};
+\node[lbl, anchor=north, text width=0.40\linewidth] at (33,-8)
+  {a verbatim \textsc{rp} test item,\\[-1pt]as \texttt{lambeq} parses it};
+
+\node[stage, anchor=west, text width=23mm] (zoo) at (73,0)
+  {trained model\\[-2pt]{\scriptsize any of five}};
+\node[qbox, anchor=west, text width=30mm] (ir) at (110,0)
+  {bound circuit\\[-2pt]{\scriptsize $U(\theta,x)\ket{0}^{\otimes n}$}};
+
+\draw[->] (obj.east) -- (zoo.west);
+\draw[->] (zoo.east) -- (ir.west);
+
+% ================= the drop from row 1 into row 2 =================
+\draw[->, rounded corners=3pt] (ir.south) -- (128,-22) -- (18,-22) -- (18,-27);
+\node[steplbl, anchor=south] at (74,-21) {truncate to bond $\chi$};
+
+% ================= row 2: the surrogate, the comparison, the certificate =========
+\node[ten] (t1) at (8,-34) {};
+\node[ten] (t2) at (16,-34) {};
+\node[ten] (t3) at (24,-34) {};
+\node[ten] (t4) at (32,-34) {};
+\draw[teal!65!black, thick] (t1) -- (t2) node[midway, above=-0.5pt, font=\scriptsize] {$\chi$};
+\draw[teal!65!black, thick] (t2) -- (t3) node[midway, above=-0.5pt, font=\scriptsize] {$\chi$};
+\draw[teal!65!black, thick] (t3) -- (t4) node[midway, above=-0.5pt, font=\scriptsize] {$\chi$};
+\foreach \t in {t1,t2,t3,t4} \draw[teal!65!black, thick] (\t) -- ++(0,-4);
+\node[grp, fit={(2,-27) (38,-41)}] (mps) {};
+\node[lbl, anchor=north, text width=40mm] at (20,-44)
+  {MPS surrogate at bond $\chi$,\\[-1pt]swept $1, 2, 4, \dots, 2^{\lfloor n/2 \rfloor}$};
+
+\node[stage, anchor=west, text width=35mm] (cmp) at (48,-34)
+  {$\hat y^{(\chi)} = \hat y$\\[-2pt]{\scriptsize on every test example?}};
+\node[vbox, anchor=west, text width=53mm] (cert) at (96,-34)
+  {$\chi^\star$: the smallest $\chi$ that\\[-2pt]recovers the predictions};
+
+\draw[->] (38,-34) -- (cmp.west);
+\draw[->] (cmp.east) -- (cert.west);
+\node[lbl, anchor=north, text width=56mm] at (124,-41)
+  {reported with $\Delta A_{\mathrm{ent}}$, $\bar S$, $g_{CQ}$\\[-1pt]and the Fourier degree};
+
+\end{tikzpicture}
+\caption{The audit protocol. A sentence the corpus actually contains enters as the
+compositional parse \texttt{lambeq} builds for it; the curved wires are the grammar cups that
+make its meaning a contraction rather than a bag of tokens. Whichever of the five trained
+models consumes it, the harness sees only the parameter-bound circuit that model emits, which
+is what makes the audit model-agnostic. That circuit is re-simulated as a matrix product state
+whose bond dimension $\chi$ is swept upward from a product state, and at each $\chi$ the
+truncated device is asked for the same decision. The smallest $\chi$ whose predictions match
+the untruncated model within tolerance is $\chi^\star$, Eq.~\ref{eq:chistar}. A model whose
+$\chi^\star$ stays small and flat in system size has no quantum resource left to appeal to.}
+\label{fig:method}
+\end{figure}

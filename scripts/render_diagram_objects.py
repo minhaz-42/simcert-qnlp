@@ -30,11 +30,32 @@ from simcert.data.loaders import load_dataset  # noqa: E402
 
 OUT = REPO / "figures" / "objects"
 
-# Only the sentence Figure 1 quotes. Rendering diagrams nothing includes just leaves
-# unused images in the repo.
+# Only sentences the paper actually quotes. Rendering diagrams nothing includes just
+# leaves unused images in the repo. The RP item is the one the method figure uses: its
+# relative pronoun is where the grammar cups do work that a bag of tokens cannot copy.
 WANTED = [
     ("mc", "mc", "engineer writes program"),
+    ("rp", "rp", "person that teacher teach"),
 ]
+
+
+
+def _trim_whitespace(path, pad: int = 6) -> None:
+    """Crop the white margin matplotlib leaves around the diagram.
+
+    Without this the figure has to be scaled up to make the word boxes legible, which then
+    wastes a third of the column on empty canvas.
+    """
+    from PIL import Image, ImageChops
+
+    img = Image.open(path).convert("RGB")
+    bg = Image.new("RGB", img.size, (255, 255, 255))
+    box = ImageChops.difference(img, bg).getbbox()
+    if box is None:
+        return
+    left, top, right, bottom = box
+    img.crop((max(0, left - pad), max(0, top - pad),
+              min(img.width, right + pad), min(img.height, bottom + pad))).save(path)
 
 
 def main() -> int:
@@ -50,6 +71,7 @@ def main() -> int:
         diagram = cups_reader.sentence2diagram(sentence)
         path = OUT / f"diagram_{tag}.png"
         diagram.draw(draw_as_pregroup=True, path=str(path), show=False, figsize=(6, 3))
+        _trim_whitespace(path)
         print(f"wrote {path.relative_to(REPO)}  ({sentence!r} from {dsname})")
     return rc
 

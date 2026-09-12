@@ -120,8 +120,10 @@ def main():
             rf"$\chi^\star{{=}}1$ ({frac:.0%})")
     if unrecovered:
         note += f"\n{unrecovered} not recovered at any finite $\\chi$"
-    ax2.annotate(note, (0.03, 0.94), xycoords="axes fraction", fontsize=8.5,
-                 color=INK_MUTED, va="top")
+    ax2.annotate(note, (0.03, 0.95), xycoords="axes fraction", fontsize=8.5,
+                 color=INK_MUTED, va="top",
+                 bbox=dict(boxstyle="round,pad=0.35", facecolor="white",
+                           edgecolor="#dcdbd4", linewidth=0.7))
 
     fig.tight_layout()
     OUT.mkdir(parents=True, exist_ok=True)

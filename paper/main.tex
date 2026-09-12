@@ -212,7 +212,7 @@ at these model sizes, on these datasets'' (Figure~\ref{fig:venn}).
 \paragraph{The bond-dimension criterion.} For a trained state we form its optimal
 bond-dimension-$\chi$ MPS approximation $|\psi^{(\chi)}\rangle$ by sequential singular-value
 truncation, recompute the readout, and obtain a truncated prediction $\hat y^{(\chi)}(x)$
-(Figure~\ref{fig:tn}). Over the test set we report the truncated accuracy $A(\chi)$, the agreement
+(Figure~\ref{fig:tn}, Appendix~\ref{app:circuits}). Over the test set we report the truncated accuracy $A(\chi)$, the agreement
 $\pi(\chi)=\Pr_x[\hat y^{(\chi)}(x)=\hat y(x)]$ with the untruncated model, and the mean state
 fidelity $F(\chi)$. The certificate's headline scalar is
 \begin{equation}
@@ -293,7 +293,6 @@ density matrices. Full circuits, gate sets, and parameter counts are in Appendix
 \label{tab:models}
 \end{table}
 
-\input{figs/fig_circuit.tex}
 
 \paragraph{Datasets.} We use the tasks these models were built on. \textsc{mc}, meaning
 classification of cooking versus computing, and \textsc{rp}, a relative-pronoun task, are the
@@ -309,6 +308,7 @@ place of the trained grammar parser whose model host is no longer reachable. Bot
 
 \section{The classical surrogate and simulation protocol}
 \label{sec:protocol}
+\input{figs/fig_method.tex}
 We do not conjecture simulability, we realise it. Each trained model exports its per-example circuit
 to a common representation, OpenQASM for gate circuits, or, for the token mixer whose state is a
 matrix polynomial rather than a gate sequence, the trained statevector directly. Statevector
@@ -339,7 +339,6 @@ correctness check for the whole pipeline.
 \end{algorithmic}
 \end{algorithm}
 
-\input{figs/fig_tn.tex}
 
 The surrogate's cost is explicit. An MPS sweep on an $n$-qubit, depth-$d$ circuit scales as
 $\mathcal{O}(n\,d\,\chi^2)$, and the exact-representation bound is $\chi=2^{\lfloor n/2\rfloor}$, so
@@ -594,9 +593,7 @@ this a stopping artefact we can correct: selecting weights by validation accurac
 validation split, picks the first epoch in every seed for \texttt{qsann} and \texttt{qmsan} and
 returns exactly the majority-class score. We therefore do not read \textsc{rp} as evidence for or
 against simulability. We keep it because what it documents is real, namely the ceiling a
-$31$-sentence benchmark places on any claim, our own included. The gap is attributable in part to
-our token embeddings and, for DisCoCat, to the offline reader standing in for the unavailable
-grammar parser, but at this size the question cannot be settled either way.
+$31$-sentence benchmark places on any claim, our own included.
 
 One might still object that better-trained models would demand more bond dimension, so that
 training quality rather than any real property drives the verdict. Section~\ref{sec:results-trajectory}
@@ -611,14 +608,13 @@ would produce.
 \label{sec:discussion}
 The scoped claim is narrow and, we think, well supported. The QNLP models we audited reproduce their
 behavior under a classical surrogate of small and non-growing bond dimension, and the entanglement
-they carry is, with one revealing exception, not load-bearing for their predictions, at the model
-sizes and datasets tested. That scope is a real limit rather than a hedge, since small-scale
-simulation cannot reach the asymptotic question, but what it does reach it answers cleanly.
+they carry is, with one revealing exception, not load-bearing for their predictions at the sizes and
+datasets tested. That scope is a real limit rather than a hedge: small-scale simulation cannot reach
+the asymptotic question, but what it does reach it answers cleanly.
 
 Several caveats bound the reading. The audit is average-case over a test set, not a statement about
-every input; \chistar\ is defined against a tolerance, and a different tolerance shifts the
-borderline cases; and our simulability notion is the practical one, up to data loading, not a
-hardness result. The scales are small, and a determined optimum at larger $n$ remains out of
+every input; \chistar\ is defined against a tolerance; and our simulability notion is the
+practical one, up to data loading, not a hardness result. The scales are small, and a determined optimum at larger $n$ remains out of
 simulation's reach. Our \textsc{rp} reimplementations do not clear a majority-class predictor, so
 we draw no verdict from them, and \textsc{mc} is saturated by every model, which leaves
 \textsc{sst2} carrying the weight on real text. Finally, the all-quantum mixer runs at reduced scale
@@ -628,19 +624,17 @@ additional compute would change what we can measure; the rest of the audit is CP
 
 There is a constructive reading. A quantum implementation earns its overhead only where a classical
 MPS cannot follow, that is where \chistar\ grows with system size, and none of the audited models
-show it growing. The audit therefore names a target rather than merely cataloguing a shortfall, and
-it poses the obvious next questions: which architectural choices, if any, make \chistar\ grow with
-$n$, and should QNLP benchmarks report a simulability certificate alongside accuracy, the way
-tabular QML increasingly does? Our position is collegial rather than combative, since the tabular
-and vision audits reached the same conclusion in their domains
-\citep{bowles2024,bermejo2024}. \emph{Until a QNLP model shows its bond dimension growing, the
-burden of proof for a quantum benefit sits with the model, not with the skeptic.}
+show it growing. The audit therefore names a target rather than cataloguing a shortfall, and poses
+the next questions: which architectural choices, if any, make \chistar\ grow with $n$, and should
+QNLP benchmarks report a simulability certificate alongside accuracy, as the tabular and vision
+audits now do \citep{bowles2024,bermejo2024}? \emph{Until a QNLP model shows its bond dimension
+growing, the burden of proof sits with the model, not the skeptic.}
 
 \subsubsection*{Reproducibility statement}
-\repoavailability{} It covers every model reimplementation, the exact configurations, seeds and
-dataset indices. A single command, \texttt{make reproduce}, rebuilds
-every figure, both tables and the paper from the stored results, with no retraining required. The audit is deterministic given a trained model, and the only stochasticity is in
-training, which we control by seed.
+\repoavailability{} It covers every model reimplementation, configuration, seed and dataset
+index, and one command, \texttt{make reproduce}, rebuilds every figure, both tables and the paper
+from stored results with no retraining. The audit is deterministic given a trained model; the only
+stochasticity is in training, which we control by seed.
 
 \begin{thebibliography}{99}
 \small

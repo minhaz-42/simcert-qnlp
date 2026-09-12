@@ -1,0 +1,54 @@
+% Appendix figure: what the three corpora actually look like, in their own words.
+% Every sentence below is a verbatim test item; the two parse images are the pregroup
+% diagrams lambeq builds for the quoted MC and RP items. Regenerate the images with
+%   conda run -n qnlp-lambeq python scripts/render_diagram_objects.py
+\begin{figure}[h]
+\centering
+\small
+\begin{tabular}{@{}p{0.17\linewidth}p{0.46\linewidth}p{0.30\linewidth}@{}}
+\toprule
+\textbf{Corpus} & \textbf{Verbatim test items} & \textbf{Structure the models see} \\
+\midrule
+\textsc{mc-real}\newline
+{\scriptsize 70 train / 30 test}\newline
+{\scriptsize 17-word vocabulary}
+&
+{\ttfamily\footnotesize [1] woman prepares tasty dinner\newline
+ [1] woman cooks tasty sauce\newline
+ [0] skillful woman prepares software}
+&
+\raisebox{-0.5\height}{\includegraphics[width=\linewidth]{objects/diagram_mc.png}}\\[2.5ex]
+\midrule
+\textsc{rp}\newline
+{\scriptsize 74 train / 31 test}\newline
+{\scriptsize 115-word vocabulary}
+&
+{\ttfamily\footnotesize [1] person that teacher teach\newline
+ [1] organization that fleet destroy\newline
+ [1] device that air enter}
+&
+\raisebox{-0.5\height}{\includegraphics[width=\linewidth]{objects/diagram_rp.png}}\\[2.5ex]
+\midrule
+\textsc{sst2}\newline
+{\scriptsize 600 train / 200 test}\newline
+{\scriptsize open vocabulary}
+&
+{\ttfamily\footnotesize [1] smart , provocative and blisteringly funny .\newline
+ [0] one long string of cliches .\newline
+ [0] my reaction in a word : disappointment .}
+&
+{\footnotesize No grammar parse. The attention and mixer models read the token sequence
+directly, capped at 16 tokens.}\\
+\bottomrule
+\end{tabular}
+\caption{The three corpora, in their own words. Each middle-column item is a verbatim test
+sentence with its gold label; the right column shows what structure the model is given.
+\textsc{mc-real} and \textsc{rp} come with a pregroup parse, drawn here as \texttt{lambeq}
+builds it, and the curved wires are the grammar cups that make a sentence's meaning a
+contraction rather than a bag of tokens. The scale contrast is the point of this figure:
+\textsc{mc-real} and \textsc{rp} resolve accuracy only to one part in thirty, so a single test
+sentence moves the score by more than three points, whereas \textsc{sst2} is the one corpus
+here at a size where a difference of a few points means anything. This is why the paper draws
+its load-bearing conclusions on \textsc{sst2}.}
+\label{fig:datasets}
+\end{figure}

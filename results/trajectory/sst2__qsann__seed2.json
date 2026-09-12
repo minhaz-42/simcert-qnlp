@@ -229,7 +229,7 @@
       "train_chunk": 32,
       "seed": 2,
       "dataset": "sst2",
-      "snapshot_dir": "/Users/tanvir/Desktop/Submitted/simcert-qnlp/checkpoints/trajectory/sst2__qsann__seed2",
+      "snapshot_dir": "checkpoints/trajectory/sst2__qsann__seed2",
       "snapshot_every": 5
     },
     "dataset": {

@@ -493,7 +493,7 @@
       "baseline": "logreg_bow",
       "seed": 1,
       "dataset": "rp",
-      "snapshot_dir": "/Users/tanvir/Desktop/Submitted/simcert-qnlp/checkpoints/trajectory/rp__qsann__seed1",
+      "snapshot_dir": "checkpoints/trajectory/rp__qsann__seed1",
       "snapshot_every": 2
     },
     "dataset": {

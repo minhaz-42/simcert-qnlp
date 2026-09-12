@@ -51,6 +51,24 @@ def parse_args():
     return p.parse_args()
 
 
+
+def _anonymised_config(cfg) -> dict:
+    """Config for the stored result, with the snapshot path made repo-relative.
+
+    fit() needs an absolute snapshot_dir to be independent of the working directory, but
+    an absolute path here would carry the author's home directory into every stored
+    result and from there into the anonymous supplementary archive.
+    """
+    out = OmegaConf.to_container(cfg, resolve=True)
+    snap = out.get("model", {}).get("snapshot_dir")
+    if snap:
+        try:
+            out["model"]["snapshot_dir"] = str(Path(snap).relative_to(REPO))
+        except ValueError:
+            out["model"]["snapshot_dir"] = Path(snap).name
+    return out
+
+
 def main():
     args = parse_args()
     audit_name = args.audit or ("claqs" if args.model == "claqs" else "default")
@@ -152,7 +170,7 @@ def main():
         "chi_star_set": sorted({str(s) for s in stars}),
         "chi_star_constant": len(set(stars)) == 1,
         "points": points,
-        "config": OmegaConf.to_container(cfg, resolve=True),
+        "config": _anonymised_config(cfg),
         "env": {"git_sha": git_sha(), "libs": lib_versions()},
     }
     path = REPO / "results" / "trajectory" / f"{tag}.json"

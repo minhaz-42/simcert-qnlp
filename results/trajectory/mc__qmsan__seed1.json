@@ -490,7 +490,7 @@
       "baseline": "logreg_bow",
       "seed": 1,
       "dataset": "mc",
-      "snapshot_dir": "/Users/tanvir/Desktop/Submitted/simcert-qnlp/checkpoints/trajectory/mc__qmsan__seed1",
+      "snapshot_dir": "checkpoints/trajectory/mc__qmsan__seed1",
       "snapshot_every": 2
     },
     "dataset": {

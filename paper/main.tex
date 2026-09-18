@@ -634,6 +634,26 @@ index, and one command, \texttt{make reproduce}, rebuilds every figure, both tab
 from stored results with no retraining. The audit is deterministic given a trained model; the only
 stochasticity is in training, which we control by seed.
 
+\subsubsection*{Statements and declarations}
+\textbf{Funding.} No funding was received for this work. All experiments ran on personal laptop
+CPUs; no hardware, cloud credit, or institutional compute was used.
+
+\textbf{Competing interests.} The author declares no financial or non-financial competing
+interests. The author has no relationship with any of the groups whose models are audited here.
+
+\textbf{Ethics approval.} Not applicable. This work involves no human or animal subjects. The
+text corpora used are public research datasets.
+
+\textbf{Data and code availability.} \repoavailability{} The audited corpora are public: the
+meaning-classification and relative-pronoun sets of \citet{lorenz2021} and the Stanford Sentiment
+Treebank \citep{socher2013}. Every trained model, configuration, seed and stored result needed to
+regenerate the figures and tables is included, and \texttt{make reproduce} rebuilds them without
+retraining.
+
+\textbf{Author contributions.} Sole author. T.A. designed the audit protocol, implemented the
+harness, reimplemented and trained the audited models, ran the experiments, and wrote the
+manuscript.
+
 \begin{thebibliography}{99}
 \small
 \bibitem[Abbas et al.(2021)]{abbas2021} A.~Abbas, D.~Sutter, C.~Zoufal, A.~Lucchi, A.~Figalli, and

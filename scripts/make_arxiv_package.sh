@@ -24,6 +24,12 @@ sed -e 's/^\\usepackage{tmlr}$/\\usepackage[preprint]{tmlr}/' \
     -e 's|^\\graphicspath{{\.\./figures/}}$|\\graphicspath{{./}}|' \
     paper/main.tex > "$STAGE/main.tex"
 
+# arXiv archives the source, comments included. Drop the whole-line comments that are
+# build scaffolding about the TMLR submission: they are meaningless to a reader and
+# there is no reason to publish them. Only full-line comments, never trailing ones,
+# which would change spacing.
+sed -i '' -E '/^%.*(TMLR|camera-ready|anonymi|double-blind|QTML)/d' "$STAGE/main.tex"
+
 grep -q 'usepackage\[preprint\]{tmlr}' "$STAGE/main.tex" \
   || { echo "ERROR: could not apply the [preprint] option" >&2; exit 1; }
 grep -q 'graphicspath{{\./}}' "$STAGE/main.tex" \

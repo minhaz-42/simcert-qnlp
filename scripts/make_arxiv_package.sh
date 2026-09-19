@@ -81,6 +81,14 @@ tar -czf "$ROOT/arxiv_submission.tar.gz" -C "$STAGE" \
   --exclude='*.pdf.bak' --exclude='main.aux' --exclude='main.log' --exclude='main.out' \
   --exclude='main.pdf' .
 echo "wrote arxiv_submission.tar.gz ($(du -h "$ROOT/arxiv_submission.tar.gz" | cut -f1))"
+
+# ---- the same sources as a .zip, which is what Springer's SNAPP accepts ----------
+# SNAPP takes LaTeX only as a zip and compiles it itself; it will not accept a PDF.
+mkdir -p "$ROOT/submission"
+rm -f "$ROOT/submission/qmi_latex_source.zip"
+( cd "$STAGE" && zip -q -r "$ROOT/submission/qmi_latex_source.zip" . \
+    -x 'main.pdf' 'main.aux' 'main.log' 'main.out' 'main.bbl' 'main.blg' )
+echo "wrote submission/qmi_latex_source.zip ($(du -h "$ROOT/submission/qmi_latex_source.zip" | cut -f1))"
 echo
 echo "Upload arxiv_submission.tar.gz to arXiv. Keep arxiv/main.pdf to compare against"
 echo "the PDF arXiv generates; they should match."

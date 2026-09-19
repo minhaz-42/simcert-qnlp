@@ -1,11 +1,12 @@
 % Fig: representative ansatz, gates colored by role (orange = data encoding, green = trainable).
+% The circuit is included as a pre-rendered PDF rather than inline quantikz: Springer's
+% submission compiler has a different quantikz and rejected the inline source. Regenerate with
+%   bash scripts/render_circuits.sh
 \begin{figure}[h]
 \centering
-\begin{quantikz}[column sep=7pt, row sep=10pt]
-\lstick{$\ket{0}$} & \gate[style={fill=orange!22}]{R_y(x_1)} & \gate[style={fill=green!25}]{R_y(\theta_1)} & \ctrl{1} & \qw      & \gate[style={fill=green!25}]{R_z(\phi_1)} & \meter{$Z$} \\
-\lstick{$\ket{0}$} & \gate[style={fill=orange!22}]{R_y(x_2)} & \gate[style={fill=green!25}]{R_y(\theta_2)} & \targ{}  & \ctrl{1} & \gate[style={fill=green!25}]{R_z(\phi_2)} & \qw \\
-\lstick{$\ket{0}$} & \gate[style={fill=orange!22}]{R_y(x_3)} & \gate[style={fill=green!25}]{R_y(\theta_3)} & \qw      & \targ{}  & \gate[style={fill=green!25}]{R_z(\phi_3)} & \qw
-\end{quantikz}\\[3pt]
+\includegraphics[width=0.72\linewidth]{objects/circuit_ref.pdf}
+
+\vspace{3pt}
 {\footnotesize\textcolor{orange!75!black}{$\blacksquare$}~data encoding \quad
  \textcolor{green!55!black}{$\blacksquare$}~trainable}
 \caption{A representative variational ansatz (the reference classifier; the attention and
